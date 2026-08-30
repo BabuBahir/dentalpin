@@ -1007,7 +1007,7 @@ defineExpose({
     <!-- Free-mode selection summary bar (prompts user to confirm) -->
     <div
       v-if="multiToothConfig && multiToothConfig.selectionMode === 'free' && multiToothSelection.teeth.length > 0 && !showMultiToothConfirm"
-      class="fixed bottom-4 start-1/2 -translate-x-1/2 z-40 flex items-center gap-3 rounded-lg border border-default bg-surface shadow-lg px-4 py-2"
+      class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-3 rounded-lg border border-default bg-surface shadow-lg px-4 py-2"
     >
       <UIcon
         name="i-lucide-link"

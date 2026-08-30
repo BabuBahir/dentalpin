@@ -559,7 +559,7 @@ function isInvalidHint(col: ColumnDef): boolean {
                 v-for="entry in inChairByCabinet"
                 :key="entry.cabinet.name"
                 class="rounded-md ring-1 ring-[var(--color-border)] bg-surface p-2 border-s-4 transition-shadow"
-                :style="{ borderLeftColor: CABINET_STATE_ACCENT[entry.state] }"
+                :style="{ borderInlineStartColor: CABINET_STATE_ACCENT[entry.state] }"
                 :class="{ 'ring-2 ring-[var(--color-primary)]': drag && isDropHint(col, entry.cabinet.name) }"
                 @dragover.stop="onDragOverColumn(col, $event, entry.cabinet.name)"
                 @drop.stop="onDrop(col, $event, entry.cabinet.name)"

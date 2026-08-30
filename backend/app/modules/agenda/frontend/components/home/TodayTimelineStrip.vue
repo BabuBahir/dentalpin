@@ -222,7 +222,7 @@ const isEmpty = computed(() => !pending.value && todayAppointments.value.length 
                   left: `${leftPct(a.start_time)}%`,
                   width: `max(40px, ${widthPct(a.start_time, a.end_time)}%)`,
                   backgroundColor: `color-mix(in srgb, ${lane.color} 14%, transparent)`,
-                  borderLeft: `3px solid ${lane.color}`,
+                  borderInlineStart: `3px solid ${lane.color}`,
                   color: 'var(--color-text)'
                 }"
                 :title="`${apptTitle(a)} · ${lane.label}`"

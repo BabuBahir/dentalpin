@@ -365,7 +365,7 @@ onMounted(() => {
               <UCard
                 class="ms-2 transition-colors"
                 :class="[
-                  isHighImpact(entry.event_type) ? `border-s-4 border-s-${getCategoryColor(entry.event_category)}-500` : '',
+                  isHighImpact(entry.event_type) ? `border-l-4 border-l-${getCategoryColor(entry.event_category)}-500` : '',
                   isLowImpact(entry.event_type) ? 'opacity-85' : '',
                   getEntryLink(entry) ? 'cursor-pointer hover:bg-surface-muted' : ''
                 ]"

@@ -278,8 +278,8 @@ function getAppointmentColorStyle(appointment: Appointment): Record<string, stri
   return {
     '--cabinet-color': color,
     'backgroundColor': `rgba(${r}, ${g}, ${b}, 0.12)`,
-    'borderLeftColor': color,
-    'borderLeftWidth': '3px'
+    'borderInlineStartColor': color,
+    'borderInlineStartWidth': '3px'
   }
 }
 
@@ -851,7 +851,7 @@ const allAppointmentsWithDayIndex = computed(() => {
                     class="absolute bottom-0 start-0 end-0 h-2 cursor-ns-resize hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
                     @mousedown.stop="startDrag(appointment, $event, 'resize')"
                   >
-                    <div class="absolute bottom-0.5 start-1/2 -translate-x-1/2 w-8 h-0.5 bg-current opacity-30 rounded" />
+                    <div class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-current opacity-30 rounded" />
                   </div>
                 </div>
               </div>
