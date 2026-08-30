@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- feat(i18n): Arabic (ar) locale for the module's frontend layer.
+
 - feat(#226): handle `odontogram.treatment.performed` (subscription
   inversion) — resolve this module's links for the performed catalog
   item and deduct stock via `InventoryService.apply_consumption`
