@@ -410,7 +410,7 @@ watch(() => props.planId, refresh, { immediate: true })
                 >
                   <UIcon
                     :name="sourceMeta(entry.source).icon"
-                    class="w-3 h-3 mr-1 shrink-0"
+                    class="w-3 h-3 me-1 shrink-0"
                   />
                   {{ sourceTypeLabel(entry.source) }}
                 </UBadge>

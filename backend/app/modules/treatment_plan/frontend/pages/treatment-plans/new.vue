@@ -163,7 +163,7 @@ function goBack() {
                 v-for="patient in patients"
                 :key="patient.id"
                 type="button"
-                class="w-full px-4 py-2 text-left hover:bg-surface-muted"
+                class="w-full px-4 py-2 text-start hover:bg-surface-muted"
                 @click="selectPatient(patient)"
               >
                 <p class="font-medium">

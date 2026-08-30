@@ -203,7 +203,7 @@ const isEmpty = computed(() => !pending.value && todayAppointments.value.length 
             <div class="absolute top-0 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-[var(--color-primary)] text-white text-micro tnum whitespace-nowrap">
               {{ nowLabel }}
             </div>
-            <div class="absolute top-5 bottom-0 left-0 w-px bg-[var(--color-primary)]" />
+            <div class="absolute top-5 bottom-0 start-0 w-px bg-[var(--color-primary)]" />
           </div>
 
           <div class="relative space-y-1">
@@ -216,7 +216,7 @@ const isEmpty = computed(() => !pending.value && todayAppointments.value.length 
                 v-for="a in lane.appts"
                 :key="a.id"
                 type="button"
-                class="absolute top-0 h-full rounded-token-sm text-caption truncate px-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] transition-[box-shadow] hover:ring-1 hover:ring-[var(--color-border-strong)]"
+                class="absolute top-0 h-full rounded-token-sm text-caption truncate px-1.5 text-start focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] transition-[box-shadow] hover:ring-1 hover:ring-[var(--color-border-strong)]"
                 :class="{ 'opacity-50 line-through': a.status === 'cancelled' }"
                 :style="{
                   left: `${leftPct(a.start_time)}%`,

@@ -246,7 +246,7 @@ onUnmounted(() => {
       <span class="flex items-center text-sm font-medium text-muted">
         <UIcon
           name="i-lucide-history"
-          class="w-4 h-4 mr-1"
+          class="w-4 h-4 me-1"
         />
         {{ t('odontogram.timeline.title') }}
       </span>
@@ -278,7 +278,7 @@ onUnmounted(() => {
       @keydown="handleKeydown"
     >
       <!-- Background line -->
-      <div class="absolute top-4 left-0 right-0 h-1 bg-surface-sunken  rounded-full" />
+      <div class="absolute top-4 start-0 end-0 h-1 bg-surface-sunken  rounded-full" />
 
       <!-- Date markers -->
       <div
@@ -303,7 +303,7 @@ onUnmounted(() => {
 
         <!-- Date label -->
         <span
-          class="absolute top-3 left-1/2 -translate-x-1/2 text-xs whitespace-nowrap font-medium transition-colors duration-150"
+          class="absolute top-3 start-1/2 -translate-x-1/2 text-xs whitespace-nowrap font-medium transition-colors duration-150"
           :class="{
             'text-success-accent': getMarkerState(index) === 'now',
             'text-primary-accent': getMarkerState(index) === 'selected',
@@ -329,7 +329,7 @@ onUnmounted(() => {
           }"
         />
         <span
-          class="absolute top-3 left-1/2 -translate-x-1/2 text-xs whitespace-nowrap font-medium transition-colors duration-150"
+          class="absolute top-3 start-1/2 -translate-x-1/2 text-xs whitespace-nowrap font-medium transition-colors duration-150"
           :class="currentIndex === null ? 'text-success-accent' : 'text-muted'"
         >
           {{ t('common.now') }}
@@ -343,7 +343,7 @@ onUnmounted(() => {
         :style="{ left: `${thumbPosition}%` }"
       >
         <!-- Badge above thumb -->
-        <div class="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
+        <div class="absolute -top-6 start-1/2 -translate-x-1/2 whitespace-nowrap">
           <UBadge
             :color="currentIndex === null ? 'success' : 'primary'"
             variant="solid"

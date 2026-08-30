@@ -188,7 +188,7 @@ const guardianRelationshipLabel = computed(() => {
           variant="link"
           color="warning"
           size="sm"
-          class="ml-auto"
+          class="ms-auto"
           @click="emit('editEmergency')"
         >
           {{ t('patients.contactInfo.addEmergency') }} →
@@ -263,7 +263,7 @@ const guardianRelationshipLabel = computed(() => {
           variant="link"
           color="warning"
           size="sm"
-          class="ml-auto"
+          class="ms-auto"
           @click="emit('editGuardian')"
         >
           {{ t('patients.contactInfo.addGuardian') }} →

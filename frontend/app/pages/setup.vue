@@ -479,7 +479,7 @@ async function onSubmit() {
         <div class="rounded-token-md border border-(--ui-border) overflow-hidden">
           <button
             type="button"
-            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 min-h-11 text-left"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 min-h-11 text-start"
             :aria-expanded="showAddress"
             @click="showAddress = !showAddress"
           >
@@ -529,7 +529,7 @@ async function onSubmit() {
         <div class="rounded-token-md border border-(--ui-border) overflow-hidden">
           <button
             type="button"
-            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 min-h-11 text-left"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 min-h-11 text-start"
             :aria-expanded="showAdvanced"
             @click="showAdvanced = !showAdvanced"
           >

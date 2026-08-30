@@ -362,7 +362,7 @@ function patientCity(p: Patient): string {
                 <span v-if="patientCity(patient)">{{ patientCity(patient) }} · </span>{{ patient.phone || patient.email || '—' }}
               </div>
             </div>
-            <div class="shrink-0 flex items-center gap-3 ml-auto">
+            <div class="shrink-0 flex items-center gap-3 ms-auto">
               <ModuleSlot
                 name="patients.list.row.financial"
                 :ctx="{ patient_id: patient.id, summary: debtSummaries[patient.id] ?? null }"

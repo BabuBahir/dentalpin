@@ -151,7 +151,7 @@ watch(patients, () => {
           icon="i-lucide-x"
           :aria-label="t('common.clear')"
           size="xs"
-          class="-mr-2"
+          class="-me-2"
           @click.stop="clearSelection"
         />
       </template>
