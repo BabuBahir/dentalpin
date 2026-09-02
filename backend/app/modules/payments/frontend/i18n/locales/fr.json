@@ -105,7 +105,7 @@
       "bank_transfer": "Virement",
       "direct_debit": "Prélèvement",
       "insurance": "Assurance",
-      "other": "Autre",
+"other": "Autre",
       "upi": "UPI",
       "netbanking": "Banque en ligne"
     },
