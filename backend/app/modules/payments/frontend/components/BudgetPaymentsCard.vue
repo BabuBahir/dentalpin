@@ -61,6 +61,8 @@ const METHOD_ICONS: Record<PaymentMethod, string> = {
   bank_transfer: 'i-lucide-landmark',
   direct_debit: 'i-lucide-repeat',
   insurance: 'i-lucide-shield',
+  upi: 'i-lucide-qr-code',
+  netbanking: 'i-lucide-globe',
   other: 'i-lucide-circle-dollar-sign'
 }
 

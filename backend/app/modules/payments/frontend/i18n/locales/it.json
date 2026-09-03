@@ -102,6 +102,8 @@
       "bank_transfer": "Bonifico",
       "direct_debit": "Addebito diretto",
       "insurance": "Assicurazione",
+      "upi": "UPI",
+      "netbanking": "Internet banking",
       "other": "Altro"
     },
     "refund": {

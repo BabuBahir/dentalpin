@@ -102,6 +102,8 @@
       "bank_transfer": "Transferência",
       "direct_debit": "Débito direto",
       "insurance": "Seguro",
+      "upi": "UPI",
+      "netbanking": "Banco online",
       "other": "Outro"
     },
     "refund": {

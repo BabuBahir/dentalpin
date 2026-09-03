@@ -35,8 +35,10 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `patient_timeline` | 0.1.0 | official | patients | auto | no | 1 | 0 | 35 | yes |
 | `patients` | 0.1.0 | official | — | auto | no | 2 | 3 | 0 | yes |
 | `patients_clinical` | 0.1.0 | official | patients | auto | no | 4 | 1 | 0 | yes |
+| `payment_gateways` | 0.1.0 | official | patients, budget, payments | manual | yes | 0 | 0 | 0 | no |
 | `payments` | 0.1.0 | official | patients, budget | auto | no | 4 | 3 | 2 | yes |
 | `periodontogram` | 0.1.0 | official | patients, odontogram | manual | yes | 2 | 1 | 2 | yes |
+| `razorpay` | 0.1.0 | official | payment_gateways | manual | yes | 2 | 0 | 0 | yes |
 | `recall_reminders` | 0.1.0 | community | recalls, notifications, patients | manual | yes | 0 | 0 | 1 | yes |
 | `recalls` | 0.1.0 | official | patients, agenda | auto | yes | 3 | 4 | 5 | yes |
 | `reports` | 0.1.0 | official | patients, agenda, catalog, budget, billing, payments | auto | no | 3 | 0 | 0 | yes |
@@ -655,6 +657,21 @@ Normalized medical history, allergies, medications, emergency contacts.
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/patients_clinical/CLAUDE.md`](../backend/app/modules/patients_clinical/CLAUDE.md)
 
+### `payment_gateways` — v0.1.0
+
+Provider-neutral payment gateway contract, registry, and PaymentRequest lifecycle.
+
+- **Author:** DentalPin Core Team
+- **License:** BSL-1.1
+- **Category:** official
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `patients`, `budget`, `payments`
+- **Frontend layer:** —
+- **Permissions:** —
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/payment_gateways/CLAUDE.md`](../backend/app/modules/payment_gateways/CLAUDE.md)
+
 ### `payments` — v0.1.0
 
 Patient-centric collections, allocations to budgets / on-account, refunds, patient ledger, and dental payment reports.
@@ -698,6 +715,23 @@ SEPA periodontal charting — snapshots, probing sites, BoP/PI/CAL indices.
   - `odontogram.treatment.performed`
   - `patient.archived`
 - **Module CLAUDE.md:** [`backend/app/modules/periodontogram/CLAUDE.md`](../backend/app/modules/periodontogram/CLAUDE.md)
+
+### `razorpay` — v0.1.0
+
+Razorpay payment gateway — UPI, QR, cards, and payment links for India clinics.
+
+- **Author:** DentalPin Core Team
+- **License:** BSL-1.1
+- **Category:** official
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `payment_gateways`
+- **Frontend layer:** `frontend`
+- **Permissions:**
+  - `razorpay.settings.read`
+  - `razorpay.settings.write`
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/razorpay/CLAUDE.md`](../backend/app/modules/razorpay/CLAUDE.md)
 
 ### `recall_reminders` — v0.1.0
 

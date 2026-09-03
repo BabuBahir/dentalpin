@@ -29,7 +29,19 @@ if TYPE_CHECKING:
 
 
 # Allowed payment methods (kept as plain list — schemas validate via Literal).
-PAYMENT_METHODS = ["cash", "card", "bank_transfer", "direct_debit", "insurance", "other"]
+# "upi"/"netbanking" added for gateway-collected payments (payment_gateways
+# module, issue #263/#365) — a gateway confirmation calls record_payment()
+# with whichever of these the provider reports as the actual instrument used.
+PAYMENT_METHODS = [
+    "cash",
+    "card",
+    "bank_transfer",
+    "direct_debit",
+    "insurance",
+    "upi",
+    "netbanking",
+    "other",
+]
 
 # Allocation targets that don't require a foreign key (``on_account``)
 # vs targets backed by another row (``budget``).

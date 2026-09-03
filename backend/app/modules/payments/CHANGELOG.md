@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- feat(#263/#365): add `upi`/`netbanking` to `PAYMENT_METHODS` (models.py) and the `PaymentMethod` schema Literal, plus the matching `payments.methods.upi`/`.netbanking` i18n key in all 9 locales — prerequisite for the new `payment_gateways`/`razorpay` modules, whose gateway confirmation calls `record_payment(method=...)` with whichever of these the provider reports as the actual instrument used. No DB migration needed: `Payment.method` has never had a DB-level CHECK constraint, only the Pydantic `Literal`.
+
 - fix(#126): ledger treatment names had a bare es → en fallback — items named only in other locales degraded to nothing; now resolved through the shared `app.core.i18n_names.catalog_name` chain with an any-non-empty catch-all.
 
 - feat(#334): Hungarian (hu) locale for the module's frontend layer.

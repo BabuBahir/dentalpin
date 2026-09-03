@@ -102,6 +102,8 @@
       "bank_transfer": "Przelew",
       "direct_debit": "Polecenie zapłaty",
       "insurance": "Ubezpieczenie",
+      "upi": "UPI",
+      "netbanking": "Bankowość internetowa",
       "other": "Inna"
     },
     "refund": {

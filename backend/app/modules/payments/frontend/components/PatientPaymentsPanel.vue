@@ -18,7 +18,9 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 import type { TotalLine } from '~~/app/components/shared/EntityTotalsCard.vue'
 import type { SemanticRole } from '~~/app/config/severity'
 import { PERMISSIONS } from '~~/app/config/permissions'
+import { resolveSlot } from '~~/app/composables/useModuleSlots'
 import PendingChargesCard from './payments/PendingChargesCard.vue'
+import PaymentCreateModal from './PaymentCreateModal.vue'
 
 interface PendingCharge {
   entry_id: string
@@ -55,6 +57,13 @@ const prefilledCobrarAmount = ref<number | null>(null)
 const canCollect = computed(() => can(PERMISSIONS.payments.recordWrite))
 const canRefund = computed(() => can(PERMISSIONS.payments.recordRefund))
 
+// Passed as `ctx.clinic` to `payment.create.modal` — same shape
+// india_gst's/verifactu's country-gated slots already expect
+// (`ctx.clinic.country`). Read independently of the host `patients`
+// module's own ctx (`{ patient, patientId }`) so this panel doesn't
+// need patients to start passing clinic through.
+const { currentClinic } = useClinic()
+
 const totalPaid = computed(() => Number(ledger.value?.total_paid ?? 0))
 const debt = computed(() => Number(ledger.value?.clinic_receivable ?? 0))
 const credit = computed(() => Number(ledger.value?.patient_credit ?? 0))
@@ -64,6 +73,13 @@ const patientFullName = computed(() => {
   const p = props.ctx.patient
   if (!p) return ''
   return [p.first_name, p.last_name].filter(Boolean).join(' ').trim()
+})
+
+// "Cobrar" never changes label or position — only what it opens does.
+// See payments/index.vue's matching comment for the same pattern.
+const createModalOverride = computed(() => {
+  const entries = resolveSlot('payment.create.modal', { clinic: currentClinic.value }, { can })
+  return entries[0]?.component ?? PaymentCreateModal
 })
 
 // Newest first. Backend returns chronological asc.
@@ -493,7 +509,8 @@ function handleRefunded() {
       </UButton>
     </div>
 
-    <PaymentCreateModal
+    <component
+      :is="createModalOverride"
       v-model:open="showCobrar"
       :default-patient-id="ctx.patientId"
       :default-patient-name="patientFullName"

@@ -102,6 +102,8 @@
       "bank_transfer": "வங்கி பரிமாற்றம்",
       "direct_debit": "நேரடி பற்று",
       "insurance": "காப்பீடு",
+      "upi": "UPI",
+      "netbanking": "இணைய வங்கி",
       "other": "மற்றவை"
     },
     "refund": {
