@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.core.auth.router import limiter
 from app.core.auth.router import router as auth_router
+from app.core.auth.router_roles import router as roles_router
 from app.core.log_context import (
     new_request_id,
     reset_request_context,
@@ -210,6 +211,7 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
 
 # Mount auth router
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(roles_router, prefix="/api/v1")
 
 # Mount module management router (install/uninstall/upgrade/restart).
 from app.core.plugins.router import router as modules_router  # noqa: E402

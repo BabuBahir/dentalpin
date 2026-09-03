@@ -28,7 +28,7 @@ from .dependencies import (
     get_current_user,
     require_permission,
 )
-from .models import Clinic, ClinicMembership, User
+from .models import Clinic, ClinicMembership, Role, User
 from .permissions import (
     CORE_PERMISSIONS,
     PROFESSIONAL_ROLES,
@@ -71,6 +71,16 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 # caps after a handful of reloads.
 _limiter_enabled = settings.ENVIRONMENT == "production" and not settings.TESTING
 limiter = Limiter(key_func=get_remote_address, enabled=_limiter_enabled)
+
+
+async def _role_is_valid_for_clinic(db: AsyncSession, clinic_id: UUID, role: str) -> bool:
+    """A role name is valid if it's a system role or a custom role owned by
+    ``clinic_id`` (issue #46 allows admins to assign clinic-created roles)."""
+    if role in ROLES:
+        return True
+    return (
+        await db.execute(select(Role.id).where(Role.clinic_id == clinic_id, Role.name == role))
+    ).scalars().first() is not None
 
 
 async def _refresh_rate_key(request: Request) -> str:
@@ -448,23 +458,6 @@ async def create_user(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[UserResponse]:
     """Create a new user (admin only)."""
-    # Validate role
-    if data.role not in ROLES:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Invalid role. Must be one of: {', '.join(ROLES)}",
-        )
-
-    # Validate password strength (when given). Without a password the
-    # account gets an unusable random hash until an invite link is consumed.
-    if data.password is not None:
-        is_valid, error_msg = validate_password_strength(data.password)
-        if not is_valid:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=error_msg,
-            )
-
     # Resolve the target clinic. A caller may only create a membership in
     # a clinic they administer themselves — otherwise an admin of clinic A
     # could mint an admin membership in clinic B by passing its id.
@@ -481,6 +474,23 @@ async def create_user(
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You do not administer the target clinic",
+            )
+
+    # Validate role (system role or a custom role owned by the target clinic).
+    if not await _role_is_valid_for_clinic(db, clinic_id, data.role):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid role. Must be a system role ({', '.join(ROLES)}) or a custom role in this clinic.",
+        )
+
+    # Validate password strength (when given). Without a password the
+    # account gets an unusable random hash until an invite link is consumed.
+    if data.password is not None:
+        is_valid, error_msg = validate_password_strength(data.password)
+        if not is_valid:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=error_msg,
             )
 
     # Check if email already exists
@@ -627,11 +637,11 @@ async def update_user(
             detail="Cannot deactivate your own account",
         )
 
-    # Validate role if provided
-    if data.role is not None and data.role not in ROLES:
+    # Validate role if provided (system role or a custom role in this clinic)
+    if data.role is not None and not await _role_is_valid_for_clinic(db, ctx.clinic_id, data.role):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Invalid role. Must be one of: {', '.join(ROLES)}",
+            detail=f"Invalid role. Must be a system role ({', '.join(ROLES)}) or a custom role in this clinic.",
         )
 
     # Check email uniqueness if changing email
