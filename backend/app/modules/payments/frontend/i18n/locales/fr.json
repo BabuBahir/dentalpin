@@ -102,9 +102,9 @@
       "bank_transfer": "Virement",
       "direct_debit": "Prélèvement",
       "insurance": "Assurance",
+      "other": "Autre",
       "upi": "UPI",
-      "netbanking": "Banque en ligne",
-      "other": "Autre"
+      "netbanking": "Banque en ligne"
     },
     "refund": {
       "title": "Rembourser le paiement",

@@ -102,9 +102,9 @@
       "bank_transfer": "Átutalás",
       "direct_debit": "Csoportos beszedés",
       "insurance": "Biztosító",
+      "other": "Egyéb",
       "upi": "UPI",
-      "netbanking": "Netbank",
-      "other": "Egyéb"
+      "netbanking": "Netbank"
     },
     "refund": {
       "title": "Befizetés visszatérítése",

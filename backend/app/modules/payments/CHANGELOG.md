@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- feat(#263/#365): add `upi`/`netbanking` to `PAYMENT_METHODS` (models.py) and the `PaymentMethod` schema Literal, plus the matching `payments.methods.upi`/`.netbanking` i18n key in all 9 locales — prerequisite for the new `payment_gateways`/`razorpay` modules, whose gateway confirmation calls `record_payment(method=...)` with whichever of these the provider reports as the actual instrument used. No DB migration needed: `Payment.method` has never had a DB-level CHECK constraint, only the Pydantic `Literal`.
+- feat(#365): payment-gateway prerequisites — `upi` + `netbanking` methods (IN-gated chip in the create modal, labels in all 9 locales); four `payments.*` extension slots (`collect.actions`, `list.row.meta`, `ledger.row.meta`, `detail.sections`) rendering nothing by default; `idempotency_key` on `record_payment` / `POST /payments` / the agent tool with a per-clinic partial unique index (`pay_0005`). The IN gate also covers the list's method filter (`useClinicCountry`), and the refund modal always offers the source payment's method.
 
 - fix(#126): ledger treatment names had a bare es → en fallback — items named only in other locales degraded to nothing; now resolved through the shared `app.core.i18n_names.catalog_name` chain with an any-non-empty catch-all.
 

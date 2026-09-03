@@ -102,9 +102,9 @@
       "bank_transfer": "Transfer",
       "direct_debit": "Direct debit",
       "insurance": "Insurance",
+      "other": "Other",
       "upi": "UPI",
-      "netbanking": "Netbanking",
-      "other": "Other"
+      "netbanking": "Net banking"
     },
     "refund": {
       "title": "Refund payment",

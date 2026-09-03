@@ -29,15 +29,13 @@ if TYPE_CHECKING:
 
 
 # Allowed payment methods (kept as plain list — schemas validate via Literal).
-# "upi"/"netbanking" added for gateway-collected payments (payment_gateways
-# module, issue #263/#365) — a gateway confirmation calls record_payment()
-# with whichever of these the provider reports as the actual instrument used.
 PAYMENT_METHODS = [
     "cash",
     "card",
     "bank_transfer",
     "direct_debit",
     "insurance",
+    # India (#365 / #263): gateway modules and the IN-gated chip use these.
     "upi",
     "netbanking",
     "other",
@@ -80,6 +78,10 @@ class Payment(Base, TimestampMixin):
     payment_date: Mapped[date] = mapped_column(Date)
     reference: Mapped[str | None] = mapped_column(String(100), default=None)
     notes: Mapped[str | None] = mapped_column(Text, default=None)
+    # Caller-supplied dedupe key (#365): a gateway module / the agent tool /
+    # the public API retrying ``record_payment`` gets the existing row back
+    # instead of a second payment. Unique per clinic when not null.
+    idempotency_key: Mapped[str | None] = mapped_column(String(100), default=None)
 
     recorded_by: Mapped[UUID] = mapped_column(ForeignKey("users.id"))
 
@@ -102,6 +104,13 @@ class Payment(Base, TimestampMixin):
         Index("idx_payments_clinic_patient", "clinic_id", "patient_id"),
         Index("idx_payments_clinic_date", "clinic_id", "payment_date"),
         Index("idx_payments_clinic_method", "clinic_id", "method"),
+        Index(
+            "uq_payments_clinic_idempotency",
+            "clinic_id",
+            "idempotency_key",
+            unique=True,
+            postgresql_where=text("idempotency_key IS NOT NULL"),
+        ),
     )
 
 
