@@ -381,10 +381,16 @@ async def get_me(
     permissions: list[str] = []
     if memberships:
         role = memberships[0].role
-        role_perms = get_role_permissions(role)
-        # Combine module permissions with core permissions
+        clinic_id = memberships[0].clinic.id
         all_perms = module_registry.get_all_permissions() + CORE_PERMISSIONS
-        permissions = expand_permissions(role_perms, all_perms)
+        if settings.RBAC_FROM_DB:
+            from .rbac import resolve_granted_permissions
+
+            role_perms = await resolve_granted_permissions(db, clinic_id, role)
+            permissions = expand_permissions(role_perms, all_perms)
+        else:
+            role_perms = get_role_permissions(role)
+            permissions = expand_permissions(role_perms, all_perms)
 
     return ApiResponse(
         data=MeResponse(

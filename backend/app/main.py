@@ -73,6 +73,18 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         "Mounted %d/%d modules: %s", len(mounted), len(discovered), [m.name for m in mounted]
     )
 
+    # Seed the RBAC tables from the static grant map + installed modules so
+    # DB-backed permission checks (require_permission / /me under
+    # settings.RBAC_FROM_DB, issue #46) have a populated source of truth.
+    if settings.RBAC_FROM_DB:
+        try:
+            from app.core.auth.seed_rbac import seed_rbac
+
+            async with async_session_maker() as session:
+                await seed_rbac(session)
+        except Exception:
+            logger.exception("RBAC seeding failed at startup")
+
     # Initialize scheduler for background jobs (active modules only)
     init_scheduler()
 
