@@ -102,7 +102,9 @@
       "bank_transfer": "تحويل",
       "direct_debit": "خصم مباشر",
       "insurance": "تأمين",
-      "other": "أخرى"
+      "other": "أخرى",
+      "upi": "UPI",
+      "netbanking": "تحويل إلكتروني"
     },
     "refund": {
       "title": "استرداد الدفعة",
