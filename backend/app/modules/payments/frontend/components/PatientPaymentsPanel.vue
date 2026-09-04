@@ -57,7 +57,7 @@ const prefilledCobrarAmount = ref<number | null>(null)
 const canCollect = computed(() => can(PERMISSIONS.payments.recordWrite))
 const canRefund = computed(() => can(PERMISSIONS.payments.recordRefund))
 
-// Passed as `ctx.clinic` to `payment.create.modal` — same shape
+// Passed as `ctx.clinic` to `payments.create.modal` — same shape
 // india_gst's/verifactu's country-gated slots already expect
 // (`ctx.clinic.country`). Read independently of the host `patients`
 // module's own ctx (`{ patient, patientId }`) so this panel doesn't
@@ -78,7 +78,7 @@ const patientFullName = computed(() => {
 // "Cobrar" never changes label or position — only what it opens does.
 // See payments/index.vue's matching comment for the same pattern.
 const createModalOverride = computed(() => {
-  const entries = resolveSlot('payment.create.modal', { clinic: currentClinic.value }, { can })
+  const entries = resolveSlot('payments.create.modal', { clinic: currentClinic.value }, { can })
   return entries[0]?.component ?? PaymentCreateModal
 })
 

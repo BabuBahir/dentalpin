@@ -24,7 +24,7 @@
   answers 200; a transport/programmer error answers 500 so Razorpay
   retries.
 - Frontend: `RazorpayPaymentModal` — a full replacement for `payments`'
-  own `PaymentCreateModal`, mounted via the new `payment.create.modal`
+  own `PaymentCreateModal`, mounted via the new `payments.create.modal`
   slot (India-clinic-gated; resolved directly, not through
   `<ModuleSlot>`, since it needs `v-model`/props/events the generic
   slot can't carry). Same "New payment"/"Cobrar" trigger; the panel
@@ -34,7 +34,7 @@
   allocated/unallocated footer. Manual rails record instantly; gateway
   rails hand off to `PaymentRequest` polling. PhonePe has no adapter in
   this PR and is not rendered. Also `RazorpayPaymentBadge` +
-  `RazorpayTransactionDetailModal` (via the new `payment.list.row.meta`
+  `RazorpayTransactionDetailModal` (via the `payments.list.row.meta`
   slot — audit trail, allocation, settlement, refund history, and a
   "refund via Razorpay" action), `/settings/razorpay` settings page +
   `settings.sections` card. en/es/ta locales.
@@ -51,12 +51,12 @@
 
 - `payments.PAYMENT_METHODS`/`PaymentMethod` gained `upi`/`netbanking`
   (see `payments/CHANGELOG.md`).
-- `payments` gained two new slots consumed by this module:
-  `payment.create.modal` (a full override of the modal opened by "New
+- `payments` gained one new slot consumed by this module:
+  `payments.create.modal` (a full override of the modal opened by "New
   payment"/"Cobrar" on `/payments` and the patient Pagos tab; resolved
-  directly via `resolveSlot`, not `<ModuleSlot>`) and
-  `payment.list.row.meta` (small badge on gateway-collected payment
-  rows). Neither slot renders anything when no provider module is
-  installed, or for a non-India clinic. `BudgetPaymentsCard`'s own
+  directly via `resolveSlot`, not `<ModuleSlot>`). The badge rides the
+  `payments.list.row.meta` slot that PR #370 already added (small badge
+  on gateway-collected payment rows). Neither slot renders anything
+  when no provider module is installed, or for a non-India clinic. `BudgetPaymentsCard`'s own
   "Cobrar" (which opens the unrelated `BudgetCollectModal`) is
   untouched and out of scope for this PR.

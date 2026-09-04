@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * India-aware "Record payment" — replaces PaymentCreateModal.vue at
- * the call site (via the `payment.create.modal` slot override, India
+ * the call site (via the `payments.create.modal` slot override, India
  * clinics only; see plugins/slots.client.ts), not inside it. The
  * "New payment"/"Cobrar" button keeps its label and location; only
  * what opens changes. Non-India clinics never load this component.

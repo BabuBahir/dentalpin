@@ -150,7 +150,7 @@ returned by `GET`/`PUT /settings` — only `has_key_secret`/
 
 - **Composable**: `useRazorpay` (settings + payment_gateways client).
 - **Components**: `RazorpaySettingsCardsSlot` (settings hub card),
-  `RazorpayPaymentModal` (`payment.create.modal` slot — a **full
+  `RazorpayPaymentModal` (`payments.create.modal` slot — a **full
   replacement** for `payments`' own `PaymentCreateModal`, India-clinic-
   gated. Same "New payment"/"Cobrar" trigger, same `open`/`created`
   contract, but the panel behind it adds UPI/UPI QR/Razorpay rails
@@ -159,10 +159,10 @@ returned by `GET`/`PUT /settings` — only `has_key_secret`/
   unallocated footer. Manual rails record instantly; gateway rails
   hand off to `PaymentRequest` polling and only call `created` once
   the request reaches `succeeded`. Resolved directly via
-  `resolveSlot('payment.create.modal', ...)` at each `payments`-module
+  `resolveSlot('payments.create.modal', ...)` at each `payments`-module
   call site — never through `<ModuleSlot>`, which only forwards `ctx`
   and can't carry this component's `v-model`/props/events), the
-  `RazorpayPaymentBadge` (`payment.list.row.meta` slot — renders
+  `RazorpayPaymentBadge` (`payments.list.row.meta` slot — renders
   nothing for a non-gateway payment), `RazorpayTransactionDetailModal`
   (audit trail, allocation, settlement, refund history + "refund via
   Razorpay" action).

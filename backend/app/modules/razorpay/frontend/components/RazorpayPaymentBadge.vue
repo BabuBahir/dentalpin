@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * Slot entry into `payment.list.row.meta` on the payments list
+ * Slot entry into `payments.list.row.meta` on the payments list
  * (`/payments`). Renders nothing for a payment that wasn't
  * gateway-collected (`GET .../gateway-info` returns `request: null`)
  * — every non-gateway payment row is completely unaffected.

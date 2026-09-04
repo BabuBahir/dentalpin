@@ -20,20 +20,20 @@ definePageMeta({ middleware: 'auth' })
 const { t, locale } = useI18n()
 const api = useApi()
 const { can } = usePermissions()
-// Passed verbatim as `ctx.clinic` to the `payment.create.modal` /
-// `payment.list.row.meta` slots — the same shape india_gst's/verifactu's
+// Passed verbatim as `ctx.clinic` to the `payments.create.modal` /
+// `payments.list.row.meta` slots — the same shape india_gst's/verifactu's
 // country-gated slots already expect (`ctx.clinic.country`).
 const { currentClinic } = useClinic()
 
 // The "New payment" button and its label never change (issue #365
 // PR1 feedback: renaming it churns muscle memory for no benefit) —
 // only what it opens does. A provider module (razorpay) may register
-// a full replacement for PaymentCreateModal into `payment.create.modal`
+// a full replacement for PaymentCreateModal into `payments.create.modal`
 // (India-clinic-gated); when none matches, the built-in modal renders
 // exactly as before. This page never imports razorpay — it only
 // resolves the slot by name.
 const createModalOverride = computed(() => {
-  const entries = resolveSlot('payment.create.modal', { clinic: currentClinic.value }, { can })
+  const entries = resolveSlot('payments.create.modal', { clinic: currentClinic.value }, { can })
   return entries[0]?.component ?? PaymentCreateModal
 })
 
@@ -390,7 +390,7 @@ function formatDate(s: string | undefined): string {
                      transaction detail — renders nothing for a payment
                      that wasn't gateway-collected. -->
                 <ModuleSlot
-                  name="payment.list.row.meta"
+                  name="payments.list.row.meta"
                   :ctx="{ payment: p, clinic: currentClinic }"
                 />
               </div>
@@ -440,15 +440,11 @@ function formatDate(s: string | undefined): string {
                     class="w-3.5 h-3.5"
                   />
                   {{ formatDate(p.payment_date) }} · {{ t(`payments.methods.${p.method}`) }}
-                  <ModuleSlot
-                    name="payment.list.row.meta"
-                    :ctx="{ payment: p, clinic: currentClinic }"
-                  />
                 </div>
                 <!-- Provider badge / settlement state from a gateway module (#365). -->
                 <ModuleSlot
                   name="payments.list.row.meta"
-                  :ctx="{ payment: p }"
+                  :ctx="{ payment: p, clinic: currentClinic }"
                 />
               </div>
               <div class="text-right shrink-0">

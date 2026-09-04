@@ -35,10 +35,10 @@ No frontend layer — this module is backend-only infrastructure. UI
 (collection panel, transaction detail, refunds) is owned entirely by
 the provider module. The collection panel is a full override of the
 "New payment"/"Cobrar" modal, resolved directly via `resolveSlot()`
-against the `payment.create.modal` slot (not the generic `<ModuleSlot>`,
+against the `payments.create.modal` slot (not the generic `<ModuleSlot>`,
 which only forwards `ctx` and can't carry the `v-model`/props/events a
 full modal replacement needs); the payment-list badge uses the
-additive `payment.list.row.meta` slot instead, since it only needs to
+additive `payments.list.row.meta` slot instead, since it only needs to
 render alongside existing content.
 
 ## Data model

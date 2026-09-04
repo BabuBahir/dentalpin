@@ -31,12 +31,12 @@ export default defineNuxtPlugin(() => {
   // "Cobrar" button, same trigger, same open/created contract; only
   // the modal content behind it changes for India clinics. See
   // components/RazorpayPaymentModal.vue's own docstring. Resolved via
-  // `resolveSlot('payment.create.modal', ...)` at each call site
+  // `resolveSlot('payments.create.modal', ...)` at each call site
   // (payments/index.vue, PatientPaymentsPanel.vue) — never rendered
   // through the generic <ModuleSlot> (which only forwards `ctx`, not
   // v-model/props/events this component needs).
-  registerSlot('payment.create.modal', {
-    id: 'razorpay.payment.create.modal',
+  registerSlot('payments.create.modal', {
+    id: 'razorpay.payments.create.modal',
     component: defineAsyncComponent(() => import('../components/RazorpayPaymentModal.vue')),
     order: 10,
     condition: isIndiaClinicCtx
@@ -44,8 +44,8 @@ export default defineNuxtPlugin(() => {
 
   // Small "Razorpay · UPI" badge on each gateway-collected payment row
   // — renders nothing for a manually-recorded payment.
-  registerSlot('payment.list.row.meta', {
-    id: 'razorpay.payment.list.row.meta',
+  registerSlot('payments.list.row.meta', {
+    id: 'razorpay.payments.list.row.meta',
     component: defineAsyncComponent(() => import('../components/RazorpayPaymentBadge.vue')),
     order: 10,
     condition: isIndiaClinicCtx

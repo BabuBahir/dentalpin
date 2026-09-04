@@ -100,7 +100,8 @@ nothing. Country gating is the gateway's `condition` (same as
 | Slot | Where | `ctx` |
 |---|---|---|
 | `payments.collect.actions` | next to "New payment" (payments page), "Cobrar" (`PatientPaymentsPanel`, both buttons), "Collect" (`BudgetPaymentsCard`) | `{ patient?, budget?, prefer_invoice_id? }` — each host passes what it has |
-| `payments.list.row.meta` | payments list row, under the date · method line | `{ payment }` |
+| `payments.create.modal` | full replacement for the built-in `PaymentCreateModal` behind "New payment" / "Cobrar" — resolved directly via `resolveSlot()` (never `<ModuleSlot>`: it carries `v-model:open`/props/events the generic slot can't forward); first matching entry wins, else the built-in modal renders unchanged | `{ clinic }` — for the provider's country `condition` |
+| `payments.list.row.meta` | payments list row, under the date · method line | `{ payment, clinic }` |
 | `payments.ledger.row.meta` | patient ledger row, under the meta line | `{ entry }` |
 | `payments.detail.sections` | payments list row, above the refund action (there is no dedicated detail view yet — this is its stand-in) | `{ payment }` |
 
