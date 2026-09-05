@@ -44,7 +44,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `purchase_orders` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 3 | 0 | yes |
 | `recall_reminders` | 0.1.0 | community | recalls, notifications, patients | manual | yes | 0 | 0 | 1 | yes |
 | `recalls` | 0.1.0 | official | patients, agenda | auto | yes | 3 | 4 | 5 | yes |
-| `reports` | 0.2.0 | official | patients, agenda, catalog, budget, billing, payments | auto | no | 6 | 0 | 0 | yes |
+| `reports` | 0.2.0 | official | patients, agenda, catalog, budget, billing, payments, treatment_plan | auto | no | 6 | 0 | 0 | yes |
 | `schedules` | 0.1.0 | official | agenda | auto | yes | 8 | 0 | 4 | yes |
 | `sdi_it` | 0.1.0 | official | billing | manual | yes | 4 | 0 | 0 | no |
 | `sms_gateway` | 0.1.0 | community | notifications | manual | yes | 2 | 0 | 0 | yes |
@@ -865,7 +865,7 @@ Cross-module reporting: billing, budgets, scheduling.
 - **License:** BSL-1.1
 - **Category:** official
 - **Install policy:** installable=True · auto_install=True · removable=False
-- **Depends:** `patients`, `agenda`, `catalog`, `budget`, `billing`, `payments`
+- **Depends:** `patients`, `agenda`, `catalog`, `budget`, `billing`, `payments`, `treatment_plan`
 - **Frontend layer:** `frontend`
 - **Permissions:**
   - `reports.billing.read`
