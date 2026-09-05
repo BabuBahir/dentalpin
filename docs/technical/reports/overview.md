@@ -20,6 +20,15 @@ published or consumed; no mutations.
   `GET /billing/issued-trend` (issued totals over time), both under
   `reports.financial.read`, plus the `financial_report` copilot tool.
   An off-books guard test pins the invoice-axis scope.
+- **patient-stats** (roadmap #230) — `GET /patients/demographics`
+  (age bands, sex split) + `GET /patients/visits` (first vs
+  returning), under `reports.patient_stats.read`, plus the
+  `patient_stats_report` copilot tool.
+- **operational** (roadmap #230) — `GET /operational/productivity`
+  (per-professional visits, treatments, revenue), under
+  `reports.operational.read`, plus the `operational_report` copilot
+  tool. Reads billing/patients/agenda/treatment_plan; the trend chart
+  has no page section yet (follow-up).
 
 ## API surface
 
