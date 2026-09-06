@@ -2419,11 +2419,18 @@
       "whatsappUnavailableHint": "WhatsApp n'est pas disponible tant que le numéro de la clinique n'est pas connecté.",
       "whatsappConnect": "Connecter WhatsApp (Kapso)",
       "noEmail": "Le patient n'a pas d'email enregistré",
-      "noPhone": "Le patient n'a pas de téléphone enregistré"
+      "noPhone": "Le patient n'a pas de téléphone enregistré",
+      "sms": "SMS",
+      "smsUnavailableHint": "Les SMS ne sont pas disponibles tant qu'un fournisseur SMS n'est pas configuré."
     },
     "channelSent": {
       "email": "Email envoyé avec succès",
       "whatsapp": "Message WhatsApp envoyé avec succès"
+    },
+    "prefs": {
+      "title": "Préférences de notification",
+      "description": "Quels canaux peuvent joindre ce patient. Se désinscrire bloque ce canal même pour les envois forcés.",
+      "saved": "Préférences enregistrées"
     }
   },
   "invoice": {

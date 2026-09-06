@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
@@ -10,6 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.auth.models import Clinic
 from app.modules.notifications.channels import Channel, channel_registry
 from app.modules.notifications.gateway import NotificationGateway
+from app.modules.notifications.models import NotificationTemplate
+from app.modules.notifications.service import NotificationService
 from app.modules.sms_gateway.adapter import SmsGatewayAdapter
 from app.modules.sms_gateway.schemas import mask_settings
 from app.modules.sms_gateway.service import SmsGatewayService
@@ -119,3 +122,79 @@ async def test_cross_clinic_isolation(db_session: AsyncSession, test_clinic: Cli
     await db_session.commit()
     await _configure(db_session, other.id)
     assert await SmsGatewayService.get_settings(db_session, test_clinic.id) is None
+
+
+# Every notification_type the gateway enqueues must have a seeded SMS
+# template row (smg_0002 ROWS), or template-kind SMS dispatches with
+# body_text=None (maintainer review on #384).
+ENQUEUED_TYPES = {
+    "appointment_confirmation",
+    "appointment_reminder",
+    "appointment_cancelled",
+    "budget_sent",
+    "budget_accepted",
+    "budget_reminder",
+    "invoice_sent",
+    "welcome",
+    "recall_reminder",
+}
+
+
+def _seed_rows():
+    """Import the frozen seed table from the migration (no DB needed)."""
+    import importlib.util
+
+    path = (
+        Path(__file__).resolve().parents[3]
+        / "app"
+        / "modules"
+        / "sms_gateway"
+        / "migrations"
+        / "versions"
+        / "smg_0002_seed_sms_templates.py"
+    )
+    spec = importlib.util.spec_from_file_location("smg_0002_seed", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.ROWS
+
+
+@pytest.mark.asyncio
+async def test_seed_rows_cover_all_enqueue_types(db_session: AsyncSession):
+    """The smg_0002 seed table covers every enqueued type in es and en."""
+    rows = _seed_rows()
+    assert len(rows) == len(ENQUEUED_TYPES)
+    covered = {key for key, _, _ in rows}
+    assert covered == ENQUEUED_TYPES
+    for key, es_body, en_body in rows:
+        assert es_body.strip() and en_body.strip()
+
+
+@pytest.mark.asyncio
+async def test_sms_template_lookup_resolves_seeded_body(
+    db_session: AsyncSession, test_clinic: Clinic
+):
+    """The dispatch lookup (channel filter + system fallback) finds SMS bodies."""
+    clinic_id = test_clinic.id
+    assert (
+        await NotificationService.get_template(
+            db_session, clinic_id, "appointment_confirmation", "es", channel="sms"
+        )
+    ) is None
+
+    db_session.add(
+        NotificationTemplate(
+            clinic_id=None,
+            channel="sms",
+            template_key="appointment_confirmation",
+            locale="es",
+            body_text="Su cita ha quedado confirmada.",
+            is_system=True,
+        )
+    )
+    await db_session.commit()
+    found = await NotificationService.get_template(
+        db_session, clinic_id, "appointment_confirmation", "es", channel="sms"
+    )
+    assert found is not None
+    assert found.body_text == "Su cita ha quedado confirmada."

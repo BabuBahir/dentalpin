@@ -45,6 +45,7 @@ const channelForm = reactive<{
 
 const availableChannels = computed<readonly string[]>(() => settings.value?.available_channels ?? ['email'])
 const whatsappAvailable = computed(() => availableChannels.value.includes('whatsapp'))
+const smsAvailable = computed(() => availableChannels.value.includes('sms'))
 
 const preferredOptions = computed(() => [
   { value: 'email', label: t('notifications.channels.email') },
@@ -52,6 +53,11 @@ const preferredOptions = computed(() => [
     value: 'whatsapp',
     label: t('notifications.channels.whatsapp'),
     disabled: !whatsappAvailable.value
+  },
+  {
+    value: 'sms',
+    label: t('notifications.channels.sms'),
+    disabled: !smsAvailable.value
   }
 ])
 
@@ -390,6 +396,12 @@ if (!isAdmin.value) {
                 :disabled="!whatsappAvailable"
                 @update:model-value="(v: boolean | 'indeterminate') => toggleManualChannel('whatsapp', v === true)"
               />
+              <UCheckbox
+                :model-value="channelForm.manual_channels.includes('sms')"
+                :label="t('notifications.channels.sms')"
+                :disabled="!smsAvailable"
+                @update:model-value="(v: boolean | 'indeterminate') => toggleManualChannel('sms', v === true)"
+              />
             </div>
             <p
               v-if="!manualChannelsValid"
@@ -416,6 +428,20 @@ if (!isAdmin.value) {
               >
                 {{ t('notifications.channels.whatsappConnect') }}
               </NuxtLink>
+            </p>
+          </div>
+
+          <!-- SMS provider not configured hint -->
+          <div
+            v-if="!smsAvailable"
+            class="p-3 alert-surface-info rounded-lg flex items-start gap-2"
+          >
+            <UIcon
+              name="i-lucide-message-square-text"
+              class="w-4 h-4 text-info-accent flex-shrink-0 mt-0.5"
+            />
+            <p class="text-caption text-info">
+              {{ t('notifications.channels.smsUnavailableHint') }}
             </p>
           </div>
         </div>

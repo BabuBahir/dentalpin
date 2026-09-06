@@ -2419,11 +2419,18 @@
       "whatsappUnavailableHint": "WhatsApp będzie dostępny po podłączeniu numeru kliniki.",
       "whatsappConnect": "Połącz WhatsApp (Kapso)",
       "noEmail": "Pacjent nie ma e-maila w kartotece",
-      "noPhone": "Pacjent nie ma telefonu w kartotece"
+      "noPhone": "Pacjent nie ma telefonu w kartotece",
+      "sms": "SMS",
+      "smsUnavailableHint": "SMS będą dostępne po skonfigurowaniu dostawcy SMS."
     },
     "channelSent": {
       "email": "E-mail wysłany pomyślnie",
       "whatsapp": "Wiadomość WhatsApp wysłana pomyślnie"
+    },
+    "prefs": {
+      "title": "Preferencje powiadomień",
+      "description": "Jakimi kanałami można kontaktować się z tym pacjentem. Rezygnacja blokuje kanał nawet przy wysyłkach wymuszonych.",
+      "saved": "Zapisano preferencje"
     }
   },
   "invoice": {

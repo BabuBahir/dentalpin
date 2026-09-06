@@ -26,8 +26,8 @@ export interface PatientContact {
   phone?: string | null
 }
 
-/** Stable render order — email first, then WhatsApp. */
-const CHANNEL_ORDER: NotificationChannel[] = ['email', 'whatsapp']
+/** Stable render order — email first, then WhatsApp, then SMS. */
+const CHANNEL_ORDER: NotificationChannel[] = ['email', 'whatsapp', 'sms']
 
 export function useClinicNotificationChannels() {
   const api = useApi()
@@ -73,7 +73,7 @@ export function useClinicNotificationChannels() {
         if (channel === 'email' && !patient?.email) {
           return { channel, disabled: true, reason: 'no_email' as const }
         }
-        if (channel === 'whatsapp' && !patient?.phone) {
+        if ((channel === 'whatsapp' || channel === 'sms') && !patient?.phone) {
           return { channel, disabled: true, reason: 'no_phone' as const }
         }
         return { channel, disabled: false }

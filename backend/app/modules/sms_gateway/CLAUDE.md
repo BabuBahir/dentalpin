@@ -22,7 +22,9 @@ Single table `sms_gateway_settings` (one row per clinic):
 - `from_number`, `is_active`
 
 Migration `smg_0001_initial` on own Alembic branch (`sms_gateway`), no
-`depends_on` (core-auth FK only — kapso pattern).
+`depends_on` (core-auth FK only — kapso pattern). `smg_0002` seeds the
+18 system SMS template rows (channel `sms`, clinic NULL); downgrade
+deletes exactly those rows by marker.
 
 ## Providers
 
@@ -57,8 +59,8 @@ None of its own. Sends flow through the standard
 - `installable=True`, `auto_install=False`, `removable=True`.
 - `on_activate` registers the adapter; `uninstall` unregisters it
   (kapso pattern, issue #91).
-- Roundtrip uninstall test: downgrading `sms_gateway@-1` drops only
-  `sms_gateway_settings`.
+- Roundtrip uninstall test: walking `sms_gateway@-1` down drops the
+  settings table and the seeded template rows, nothing else.
 
 ## Gotchas
 

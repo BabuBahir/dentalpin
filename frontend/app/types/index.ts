@@ -1165,7 +1165,7 @@ export interface NotificationTypeSettings {
   channels?: string[]
 }
 
-export type NotificationChannel = 'email' | 'whatsapp'
+export type NotificationChannel = 'email' | 'whatsapp' | 'sms'
 
 export interface ClinicNotificationSettings {
   id: string

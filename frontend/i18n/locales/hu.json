@@ -2419,11 +2419,18 @@
       "whatsappUnavailableHint": "A WhatsApp addig nem érhető el, amíg a rendelő száma nincs csatlakoztatva.",
       "whatsappConnect": "WhatsApp (Kapso) csatlakoztatása",
       "noEmail": "A páciensnek nincs rögzített e-mail-címe",
-      "noPhone": "A páciensnek nincs rögzített telefonszáma"
+      "noPhone": "A páciensnek nincs rögzített telefonszáma",
+      "sms": "SMS",
+      "smsUnavailableHint": "Az SMS csak SMS-szolgáltató beállítása után érhető el."
     },
     "channelSent": {
       "email": "E-mail sikeresen elküldve",
       "whatsapp": "WhatsApp-üzenet sikeresen elküldve"
+    },
+    "prefs": {
+      "title": "Értesítési beállítások",
+      "description": "Mely csatornákon érhető el a páciens. A leiratkozás kényszerített küldésnél is blokkolja a csatornát.",
+      "saved": "Beállítások mentve"
     }
   },
   "invoice": {
