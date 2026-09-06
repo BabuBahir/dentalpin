@@ -76,8 +76,11 @@ are invisible (404, never 403).
 ## Constraints
 
 Own Alembic branch (`payroll`); `manifest.depends = []`. No agent
-tools. No hard deletes — profiles deactivate, periods/entries are
-immutable records.
+tools. No hard deletes except draft corrections (issue #390):
+`DELETE /entries/{id}` and `DELETE /periods/{id}` (both 204,
+`payroll.write`) work only while the period is `draft` — 409 once
+closed/paid, 409 for a period that still has entries. Profiles
+deactivate; closed/paid records stay immutable.
 
 See [`./permissions.md`](./permissions.md) and [`./events.md`](./events.md)
 for full detail.
