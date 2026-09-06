@@ -87,6 +87,25 @@ Key decisions (do NOT revisit unless you find a bug):
   the generator output — this is normally written at runtime).
 - `docs/technical/razorpay/{overview,permissions,events}.md`.
 
+## PR #373 review compliance (martinezsalmeron, Sep 6) — verify on the new machine
+
+| # | Review point | Status in this branch | What the new machine must verify |
+|---|---|---|---|
+| 1 | Separate gateway module, not inside `payments` | Done — standalone `razorpay` module + slot | `payments/` clean vs `57f7c536`; module boots |
+| 2 | Keys per-clinic, not global settings | Done — Fernet-encrypted `razorpay_settings` | settings round-trip tests |
+| 3 | Amount verified server-side | Done — re-fetch, assert `captured` + order match, record gateway amount/currency | `test_verify_router.py` (amount/currency from gateway, tamper rejected) |
+| 4 | Replay / idempotency | Done — `idempotency_key=f"razorpay:{payment_id}"` | replay test returns original payment, no double row |
+| 5 | Currency mismatch | Done — order uses `ctx.clinic.currency`; recorded currency from capture | currency paths in `test_verify_router.py` |
+| 6 | `razorpay` not a valid method | Done — mapped onto closed list; id in `reference` | confirm `razorpay` NOT in `PAYMENT_METHODS` |
+| 7 | Dependency must be locked | **PENDING here** — `backend/uv.lock` stale; needs `uv lock` (bootstrap step 3) | `uv lock` passes; backend image installs razorpay |
+| 8 | Frontend flow (swallowed errors, stale submit state, hard-coded English, competing buttons) | Mostly done — slot button (no competing buttons), error toast in handler, i18n. `modal.ondismiss` intentionally not set (reload covers it) | frontend lint/typecheck + manual IN-clinic checkout |
+| 9 | CI: lint import order, N818 name, no-`any`, Nuxt UI colors | Done in code — `RazorpayNotConfiguredError`, typed `razorpay.d.ts`, `neutral` color | `ruff`, `npm run lint`, `npm run typecheck:layers` |
+| 10 | Tests, CHANGELOG, docs | Done — 4 test files, module CLAUDE/CHANGELOG, `docs/technical/razorpay/*` | full pytest suite (razorpay + all modules) |
+
+The reviewer also asked for a **design sketch in issue #263** before
+implementation — that is a conversation point on GitHub (tresundios
+offered to drive it), not a code task here. Decide separately.
+
 ## Remaining (requires Python/Docker — the reason for this handoff)
 
 1. **Regenerate catalogs** (this was NOT done, CI will fail until you do):
