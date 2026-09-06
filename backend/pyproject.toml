@@ -105,6 +105,7 @@ supplier_items = "app.modules.supplier_items:SupplierItemsModule"
 purchase_orders = "app.modules.purchase_orders:PurchaseOrdersModule"
 gdpr = "app.modules.gdpr:GdprModule"
 inventory_reorder = "app.modules.inventory_reorder:InventoryReorderModule"
+supplier_ratings = "app.modules.supplier_ratings:SupplierRatingsModule"
 
 [tool.setuptools.packages.find]
 where = ["."]
