@@ -18,6 +18,7 @@
     "/module_layers/medical_reference/frontend",
     "/module_layers/medication_catalog/frontend",
     "/module_layers/migration_import/frontend",
+    "/module_layers/nav_online/frontend",
     "/module_layers/notifications/frontend",
     "/module_layers/odontogram/frontend",
     "/module_layers/patient_relationships/frontend",
@@ -165,6 +166,11 @@
     {
       "name": "migration_import",
       "path": "/module_layers/migration_import/frontend",
+      "routes": []
+    },
+    {
+      "name": "nav_online",
+      "path": "/module_layers/nav_online/frontend",
       "routes": []
     },
     {
