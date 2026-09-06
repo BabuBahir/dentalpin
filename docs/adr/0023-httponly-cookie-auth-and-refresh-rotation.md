@@ -26,6 +26,11 @@ main today:
   same `Authorization` header — EventSource can't set headers.
 - The e2e fixture (`frontend/tests/e2e/_fixtures.ts`) logs in via the
   API and **pins the `access_token` cookie by hand**.
+- There is **no backend logout endpoint**: `useAuth.logout()` only clears
+  the two cookies client-side, so both JWTs stay valid until expiry.
+- Tokens are minted by `/auth/setup` (first-run wizard), `/auth/login`,
+  `/auth/refresh` and `/auth/set-password` (invite flow); all four must
+  move together.
 
 Risk: any XSS (no CSP yet — #355) reads a 7-day refresh token from
 `document.cookie`, and a stolen refresh token can be replayed for its
@@ -35,8 +40,9 @@ whole lifetime with no server-side way to revoke just that token.
 
 1. **Tokens become `HttpOnly; Secure; SameSite=Lax` cookies set by the
    backend**, never readable by JS:
-   - `/auth/login`, `/auth/refresh`, `/auth/mfa/verify` (ADR 0022) and
-     `/auth/set-password` respond with `Set-Cookie` for
+   - `/auth/setup`, `/auth/login`, `/auth/refresh`, `/auth/set-password`
+     (and `/auth/mfa/verify`, if ADR 0022's deferred TOTP ever ships)
+     respond with `Set-Cookie` for
      `dp_access` (path `/`, TTL = access TTL 15 min) and `dp_refresh`
      (path `/api/v1/auth/refresh`, TTL = refresh TTL) — the refresh
      cookie is only ever sent to the one endpoint that needs it.
@@ -45,10 +51,21 @@ whole lifetime with no server-side way to revoke just that token.
      stops reading it. `useApi` sends `credentials: 'include'` and drops
      the `Authorization` header for same-origin calls; the backend's
      bearer dependency accepts **either** the header or the `dp_access`
-     cookie (header wins), so scripts, the Zapier public API (dp_ tokens,
-     unaffected) and the SSE `fetch()` keep working unchanged.
-   - `/auth/logout` clears both cookies **and** revokes the refresh
-     token (below).
+     cookie (header wins), so scripts and the Zapier public API (dp_
+     tokens) keep working unchanged; the SSE `fetch()` drops the header
+     and sends `credentials: 'include'` instead.
+   - The access JWT carries the refresh `family_id` as a `sid` claim, so
+     endpoints that never see the path-scoped refresh cookie can still
+     name the session.
+   - A **new** `POST /auth/logout` clears both cookies **and** revokes the
+     family named by `sid` (below).
+   - The refresh limiter (`_refresh_rate_key`) reads the token from the
+     cookie when the body has none; otherwise every cookie-flow refresh
+     collapses to the proxy IP bucket it was written to avoid.
+   - SSR: `auth.init()` / `useApi` on the server forward the incoming
+     `Cookie` header (`useRequestHeaders(['cookie'])`); `isAuthenticated`
+     derives from a successful `/me`, not from cookie presence, since
+     JS can no longer see the cookie.
 2. **Refresh rotation with server-side revocation** (per-token, not
    per-user):
    - New core table `auth_refresh_tokens(id/jti PK, user_id, family_id,
@@ -62,14 +79,15 @@ whole lifetime with no server-side way to revoke just that token.
      log in again.
    - `token_version` stays as the "log out everywhere" hammer
      (password change, MFA enable/reset); rotation is the scalpel.
-   - Logout revokes the presented family; an admin "sign out all
-     sessions" for a member revokes all families for that user.
+   - Logout revokes the family in the access token's `sid`; an admin
+     "sign out all sessions" for a member revokes all families for that
+     user.
    - Expired rows are pruned by the existing scheduler (daily job in
      core, not a module).
-3. **CSRF posture**: `SameSite=Lax` cookies + the existing custom
-   `X-Requested-With`-style requirement is *not* enough for the
-   state-changing endpoints once auth is a cookie, because Lax still
-   sends cookies on top-level GET navigations. Decision: **double-submit
+3. **CSRF posture**: there is no custom-header requirement today, and
+   `SameSite=Lax` alone is *not* enough for the state-changing endpoints
+   once auth is a cookie, because Lax still sends cookies on top-level
+   GET navigations. Decision: **double-submit
    token** — `/auth/login` also sets a non-HttpOnly `dp_csrf` cookie;
    `useApi` echoes it as `X-CSRF-Token` on every non-GET; a core
    dependency rejects unsafe methods whose header ≠ cookie. Public
@@ -81,6 +99,9 @@ whole lifetime with no server-side way to revoke just that token.
    `localhost:3000` → `localhost:8000` cross-origin, so dev needs
    `SameSite=Lax` + CORS `credentials: true` on the backend for
    `http://localhost:3000` — already the case for the header flow).
+   `Secure` is set only when `ENVIRONMENT=production` (Safari drops
+   `Secure` cookies on `http://localhost`), mirroring today's
+   `secure: import.meta.env.PROD`.
 
 ## Consequences
 
@@ -124,7 +145,9 @@ whole lifetime with no server-side way to revoke just that token.
   `HttpOnly` cookies and the body still carries the token in the
   transition release; a request with only the cookie is authenticated;
   refresh rotates (old jti rejected, family revoked on reuse); logout
-  revokes; CSRF header mismatch on POST is 403.
+  revokes the `sid` family and a later refresh with that family's cookie
+  is 401; CSRF header mismatch on POST is 403; `/setup` and
+  `/set-password` set the same cookies as `/login`.
 - e2e: the login fixture no longer writes `document.cookie`; a grep for
   `useCookie('access_token'` / `useCookie('refresh_token'` in
   `frontend/app` returns nothing.
@@ -132,8 +155,10 @@ whole lifetime with no server-side way to revoke just that token.
 ## References
 
 - `frontend/app/composables/useAuth.ts`, `useApi.ts`
-- `backend/app/core/auth/router.py` — `/login`, `/refresh`, `/logout`
+- `backend/app/core/auth/router.py` — `/setup`, `/login`, `/refresh`,
+  `/set-password`, `_refresh_rate_key` (`/logout` is new)
 - `backend/app/core/auth/service.py` — `create_refresh_token`
 - `backend/app/modules/copilot/frontend/composables/useCopilotStream.ts`
 - `frontend/tests/e2e/_fixtures.ts`
-- Issue #353; ADR 0022 (MFA handshake shares `/login`); issue #355 (CSP)
+- Issue #353; ADR 0022 (deferred TOTP; its handshake would share
+  `/login`); issue #355 (CSP)
