@@ -25,7 +25,11 @@ from alembic import op
 revision: str = "smg_0002"
 down_revision: str | None = "smg_0001"
 branch_labels: str | Sequence[str] | None = None
-depends_on: str | Sequence[str] | None = None
+# Ordered after the notifications head: the seed INSERTs into
+# notification_templates, which must exist first. Safe as a drag edge:
+# notifications is removable=False, so no branch uninstall ever
+# downgrades through here (M6-trap aware, cf. reverted ARCH-01).
+depends_on: str | Sequence[str] | None = ("notif_0005",)
 
 MARKER = "Seeded by sms_gateway smg_0002 (system SMS templates)"
 
@@ -84,8 +88,10 @@ _INSERT = sa.text(
 INSERT INTO notification_templates
     (id, clinic_id, channel, template_key, locale, body_text,
      is_system, is_active, description, created_at, updated_at)
-SELECT gen_random_uuid(), NULL, 'sms', :key, :locale, :body,
-       TRUE, TRUE, :marker, now(), now()
+SELECT gen_random_uuid(), NULL, 'sms',
+       CAST(:key AS VARCHAR(100)), CAST(:locale AS VARCHAR(5)),
+       CAST(:body AS TEXT),
+       TRUE, TRUE, CAST(:marker AS VARCHAR(500)), now(), now()
 WHERE NOT EXISTS (
     SELECT 1 FROM notification_templates
     WHERE clinic_id IS NULL
