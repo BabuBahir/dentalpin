@@ -328,3 +328,9 @@ class EventType:
     GDPR_ERASURE_EXECUTED = "gdpr.erasure.executed"
     # Breach reported. Payload: (clinic_id, breach_id, affected_people).
     GDPR_BREACH_REPORTED = "gdpr.breach.reported"
+
+    # Payroll events (payroll module — admin-only compliance data).
+    # Payloads are masked: profile events carry ids only, never amounts
+    # or bank/tax values (plaintext or ciphertext).
+    PAYROLL_PROFILE_UPDATED = "payroll.profile.updated"
+    PAYROLL_PERIOD_STATUS_CHANGED = "payroll.period.status_changed"
