@@ -80,8 +80,9 @@ roundtrip uninstall test.
 
 ## Gotchas
 
-- **Every query filters `clinic_id`.** Users are global rows; the
-  profile/entry scoping is what isolates clinics.
+- **Every query filters `clinic_id`.** Users are global rows, so
+  profiles/entries only accept `user_id`s with a membership in the
+  current clinic (404 otherwise) — the roster is `/api/v1/auth/users`.
 - **Entries mutate only in draft periods** (409 otherwise); periods move
   strictly draft → closed → paid (409 on skips).
 - **`net` is validated, not computed** — unbalanced books are a 422.

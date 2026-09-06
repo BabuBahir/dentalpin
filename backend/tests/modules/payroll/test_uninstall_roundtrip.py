@@ -2,7 +2,7 @@
 
 Install -> uninstall -> reinstall must drop ONLY the payroll_profiles,
 payroll_periods and payroll_entries tables. The module owns a single
-revision (pay_0001) with no depends_on, so the branch-scoped downgrade
+revision (payr_0001) with no depends_on, so the branch-scoped downgrade
 target is ``payroll@-1``. Marked ``alembic_roundtrip``.
 """
 

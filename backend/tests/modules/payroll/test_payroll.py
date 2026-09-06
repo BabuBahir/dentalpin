@@ -7,9 +7,11 @@ from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth.models import Clinic, User
+from app.core.auth.models import Clinic, ClinicMembership, User
+from app.core.auth.service import create_access_token
 from app.modules.payroll.schemas import (
     PayrollEntryCreate,
     PayrollEntryUpdate,
@@ -30,7 +32,8 @@ IBAN = "ES9121000418450200051332"
 TAX_ID = "12345678Z"
 
 
-async def _make_user(db: AsyncSession) -> User:
+async def _make_user(db: AsyncSession, clinic_id=None, role="dentist") -> User:
+    """A staff user; with ``clinic_id`` also a member of that clinic."""
     user = User(
         email=f"staff-{uuid4().hex[:8]}@test.clinic",
         password_hash="not-a-real-hash",
@@ -38,13 +41,16 @@ async def _make_user(db: AsyncSession) -> User:
         last_name="Member",
     )
     db.add(user)
+    if clinic_id is not None:
+        await db.flush()
+        db.add(ClinicMembership(user_id=user.id, clinic_id=clinic_id, role=role))
     await db.commit()
     await db.refresh(user)
     return user
 
 
 async def _make_profile(db, clinic_id, user_id=None, **kw):
-    user = await _make_user(db) if user_id is None else None
+    user = await _make_user(db, clinic_id) if user_id is None else None
     return await ProfileService.create_profile(
         db,
         clinic_id,
@@ -79,7 +85,7 @@ async def _make_entry(db, clinic_id, period_id, user_id, gross="3000", ded="600"
 
 @pytest.mark.asyncio
 async def test_profile_create_is_masked(db_session: AsyncSession, test_clinic: Clinic):
-    user = await _make_user(db_session)
+    user = await _make_user(db_session, test_clinic.id)
     row = await _make_profile(db_session, test_clinic.id, user.id)
     out = mask_profile(row)
     assert out.has_bank_account is True
@@ -98,7 +104,9 @@ async def test_profile_create_is_masked(db_session: AsyncSession, test_clinic: C
 
 
 @pytest.mark.asyncio
-async def test_profile_unknown_user_is_404(db_session: AsyncSession, test_clinic: Clinic):
+async def test_profile_unknown_or_foreign_user_is_404(
+    db_session: AsyncSession, test_clinic: Clinic
+):
     with pytest.raises(HTTPException) as exc:
         await ProfileService.create_profile(
             db_session,
@@ -106,11 +114,18 @@ async def test_profile_unknown_user_is_404(db_session: AsyncSession, test_clinic
             PayrollProfileCreate(user_id=uuid4(), bank_account=IBAN),
         )
     assert exc.value.status_code == 404
+    # A real user who is not a member of this clinic is equally invisible.
+    outsider = await _make_user(db_session)
+    with pytest.raises(HTTPException) as exc:
+        await ProfileService.create_profile(
+            db_session, test_clinic.id, PayrollProfileCreate(user_id=outsider.id)
+        )
+    assert exc.value.status_code == 404
 
 
 @pytest.mark.asyncio
 async def test_profile_duplicate_is_409(db_session: AsyncSession, test_clinic: Clinic):
-    user = await _make_user(db_session)
+    user = await _make_user(db_session, test_clinic.id)
     await _make_profile(db_session, test_clinic.id, user.id)
     with pytest.raises(HTTPException) as exc:
         await _make_profile(db_session, test_clinic.id, user.id)
@@ -119,7 +134,7 @@ async def test_profile_duplicate_is_409(db_session: AsyncSession, test_clinic: C
 
 @pytest.mark.asyncio
 async def test_profile_replace_to_edit(db_session: AsyncSession, test_clinic: Clinic):
-    user = await _make_user(db_session)
+    user = await _make_user(db_session, test_clinic.id)
     row = await _make_profile(db_session, test_clinic.id, user.id)
     old_cipher = row.bank_account_encrypted
     # Omitted fields keep the stored ciphertext.
@@ -167,7 +182,7 @@ async def test_entry_balanced_and_draft_gated(db_session: AsyncSession, test_cli
     # Same id-binding rule as above: no instance attribute is touched
     # after a rollback in this test.
     clinic_id = test_clinic.id
-    user = await _make_user(db_session)
+    user = await _make_user(db_session, test_clinic.id)
     user_id = user.id
     period = await _make_period(db_session, clinic_id)
     period_id = period.id
@@ -205,8 +220,8 @@ async def test_entry_balanced_and_draft_gated(db_session: AsyncSession, test_cli
 
 @pytest.mark.asyncio
 async def test_reports_aggregate(db_session: AsyncSession, test_clinic: Clinic):
-    user_a = await _make_user(db_session)
-    user_b = await _make_user(db_session)
+    user_a = await _make_user(db_session, test_clinic.id)
+    user_b = await _make_user(db_session, test_clinic.id)
     jan = await _make_period(db_session, test_clinic.id, "2026-01")
     feb = await _make_period(db_session, test_clinic.id, "2026-02")
     await _make_entry(db_session, test_clinic.id, jan.id, user_a.id)
@@ -237,8 +252,33 @@ async def test_cross_clinic_isolation(db_session: AsyncSession, test_clinic: Cli
     )
     db_session.add(other)
     await db_session.commit()
-    user = await _make_user(db_session)
+    user = await _make_user(db_session, other.id)
     await _make_profile(db_session, other.id, user.id)
     items, total = await ProfileService.list_profiles(db_session, test_clinic.id)
     assert total == 0
     assert items == []
+
+
+@pytest.mark.asyncio
+async def test_http_masked_and_admin_only(
+    client: AsyncClient, auth_headers: dict, test_clinic: Clinic, db_session: AsyncSession
+):
+    staff = await _make_user(db_session, test_clinic.id)
+    created = await client.post(
+        "/api/v1/payroll/profiles",
+        json={"user_id": str(staff.id), "bank_account": IBAN, "tax_id": TAX_ID},
+        headers=auth_headers,
+    )
+    assert created.status_code == 201, created.text
+    body = created.json()["data"]
+    assert body["bank_last_4"] == IBAN[-4:]
+    assert IBAN not in created.text and TAX_ID not in created.text
+    assert "encrypted" not in created.text
+    # Non-admin staff (any role) never see payroll.
+    receptionist = await _make_user(db_session, test_clinic.id, role="receptionist")
+    token = create_access_token(receptionist.id, token_version=receptionist.token_version)
+    headers = {"Authorization": f"Bearer {token}"}
+    assert (await client.get("/api/v1/payroll/profiles", headers=headers)).status_code == 403
+    assert (
+        await client.get("/api/v1/payroll/reports/annual?year=2026", headers=headers)
+    ).status_code == 403

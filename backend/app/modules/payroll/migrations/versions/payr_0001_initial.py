@@ -94,9 +94,11 @@ def upgrade() -> None:
     )
     op.create_index("ix_payroll_entries_clinic_id", "payroll_entries", ["clinic_id"])
     op.create_index("ix_payroll_entries_period_id", "payroll_entries", ["period_id"])
+    op.create_index("ix_payroll_entries_user_id", "payroll_entries", ["user_id"])
 
 
 def downgrade() -> None:
+    op.drop_index("ix_payroll_entries_user_id", table_name="payroll_entries")
     op.drop_index("ix_payroll_entries_period_id", table_name="payroll_entries")
     op.drop_index("ix_payroll_entries_clinic_id", table_name="payroll_entries")
     op.drop_table("payroll_entries")

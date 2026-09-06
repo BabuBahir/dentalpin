@@ -16,7 +16,7 @@ from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.auth.models import User
+from app.core.auth.models import ClinicMembership
 from app.core.email.encryption import decrypt_password, encrypt_password
 from app.core.events import EventType, event_bus
 
@@ -72,17 +72,26 @@ def mask_profile(row: PayrollProfile) -> PayrollProfileResponse:
 
 class ProfileService:
     @staticmethod
-    async def _assert_user(db: AsyncSession, user_id: UUID) -> User:
-        user = (await db.execute(select(User).where(User.id == user_id))).scalar_one_or_none()
-        if user is None:
+    async def _assert_user(db: AsyncSession, clinic_id: UUID, user_id: UUID) -> None:
+        """The user must be a member of *this* clinic — users are global
+        rows, so an existence check alone would let an admin attach payroll
+        to another clinic's staff (and probe user ids)."""
+        member = (
+            await db.execute(
+                select(ClinicMembership.id).where(
+                    ClinicMembership.clinic_id == clinic_id,
+                    ClinicMembership.user_id == user_id,
+                )
+            )
+        ).first()
+        if member is None:
             raise HTTPException(http_status.HTTP_404_NOT_FOUND, "user not found")
-        return user
 
     @staticmethod
     async def create_profile(
         db: AsyncSession, clinic_id: UUID, payload: PayrollProfileCreate
     ) -> PayrollProfile:
-        await ProfileService._assert_user(db, payload.user_id)
+        await ProfileService._assert_user(db, clinic_id, payload.user_id)
         row = PayrollProfile(
             clinic_id=clinic_id,
             user_id=payload.user_id,
@@ -270,7 +279,7 @@ class EntryService:
         db: AsyncSession, clinic_id: UUID, payload: PayrollEntryCreate
     ) -> PayrollEntry:
         await EntryService._assert_draft_period(db, clinic_id, payload.period_id)
-        await ProfileService._assert_user(db, payload.user_id)
+        await ProfileService._assert_user(db, clinic_id, payload.user_id)
         _assert_balanced(payload.gross, payload.deductions, payload.net)
         row = PayrollEntry(
             clinic_id=clinic_id,

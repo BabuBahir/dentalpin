@@ -51,7 +51,7 @@ Migration `payr_0001_initial` on own Alembic branch (`payroll`), no
 
 ## Service layer
 
-- `ProfileService` — create (user must exist → 404; duplicate → 409),
+- `ProfileService` — create (user must be a member of the clinic → 404 otherwise; duplicate → 409),
   masked reads, replace-to-edit updates.
 - `PeriodService` — strictly draft → closed → paid (409 on skips),
   publishes `payroll.period.status_changed`.
@@ -68,9 +68,10 @@ re-encrypting stored values (same trade-off as verifactu).
 
 ## Tenancy
 
-Every query filters by `clinic_id`; users are global rows, so the
-profile/entry scoping is what isolates clinics. Unknown users are a
-404, cross-clinic ids are invisible (404, never 403).
+Every query filters by `clinic_id`. Users are global rows, so profiles
+and entries only accept users with a `clinic_memberships` row in the
+current clinic. Unknown or foreign users are a 404, cross-clinic ids
+are invisible (404, never 403).
 
 ## Constraints
 
