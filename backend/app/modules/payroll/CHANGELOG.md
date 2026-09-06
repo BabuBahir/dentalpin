@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Admin-only frontend layer (issue #391): profiles, periods,
+  period-detail entries and reports pages under `/payroll/*`, backend-
+  driven nav (manifest `frontend.navigation`), `PERMISSIONS.payroll.*`
+  mirror, 9 layer locales, user-manual screens en/es. Entry/period
+  remove actions wait for #399 (draft deletes) to merge.
 - Initial module (roadmap issue #229, approved v1): staff payroll with
   encrypted bank/tax data, monthly periods, raw entries, reports.
 - 3 tables on own Alembic branch (`payr_0001`, no `depends_on`):

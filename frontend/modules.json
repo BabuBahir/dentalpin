@@ -25,6 +25,7 @@
     "/module_layers/patients/frontend",
     "/module_layers/patients_clinical/frontend",
     "/module_layers/payments/frontend",
+    "/module_layers/payroll/frontend",
     "/module_layers/periodontogram/frontend",
     "/module_layers/purchase_orders/frontend",
     "/module_layers/recall_reminders/frontend",
@@ -208,6 +209,16 @@
       "routes": [
         "/payments",
         "/reports/payments"
+      ]
+    },
+    {
+      "name": "payroll",
+      "path": "/module_layers/payroll/frontend",
+      "routes": [
+        "/payroll/periods/:id",
+        "/payroll/periods",
+        "/payroll/profiles",
+        "/payroll/reports"
       ]
     },
     {
