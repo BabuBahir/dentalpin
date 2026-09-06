@@ -1,6 +1,6 @@
 ---
 module: payroll
-last_verified_commit: 0f333000
+last_verified_commit: 14ec616c
 ---
 
 # payroll — permissions

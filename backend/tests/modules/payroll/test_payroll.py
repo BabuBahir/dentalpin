@@ -367,3 +367,15 @@ async def test_http_delete_draft_guards(
     period = await PeriodService.transition(db_session, period, PeriodTransition(status="closed"))
     closed = await client.delete(f"/api/v1/payroll/periods/{period.id}", headers=auth_headers)
     assert closed.status_code == 409, closed.text
+    # Entries of a closed period refuse with 409 at HTTP level too: create
+    # while draft, close, then delete.
+    late = await _make_period(db_session, clinic_id, "2026-05")
+    late_id = late.id
+    user2 = await _make_user(db_session, clinic_id)
+    stuck = await _make_entry(db_session, clinic_id, late_id, user2.id)
+    stuck_id = stuck.id
+    late = await PeriodService.get_period(db_session, clinic_id, late_id)
+    assert late is not None
+    await PeriodService.transition(db_session, late, PeriodTransition(status="closed"))
+    blocked = await client.delete(f"/api/v1/payroll/entries/{stuck_id}", headers=auth_headers)
+    assert blocked.status_code == 409, blocked.text

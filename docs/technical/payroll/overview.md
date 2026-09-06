@@ -1,6 +1,6 @@
 ---
 module: payroll
-last_verified_commit: 0f333000
+last_verified_commit: 14ec616c
 ---
 
 # payroll — overview
@@ -29,10 +29,12 @@ Routes:
 - `POST /api/v1/payroll/periods` — open a draft period (201)
 - `GET /api/v1/payroll/periods/{id}` — one period
 - `POST /api/v1/payroll/periods/{id}/status` — draft → closed → paid
+- `DELETE /api/v1/payroll/periods/{id}` — delete an empty draft period (204)
 - `GET /api/v1/payroll/periods/{id}/entries` — entries of a period
 - `POST /api/v1/payroll/entries` — raw entry (201, draft only)
 - `GET /api/v1/payroll/entries/{id}` — one entry
 - `PATCH /api/v1/payroll/entries/{id}` — edit a draft entry
+- `DELETE /api/v1/payroll/entries/{id}` — delete a draft entry (204)
 - `GET /api/v1/payroll/reports/monthly?month=` — period rollup
 - `GET /api/v1/payroll/reports/annual?year=` — year rollup
 
