@@ -35,6 +35,16 @@ export default defineEventHandler((event) => {
     apiOrigin = ''
   }
   const connect = ['\'self\'', apiOrigin].filter(Boolean).join(' ')
+  // HelpButton embeds the docs portal in an <iframe>; media's PDFViewer
+  // embeds blob: URLs. Without frame-src both fall back to default-src.
+  let docsOrigin = ''
+  try {
+    const docsUrl = String(config.public.docsUrl || '')
+    if (/^https?:\/\//.test(docsUrl)) docsOrigin = new URL(docsUrl).origin
+  } catch {
+    docsOrigin = ''
+  }
+  const frame = ['\'self\'', 'blob:', docsOrigin].filter(Boolean).join(' ')
   const reportUri = `${apiOrigin || ''}/api/v1/security/csp-report`
 
   const policy = [
@@ -47,6 +57,7 @@ export default defineEventHandler((event) => {
     'font-src \'self\' data:',
     `connect-src ${connect}`,
     'worker-src \'self\' blob:',
+    `frame-src ${frame}`,
     'frame-ancestors \'self\'',
     'base-uri \'self\'',
     'form-action \'self\'',

@@ -50,9 +50,13 @@ def _normalize(payload: Any) -> list[dict[str, Any]]:
             continue
         # Reporting-API bodies use camelCase; legacy uses kebab-case.
         flat = {k.replace("_", "-"): v for k, v in report.items()}
-        flat.update({_camel_to_kebab(k): v for k, v in report.items()})
+        flat.update({_ALIAS.get(k, _camel_to_kebab(k)): v for k, v in report.items()})
         out.append({k: str(flat[k])[:300] for k in _KEEP if k in flat})
     return out
+
+
+# Reporting-API names that don't kebab-case into the legacy field.
+_ALIAS = {"documentURL": "document-uri", "blockedURL": "blocked-uri"}
 
 
 def _camel_to_kebab(name: str) -> str:

@@ -19,6 +19,7 @@ test.describe('content security policy', () => {
     expect(policy).toContain('default-src \'self\'')
     expect(policy).toContain('frame-ancestors \'self\'')
     expect(policy).toContain('object-src \'none\'')
+    expect(policy).toMatch(/frame-src 'self' blob:/)
   })
 
   test('login page and dashboard render without violations', async ({ page }) => {

@@ -45,7 +45,8 @@ Rendered `/login` from `nuxt build` output, then grepped:
 | API + copilot SSE | `fetch()` to the API origin | `connect-src 'self' <api origin>` |
 | avatars / uploads / QR previews | `data:` and `blob:` URLs | `img-src 'self' data: blob:` |
 | icons | pre-bundled (`icon.clientBundle`), no runtime CDN | `'self'` |
-| docs portal (`NUXT_PUBLIC_DOCS_URL`) | opened as a link/new tab | not a resource load; no directive |
+| docs portal (`NUXT_PUBLIC_DOCS_URL`) | embedded in an `<iframe>` by `HelpButton.vue` (contextual help drawer) | `frame-src <docs origin>` |
+| PDF preview (`media/PDFViewer.vue`) | `<iframe src="blob:…">` | `frame-src blob:` |
 
 Resulting policy (see the middleware for the source of truth):
 
@@ -53,8 +54,9 @@ Resulting policy (see the middleware for the source of truth):
 default-src 'self'; script-src 'self' 'unsafe-inline';
 style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;
 font-src 'self' data:; connect-src 'self' <api-origin>;
-worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self';
-form-action 'self'; object-src 'none'; report-uri <api-origin>/api/v1/security/csp-report
+worker-src 'self' blob:; frame-src 'self' blob: <docs-origin>;
+frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none';
+report-uri <api-origin>/api/v1/security/csp-report
 ```
 
 ## The known gap: `script-src 'unsafe-inline'`

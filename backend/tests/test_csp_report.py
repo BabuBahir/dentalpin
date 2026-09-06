@@ -52,6 +52,8 @@ async def test_reporting_api_batch_format_is_logged(client: AsyncClient, caplog)
     logged = json.loads(line.getMessage().split("csp violation ", 1)[1])
     assert logged["effective-directive"] == "img-src"
     assert logged["disposition"] == "report"
+    assert logged["document-uri"] == "https://clinic.example/"
+    assert logged["blocked-uri"] == "https://cdn.example/a.png"
 
 
 @pytest.mark.asyncio
