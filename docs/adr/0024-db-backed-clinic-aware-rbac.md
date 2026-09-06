@@ -1,4 +1,4 @@
-# 0022 — DB-backed, clinic-aware RBAC (persist roles & grants)
+# 0024 — DB-backed, clinic-aware RBAC (persist roles & grants)
 
 - **Status:** accepted
 - **Date:** 2026-09-03
