@@ -1,6 +1,7 @@
 # 0022 — TOTP second factor for staff login, and a 12-character password floor
 
-- **Status:** proposed
+- **Status:** deferred (decision 1 accepted and shipped in #380; decision 2
+  deferred on 2026-09-06 until a customer requires it — see *Decision*)
 - **Date:** 2026-09-05
 - **Deciders:** maintainers (@martinezsalmeron)
 - **Tags:** security, auth
@@ -28,8 +29,13 @@ once the ADR is accepted.
    endpoint today) — never at login, so existing accounts keep working
    until their next change. The demo seed (`demo1234`) is unaffected by
    design: it is only ever *logged in with*.
-2. **TOTP (RFC 6238) as the staff second factor**, implemented in core
-   auth (login is core, not a module):
+2. **TOTP (RFC 6238) as the staff second factor** — **deferred**
+   (2026-09-06): not built until a customer requires it. When it is, two
+   conditions override the design below: it is **always opt-in per
+   user** (no mandatory-for-admin, no clinic-wide enforcement toggle),
+   and it uses **`pyotp`** rather than a hand-rolled RFC 6238. The rest
+   stays as the reference design, implemented in core auth (login is
+   core, not a module):
    - **Enrolment**: `POST /auth/mfa/totp/enroll` returns a provisioning
      URI (`otpauth://totp/DentalPin:<email>?secret=…&issuer=DentalPin`)
      rendered as a QR client-side; `POST /auth/mfa/totp/confirm` with one
