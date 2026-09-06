@@ -136,14 +136,14 @@ async def _reconcile_role(
         .scalars()
         .all()
     )
-    existing_by_perm = {rp.permission_id: rp for rp in existing}
+    existing_by_perm = {str(rp.permission_id): rp for rp in existing}
 
     for code, (module, perm) in found.items():
         pid = str(perm.id)
         in_target = pid in target_ids
         row = existing_by_perm.get(pid)
         if in_target and row is None:
-            db.add(RolePermission(id=uuid4(), role_id=role.id, permission_id=pid))
+            db.add(RolePermission(id=uuid4(), role_id=role.id, permission_id=perm.id))
             await _record_module_default(db, role, module, perm)
         elif not in_target and row is not None:
             await db.delete(row)

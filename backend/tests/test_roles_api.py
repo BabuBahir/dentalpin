@@ -195,3 +195,32 @@ async def test_role_override_rejects_custom_role(client, auth_headers, test_clin
         headers=auth_headers,
     )
     assert resp.status_code == 422
+
+
+async def test_roles_endpoints_forbid_non_admin(client, auth_headers, test_clinic, db_session):
+    from uuid import uuid4 as _uuid4
+
+    from app.core.auth.models import User
+    from app.core.auth.service import create_access_token
+
+    staff = User(
+        email=f"reception-{_uuid4().hex[:8]}@test.clinic",
+        password_hash="not-a-real-hash",
+        first_name="Recep",
+        last_name="Staff",
+    )
+    db_session.add(staff)
+    await db_session.flush()
+    db_session.add(
+        ClinicMembership(user_id=staff.id, clinic_id=test_clinic.id, role="receptionist")
+    )
+    await db_session.commit()
+    headers = {
+        "Authorization": f"Bearer {create_access_token(staff.id, token_version=staff.token_version)}"
+    }
+    assert (await client.get("/api/v1/roles", headers=headers)).status_code == 403
+    assert (
+        await client.post(
+            "/api/v1/roles", json={"name": "nope", "permissions": []}, headers=headers
+        )
+    ).status_code == 403

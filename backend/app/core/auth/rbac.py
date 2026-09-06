@@ -22,6 +22,7 @@ frontend ``/me`` contract and existing behavior are unchanged.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -66,12 +67,15 @@ class _RoleSetCache:
     Falls back to a DB read on a miss; correct even if the cache is cold.
     """
 
-    _cache: dict[tuple[str | None, str], set[str]] = {}
+    _cache: dict[tuple[UUID | None, str], set[str]]
 
-    def get(self, clinic_id: str | None, role_name: str) -> set[str] | None:
+    def __init__(self) -> None:
+        self._cache = {}
+
+    def get(self, clinic_id: UUID | None, role_name: str) -> set[str] | None:
         return self._cache.get((clinic_id, role_name))
 
-    def put(self, clinic_id: str | None, role_name: str, granted: set[str]) -> None:
+    def put(self, clinic_id: UUID | None, role_name: str, granted: set[str]) -> None:
         self._cache[(clinic_id, role_name)] = granted
 
     def invalidate(self) -> None:
@@ -85,7 +89,7 @@ def invalidate_rbac_cache() -> None:
     _role_set_cache.invalidate()
 
 
-async def _load_role(db: AsyncSession, clinic_id: str | None, role_name: str) -> Role | None:
+async def _load_role(db: AsyncSession, clinic_id: UUID | None, role_name: str) -> Role | None:
     stmt = select(Role).where(Role.name == role_name)
     if clinic_id is None:
         stmt = stmt.where(Role.clinic_id.is_(None))
@@ -108,7 +112,7 @@ async def _role_granted_permissions(db: AsyncSession, role: Role) -> set[str]:
 
 
 async def _apply_clinic_overrides(
-    db: AsyncSession, clinic_id: str, role_id: str, base: set[str]
+    db: AsyncSession, clinic_id: UUID, role_id: UUID, base: set[str]
 ) -> set[str]:
     stmt = (
         select(Permission.code, ClinicRoleOverride.granted)
@@ -129,7 +133,7 @@ async def _apply_clinic_overrides(
 
 
 async def resolve_granted_permissions(
-    db: AsyncSession, clinic_id: str | None, role_name: str
+    db: AsyncSession, clinic_id: UUID | None, role_name: str
 ) -> set[str]:
     """Return the effective granted permission set (wildcards excluded) for a
     role in a clinic. ``clinic_id`` may be ``None`` to resolve the pure system
@@ -151,7 +155,7 @@ async def resolve_granted_permissions(
 
 
 async def has_permission_in_clinic(
-    db: AsyncSession, clinic_id: str | None, role_name: str, permission: str
+    db: AsyncSession, clinic_id: UUID | None, role_name: str, permission: str
 ) -> bool:
     """True if a membership with ``role_name`` in ``clinic_id`` holds
     ``permission`` (wildcards honoured)."""

@@ -146,8 +146,15 @@ async def _set_role_permissions(db: AsyncSession, role_id: UUID, codes: list[str
         perm = (
             (await db.execute(select(Permission).where(Permission.code == code))).scalars().first()
         )
-        if perm is not None:  # guaranteed by the validity check above
-            db.add(RolePermission(id=uuid4(), role_id=role_id, permission_id=perm.id))
+        if perm is None:
+            # Validated above, but a code can be known (core/registry) with
+            # no Permission row yet (seeder hasn't run): fail loudly, never
+            # silently drop the grant.
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unknown permission code(s): {code}",
+            )
+        db.add(RolePermission(id=uuid4(), role_id=role_id, permission_id=perm.id))
     await db.flush()
 
 
@@ -368,6 +375,11 @@ async def set_role_overrides(
         perm = (
             (await db.execute(select(Permission).where(Permission.code == code))).scalars().first()
         )
+        if perm is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unknown permission code(s): {code}",
+            )
         db.add(
             ClinicRoleOverride(
                 id=uuid4(),
@@ -381,6 +393,11 @@ async def set_role_overrides(
         perm = (
             (await db.execute(select(Permission).where(Permission.code == code))).scalars().first()
         )
+        if perm is None:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Unknown permission code(s): {code}",
+            )
         db.add(
             ClinicRoleOverride(
                 id=uuid4(),
