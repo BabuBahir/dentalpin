@@ -16,7 +16,9 @@ class SupplierReviewCreate(BaseModel):
 
 
 class SupplierReviewUpdate(BaseModel):
-    score: int = Field(ge=1, le=5, description="1-5 communication rating")
+    """PATCH body: only the fields sent are changed."""
+
+    score: int | None = Field(default=None, ge=1, le=5, description="1-5 communication rating")
     comment: str | None = Field(default=None, max_length=2000)
 
 

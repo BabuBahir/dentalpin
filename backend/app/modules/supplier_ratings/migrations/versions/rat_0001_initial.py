@@ -51,13 +51,9 @@ def upgrade() -> None:
     )
     op.create_index("ix_supplier_reviews_clinic_id", "supplier_reviews", ["clinic_id"])
     op.create_index("ix_supplier_reviews_supplier_id", "supplier_reviews", ["supplier_id"])
-    op.create_index(
-        "ix_supplier_reviews_supplier_clinic", "supplier_reviews", ["supplier_id", "clinic_id"]
-    )
 
 
 def downgrade() -> None:
-    op.drop_index("ix_supplier_reviews_supplier_clinic", table_name="supplier_reviews")
     op.drop_index("ix_supplier_reviews_supplier_id", table_name="supplier_reviews")
     op.drop_index("ix_supplier_reviews_clinic_id", table_name="supplier_reviews")
     op.drop_table("supplier_reviews")

@@ -205,7 +205,7 @@ async def test_metrics_with_no_due_date_exclude_from_total(
 async def test_list_ratings_paginated(db_session: AsyncSession, test_clinic: Clinic):
     _, a = await _make_supplier(db_session, test_clinic.id, name="Alpha Supply")
     _, b = await _make_supplier(db_session, test_clinic.id, name="Beta Materials")
-    # Beta gets a lower average via two reviews; Alpha none.
+    # Beta has a review; Alpha none.
     await SupplierRatingsService.create_review(
         db_session,
         test_clinic.id,
@@ -249,6 +249,13 @@ async def test_review_crud_and_conflict(db_session: AsyncSession, test_clinic: C
         db_session, test_clinic.id, created.id, SupplierReviewUpdate(score=5, comment="great")
     )
     assert updated.score == 5
+    assert updated.comment == "great"
+
+    # PATCH with only a score keeps the comment.
+    updated = await SupplierRatingsService.update_review(
+        db_session, test_clinic.id, created.id, SupplierReviewUpdate(score=4)
+    )
+    assert updated.score == 4
     assert updated.comment == "great"
 
     review, contact = await SupplierRatingsService.get_review(

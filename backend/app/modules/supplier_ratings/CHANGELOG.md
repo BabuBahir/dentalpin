@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `PATCH /reviews/{id}` is a partial update: omitted fields are left untouched.
+
 - Rebuilt fresh off current `main` (roadmap #227-5): unknown-supplier
   ids answer 404 (was 400); duplicate ratings answer 409 from the unique
   constraint under race; agent review creation passes `created_by=None`

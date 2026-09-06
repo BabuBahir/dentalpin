@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, ForeignKey, Index, Integer, Text, UniqueConstraint
+from sqlalchemy import CheckConstraint, ForeignKey, Integer, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base, TimestampMixin
@@ -34,7 +34,6 @@ class SupplierReview(Base, TimestampMixin):
     __table_args__ = (
         UniqueConstraint("clinic_id", "supplier_id", name="uq_supplier_reviews_clinic_supplier"),
         CheckConstraint("score >= 1 AND score <= 5", name="ck_supplier_reviews_score_range"),
-        Index("ix_supplier_reviews_supplier_clinic", "supplier_id", "clinic_id"),
     )
 
     contact: Mapped[Contact] = relationship(foreign_keys=[supplier_id])

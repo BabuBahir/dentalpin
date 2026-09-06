@@ -279,9 +279,8 @@ class SupplierRatingsService:
     ) -> SupplierReview:
         """Edit score/comment in place."""
         review, _ = await SupplierRatingsService.get_review(db, clinic_id, review_id)
-        if payload.score != review.score:
-            review.score = payload.score
-        review.comment = payload.comment
+        for field, value in payload.model_dump(exclude_unset=True).items():
+            setattr(review, field, value)
         await db.commit()
         await db.refresh(review)
         return review
