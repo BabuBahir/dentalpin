@@ -238,6 +238,7 @@ def _settings_response(
         clinic_id=settings.clinic_id,
         preferred_channel=settings.preferred_channel,
         fallback_enabled=settings.fallback_enabled,
+        sms_daily_limit=settings.sms_daily_limit,
         manual_channels=list(settings.manual_channels or []),
         settings=settings.settings,
         available_channels=available_channels,

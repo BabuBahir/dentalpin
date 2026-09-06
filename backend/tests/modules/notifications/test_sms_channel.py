@@ -227,3 +227,40 @@ async def test_sms_rate_limit_skips_when_exhausted(db_session, test_patient, sms
     )
     assert second.status == "skipped"
     assert second.error_message == "sms_rate_limited"
+
+
+@pytest.mark.asyncio
+async def test_sms_rate_limit_falls_back_to_next_channel(db_session, test_patient, sms_adapter):
+    """An exhausted SMS cap is not a dead end: fallback still reaches email."""
+    clinic_id = test_patient.clinic_id
+    patient_id = test_patient.id
+    patient_email = test_patient.email
+    settings = await _channel_settings(db_session, clinic_id, preferred="sms")
+    settings.sms_daily_limit = 0
+    await db_session.commit()
+
+    msg = await NotificationGateway.enqueue(
+        db_session,
+        clinic_id,
+        "appointment_confirmation",
+        context={},
+        patient_id=patient_id,
+    )
+    assert msg.status == "queued"
+    assert msg.channel == "email"
+    assert msg.to_address == patient_email
+
+
+@pytest.mark.asyncio
+async def test_settings_put_sms_daily_limit_round_trips(client, auth_headers, test_clinic):
+    """The persisted cap is echoed back, not the schema default."""
+    response = await client.put(
+        "/api/v1/notifications/settings",
+        json={"sms_daily_limit": 50},
+        headers=auth_headers,
+    )
+    assert response.status_code == 200
+    assert response.json()["data"]["sms_daily_limit"] == 50
+
+    response = await client.get("/api/v1/notifications/settings", headers=auth_headers)
+    assert response.json()["data"]["sms_daily_limit"] == 50

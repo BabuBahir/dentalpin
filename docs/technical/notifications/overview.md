@@ -20,8 +20,11 @@ channel preferences, clinic settings, delivery logs, and a single
   `force_send`); a missing prefs row means reachable.
   `sms_opt_in_at` mirrors the whatsapp consent trail.
   Per-clinic cost guard: `sms_daily_limit` (default 100/UTC day,
-  `0` = blocked, skips don't consume); email/whatsapp are uncapped
-  flat-rate transports. Delivery itself arrives with the `sms_gateway`
+  `0` = blocked, skips and inbound rows don't consume). An exhausted
+  cap behaves like an unreachable channel: with `fallback_enabled`
+  the next connected channel takes the send, and only when none is
+  viable is the row skipped with `sms_rate_limited`. Email/whatsapp
+  are uncapped flat-rate transports. Delivery itself arrives with the `sms_gateway`
   module (pluggable providers); until then SMS resolves but has no
   transport backend.
 
