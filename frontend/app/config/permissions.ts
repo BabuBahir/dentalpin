@@ -106,6 +106,11 @@ export const PERMISSIONS = {
     recordRefund: 'payments.record.refund',
     reportsRead: 'payments.reports.read'
   },
+  razorpay: {
+    settingsRead: 'razorpay.settings.read',
+    settingsWrite: 'razorpay.settings.write',
+    collect: 'razorpay.collect'
+  },
   verifactu: {
     settingsRead: 'verifactu.settings.read',
     settingsConfigure: 'verifactu.settings.configure',

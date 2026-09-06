@@ -1,0 +1,35 @@
+{
+  "razorpay": {
+    "settings": {
+      "title": "Razorpay",
+      "description": "Online payments (UPI, netbanking, cards) through Razorpay for Indian clinics.",
+      "credentials": "Gateway credentials",
+      "active": "Active",
+      "inactive": "Not configured",
+      "keyId": "Key ID",
+      "keyIdHelp": "Public identifier from the Razorpay Dashboard (Settings → API Keys).",
+      "keySecret": "Key secret",
+      "keySecretHelp": "Stored encrypted server-side; the pay button appears as soon as credentials are saved.",
+      "keySecretStored": "A secret is already stored. Leave the field blank to keep it, or type a new one to rotate it.",
+      "activeLabel": "Accept online payments",
+      "saved": "Razorpay settings saved",
+      "saveError": "Could not save the Razorpay settings",
+      "loadError": "Could not load the Razorpay settings",
+      "howTo": "How to configure",
+      "howToHelp": "Create a Razorpay account, copy the API keys (Key ID + Key secret), and save them here. The online payment button then appears in the payments screen and the patient ledger."
+    },
+    "collect": {
+      "button": "Pay with Razorpay",
+      "title": "Collect online",
+      "description": "Clinic payment",
+      "patient": "Patient",
+      "budget": "Budget",
+      "amount": "Amount",
+      "invalidAmount": "Enter a valid amount greater than 0.",
+      "pay": "Pay",
+      "loadError": "Could not load the Razorpay checkout.",
+      "error": "The payment could not be started.",
+      "verifyError": "The payment could not be confirmed."
+    }
+  }
+}

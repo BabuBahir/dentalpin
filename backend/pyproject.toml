@@ -51,6 +51,8 @@ dependencies = [
     "anthropic>=0.40",
     # telephony module: E.164 normalization of caller numbers (issue #64).
     "phonenumbers>=8.13",
+    # razorpay module: Razorpay online payment gateway (India).
+    "razorpay>=1.4.0",
 ]
 
 [project.optional-dependencies]
@@ -107,6 +109,7 @@ gdpr = "app.modules.gdpr:GdprModule"
 inventory_reorder = "app.modules.inventory_reorder:InventoryReorderModule"
 supplier_ratings = "app.modules.supplier_ratings:SupplierRatingsModule"
 payroll = "app.modules.payroll:PayrollModule"
+razorpay = "app.modules.razorpay:RazorpayModule"
 
 [tool.setuptools.packages.find]
 where = ["."]

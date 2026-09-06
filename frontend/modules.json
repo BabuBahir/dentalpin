@@ -27,6 +27,7 @@
     "/module_layers/payments/frontend",
     "/module_layers/periodontogram/frontend",
     "/module_layers/purchase_orders/frontend",
+    "/module_layers/razorpay/frontend",
     "/module_layers/recall_reminders/frontend",
     "/module_layers/recalls/frontend",
     "/module_layers/reports/frontend",
@@ -225,6 +226,11 @@
         "/procurement/reorder",
         "/procurement/suppliers"
       ]
+    },
+    {
+      "name": "razorpay",
+      "path": "/module_layers/razorpay/frontend",
+      "routes": []
     },
     {
       "name": "recall_reminders",

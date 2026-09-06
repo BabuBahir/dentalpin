@@ -1,0 +1,35 @@
+{
+  "razorpay": {
+    "settings": {
+      "title": "Razorpay",
+      "description": "Pagamentos online (UPI, transferência, cartões) via Razorpay para clínicas indianas.",
+      "credentials": "Credenciais do gateway",
+      "active": "Ativo",
+      "inactive": "Não configurado",
+      "keyId": "ID da chave",
+      "keyIdHelp": "Identificador público do painel Razorpay (Settings → API Keys).",
+      "keySecret": "Chave secreta",
+      "keySecretHelp": "Guardada cifrada no servidor; o botão de pagamento aparece assim que as credenciais são salvas.",
+      "keySecretStored": "Já existe uma chave guardada. Deixe o campo em branco para mantê-la ou digite uma nova para rotacioná-la.",
+      "activeLabel": "Aceitar pagamentos online",
+      "saved": "Definições do Razorpay guardadas",
+      "saveError": "Não foi possível guardar as definições do Razorpay",
+      "loadError": "Não foi possível carregar as definições do Razorpay",
+      "howTo": "Como configurar",
+      "howToHelp": "Crie uma conta Razorpay, copie as chaves da API (Key ID e Key secret) e guarde-as aqui. O botão de pagamento online aparece no ecrã de pagamentos e no histórico do paciente."
+    },
+    "collect": {
+      "button": "Pagar com Razorpay",
+      "title": "Cobrar online",
+      "description": "Pagamento da clínica",
+      "patient": "Paciente",
+      "budget": "Orçamento",
+      "amount": "Valor",
+      "invalidAmount": "Introduza um valor válido maior que 0.",
+      "pay": "Pagar",
+      "loadError": "Não foi possível carregar o checkout do Razorpay.",
+      "error": "Não foi possível iniciar o pagamento.",
+      "verifyError": "Não foi possível confirmar o pagamento."
+    }
+  }
+}
