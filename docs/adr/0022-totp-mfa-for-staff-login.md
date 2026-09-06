@@ -24,7 +24,8 @@ once the ADR is accepted.
    Length beats composition (NIST SP 800-63B); no forced rotation, no
    special-character rule. Applies wherever a password is *set*
    (first-run setup, admin-created users, invite `set-password`, own
-   password change) — never at login, so existing accounts keep working
+   password change once one exists — there is no self-service change
+   endpoint today) — never at login, so existing accounts keep working
    until their next change. The demo seed (`demo1234`) is unaffected by
    design: it is only ever *logged in with*.
 2. **TOTP (RFC 6238) as the staff second factor**, implemented in core
