@@ -78,7 +78,7 @@
     "emailRequired": "أدخل البريد الإلكتروني",
     "emailInvalid": "البريد الإلكتروني غير صالح",
     "passwordRequired": "أدخل كلمة المرور",
-    "passwordTooShort": "يجب ألا تقل كلمة المرور عن ٨ أحرف",
+    "passwordTooShort": "يجب ألا تقل كلمة المرور عن ١٢ حرفًا",
     "passwordWeak": "يجب أن تتضمن كلمة المرور حروفًا وأرقامًا",
     "passwordMismatch": "كلمتا المرور غير متطابقتين",
     "clinicNameRequired": "أدخل اسم العيادة",
