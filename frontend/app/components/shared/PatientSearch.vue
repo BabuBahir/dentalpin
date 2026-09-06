@@ -198,7 +198,7 @@ watch(patients, () => {
             {{ patient.last_name }}, {{ patient.first_name }}
           </p>
           <p class="text-sm text-muted truncate">
-            {{ patient.phone || patient.email || '-' }}
+            <span dir="ltr">{{ patient.phone || patient.email || '-' }}</span>
           </p>
         </div>
       </div>

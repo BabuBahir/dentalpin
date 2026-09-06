@@ -129,7 +129,7 @@ function goBack() {
                 {{ selectedPatient.last_name }}, {{ selectedPatient.first_name }}
               </p>
               <p class="text-caption text-subtle">
-                {{ selectedPatient.phone }}
+                <span dir="ltr">{{ selectedPatient.phone }}</span>
               </p>
             </div>
             <UButton
@@ -170,7 +170,7 @@ function goBack() {
                   {{ patient.last_name }}, {{ patient.first_name }}
                 </p>
                 <p class="text-caption text-subtle">
-                  {{ patient.phone }}
+                  <span dir="ltr">{{ patient.phone }}</span>
                 </p>
               </button>
             </div>
