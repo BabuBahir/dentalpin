@@ -43,7 +43,9 @@ async def _make_supplier(
     )
 
 
-async def _make_item(db: AsyncSession, clinic_id, *, name="Gloves", stock=0, active=True) -> object:
+async def _make_item(
+    db: AsyncSession, clinic_id, *, name="Gloves", stock=0, min_quantity=0, active=True
+) -> object:
     return await InventoryService.create_item(
         db,
         clinic_id,
@@ -52,6 +54,7 @@ async def _make_item(db: AsyncSession, clinic_id, *, name="Gloves", stock=0, act
             category="consumables",
             unit="units",
             stock_quantity=Decimal(stock),
+            min_quantity=Decimal(min_quantity),
             unit_cost=Decimal("2.50"),
         ),
         created_by=None,
@@ -116,7 +119,8 @@ async def test_suggestion_math(db_session: AsyncSession, test_clinic: Clinic):
     await _make_link(db_session, test_clinic.id, supplier.id, item.id)
 
     # 30 units consumed over the last 90 days -> daily_usage 0.33,
-    # reorder_point ceil(0.33 * 5) = ceil(1.65) = 2, stock 0 -> suggest 2.
+    # reorder_point ceil(0.33 * 5) = ceil(1.65) = 2, stock 0 < 2 ->
+    # suggest up to reorder_point + 30 days cover: 2 + ceil(9.9) = 12.
     for days_ago, qty in ((2, 10), (20, 10), (60, 10)):
         await _add_consumption(db_session, test_clinic.id, item.id, qty, days_ago)
 
@@ -128,7 +132,7 @@ async def test_suggestion_math(db_session: AsyncSession, test_clinic: Clinic):
     assert suggestion["reorder_point"] == Decimal("2")
     assert suggestion["stock_quantity"] == Decimal("0")
     assert suggestion["on_order"] == Decimal("0")
-    assert suggestion["suggested_quantity"] == Decimal("2")
+    assert suggestion["suggested_quantity"] == Decimal("12")
     assert suggestion["supplier_id"] == supplier.id
     assert suggestion["supplier_name"] == "Acme Supplies"
     assert suggestion["unit_price"] == Decimal("3.00")
@@ -162,11 +166,11 @@ async def test_on_order_reduces_suggestion(db_session: AsyncSession, test_clinic
     await _make_link(db_session, test_clinic.id, supplier.id, item.id)
     await _add_consumption(db_session, test_clinic.id, item.id, 30, 5)
 
-    # Nothing on order -> suggestion 2.
+    # Nothing on order -> reorder_point 2, suggestion 2 + 10 cover = 12.
     before = await _suggestions(db_session, test_clinic.id)
-    assert before[item.id]["suggested_quantity"] == Decimal("2")
+    assert before[item.id]["suggested_quantity"] == Decimal("12")
 
-    # A draft PO for 3 covers stock_quantity+on_order projection -> suggest 0.
+    # A draft PO for 3 lifts stock_quantity+on_order past the reorder point.
     await _open_order(db_session, test_clinic.id, supplier.id, item.id, qty=3)
     after = await _suggestions(db_session, test_clinic.id)
     assert item.id not in after
@@ -195,6 +199,26 @@ async def test_exclusions(db_session: AsyncSession, test_clinic: Clinic):
     assert no_link.id not in suggestions  # no sourcing link
     assert inactive.id not in suggestions  # not active
     assert no_lead_item.id not in suggestions  # lead_time None -> reorder_point 0
+
+
+@pytest.mark.asyncio
+async def test_min_quantity_floors_reorder_point(db_session: AsyncSession, test_clinic: Clinic):
+    """The clinic's low-stock threshold is the reorder point when it beats lead-time demand."""
+    _, supplier = await _make_supplier(db_session, test_clinic.id, lead_time=None)
+    item = await _make_item(db_session, test_clinic.id, name="Masks", stock=5, min_quantity=20)
+    await _make_link(db_session, test_clinic.id, supplier.id, item.id)
+    # 90 units / 90 days -> daily_usage 1; no lead time -> demand 0 -> point = min 20.
+    await _add_consumption(db_session, test_clinic.id, item.id, 90, 3)
+
+    suggestion = (await _suggestions(db_session, test_clinic.id))[item.id]
+    assert suggestion["reorder_point"] == Decimal("20")
+    assert suggestion["suggested_quantity"] == Decimal("45")  # 20 + 30 cover - 5 stock
+
+    # At or above the reorder point -> no suggestion.
+    await InventoryService.update_item(
+        db_session, test_clinic.id, item.id, InventoryItemUpdate(stock_quantity=Decimal("20"))
+    )
+    assert item.id not in await _suggestions(db_session, test_clinic.id)
 
 
 @pytest.mark.asyncio

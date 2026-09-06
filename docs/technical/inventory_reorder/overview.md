@@ -50,20 +50,22 @@ For each **active** inventory item in the clinic:
    ordered by supplier name. Items with **no supplier link** are
    **skipped** (the engine cannot order from nobody).
 3. **`lead_time_days`** — the chosen supplier's lead time. If the
-   supplier has **no lead time set**, it is treated as `0`, so the item
-   is **skipped** (`reorder_point = 0`, suggestion stays `≤ 0`).
+   supplier has **no lead time set**, it is treated as `0`.
 4. **`daily_usage`** — `usage_90d / 90`, rounded to 2 decimals.
-5. **`reorder_point`** — `ceil(daily_usage × lead_time_days)`: the stock
-   level at which to reorder so that expected consumption during the
-   lead time is covered.
+5. **`reorder_point`** — `max(min_quantity, ceil(daily_usage ×
+   lead_time_days))`: the item's own low-stock threshold from the
+   inventory module, raised so that expected consumption during the
+   lead time is covered. An item with neither a `min_quantity` nor a
+   supplier lead time has a point of `0` and is **skipped**.
 6. **`on_order`** — quantity already committed to **open** purchase
    orders (`draft` / `sent` / `confirmed`): `Σ(quantity_ordered −
    quantity_received)`.
-7. **`suggested_quantity`** — `ceil(reorder_point − (stock_quantity +
-   on_order))`. Only suggestions with `suggested_quantity > 0` are
-   returned; the positive check is what makes an in-stock item
-   disappear from the list once a PO covers the projected shortfall
-   (re-runs of `/suggestions` shrink as `on_order` fills).
+7. **`suggested_quantity`** — only when `stock_quantity + on_order` is
+   **below** the reorder point: `reorder_point + ceil(daily_usage × 30)
+   − (stock_quantity + on_order)`, i.e. order up to the point plus 30
+   days of cover. Ordering a real lot (rather than just back up to the
+   point) is what keeps an item off the list for weeks once a PO is
+   raised; re-runs of `/suggestions` shrink as `on_order` fills.
 
 All figures are returned as native values — UUIDs, `Decimal` quantities
 — for `jsonify` at the registry. Suggestions are sorted by item name.

@@ -24,6 +24,10 @@ from app.modules.supplier_items.models import SupplierItem
 from app.modules.suppliers.models import Supplier
 
 LOOKBACK_DAYS = 90
+# Order-up-to cover beyond the reorder point, so a suggestion buys a real lot
+# instead of chasing the reorder point one day of usage at a time.
+# ponytail: fixed cover; make it a clinic setting if clinics ask for it.
+COVER_DAYS = 30
 OPEN_PO_STATUSES = ("draft", "sent", "confirmed")
 
 
@@ -103,8 +107,10 @@ class ReorderService:
         """Return reorder suggestions for active items, sorted by item name.
 
         Only items with usage in the lookback window AND a sourcing link
-        AND positive suggested quantity appear. Returns native values
-        (UUID/Decimal) — jsonify at the registry coerces them.
+        AND stock+on_order below the reorder point appear. The suggested
+        quantity tops the item up to reorder_point + COVER_DAYS of usage.
+        Returns native values (UUID/Decimal) — jsonify at the registry
+        coerces them.
         """
         items = (
             (
@@ -134,14 +140,20 @@ class ReorderService:
             link, supplier, contact = source
             lead_time = supplier.lead_time_days if supplier.lead_time_days is not None else 0
             daily_usage = (usage_90d / Decimal(LOOKBACK_DAYS)).quantize(Decimal("0.01"))
-            reorder_point = (daily_usage * Decimal(lead_time)).quantize(
+            lead_time_demand = (daily_usage * Decimal(lead_time)).quantize(
                 Decimal("1"), rounding=ROUND_CEILING
             )
+            # Reorder point: the clinic's own low-stock threshold, raised to
+            # cover expected consumption during the supplier's lead time.
+            reorder_point = max(item.min_quantity, lead_time_demand)
             outstanding = on_order.get(item.id, Decimal("0"))
             available = item.stock_quantity + outstanding
-            suggested = (reorder_point - available).quantize(Decimal("1"), rounding=ROUND_CEILING)
-            if suggested <= 0:
+            if available >= reorder_point:
                 continue
+            cover = (daily_usage * Decimal(COVER_DAYS)).quantize(
+                Decimal("1"), rounding=ROUND_CEILING
+            )
+            suggested = reorder_point + cover - available
             suggestions.append(
                 {
                     "inventory_item_id": item.id,

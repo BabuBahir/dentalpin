@@ -43,7 +43,10 @@ def _suggestion_summary(suggestion: dict) -> dict:
 
 async def _list_reorder_suggestions(ctx: AgentContext, params: ListReorderSuggestionsArgs) -> dict:
     suggestions = await ReorderService.compute_suggestions(ctx.db, ctx.clinic_id)
-    return {"total": len(suggestions), "suggestions": [_suggestion_summary(s) for s in suggestions]}
+    return {
+        "total": len(suggestions),
+        "suggestions": [_suggestion_summary(s) for s in suggestions[: params.limit]],
+    }
 
 
 async def _generate_reorder_orders(ctx: AgentContext, params: GenerateReorderOrdersArgs) -> dict:

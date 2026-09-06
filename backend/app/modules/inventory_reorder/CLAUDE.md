@@ -26,14 +26,18 @@ For each active item, in order:
    `delta < 0`. No usage → item **skipped** (no demand).
 2. Sourcing — `preferred` supplier link first, else first link ordered
    by supplier name. No link → **skipped**.
-3. `lead_time_days` — chosen supplier's value; `None` → treated as `0`,
-   so `reorder_point = 0` and the item is **skipped**.
+3. `lead_time_days` — chosen supplier's value; `None` → treated as `0`.
 4. `daily_usage = usage_90d / 90` (2 dp, half-up).
-5. `reorder_point = ceil(daily_usage × lead_time_days)`.
+5. `reorder_point = max(item.min_quantity, ceil(daily_usage ×
+   lead_time_days))` — the clinic's low-stock threshold, raised to cover
+   lead-time consumption. Both `0` → point `0` → item **skipped**.
 6. `on_order = Σ(quantity_ordered − quantity_received)` over PO lines on
    open orders (`draft` / `sent` / `confirmed`).
-7. `suggested_quantity = ceil(reorder_point − (stock_quantity +
-   on_order))`; only `> 0` returned.
+7. `stock_quantity + on_order >= reorder_point` → **skipped**. Otherwise
+   `suggested_quantity = reorder_point + ceil(daily_usage × 30) −
+   (stock_quantity + on_order)` — order up to the point plus 30 days of
+   cover (`COVER_DAYS`), so one suggestion buys a real lot instead of
+   re-triggering every day.
 
 Everything returns native values (UUID/Decimal) — `jsonify` at the
 registry coerces them; never hand-`str()`/`float()`.

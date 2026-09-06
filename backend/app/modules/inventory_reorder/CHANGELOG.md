@@ -12,10 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   passes `created_by=None` (AgentContext carries no acting user).
 - Reorder suggestion engine (`ReorderService.compute_suggestions`):
   `usage_90d` from negative stock movement deltas, preferred-supplier
-  sourcing, `reorder_point = ceil(daily_usage × lead_time)` and
-  `suggested_quantity = ceil(reorder_point − (stock + on_order))`,
-  returning only positive suggestions for active items with demand,
-  a supplier link and a set lead time.
+  sourcing, `reorder_point = max(min_quantity, ceil(daily_usage ×
+  lead_time))` and, when `stock + on_order` is below it,
+  `suggested_quantity = reorder_point + ceil(daily_usage × 30) −
+  (stock + on_order)` (order up to the point plus 30 days of cover),
+  for active items with demand and a supplier link.
 - `GET /api/v1/inventory_reorder/suggestions` (read) and
   `POST /api/v1/inventory_reorder/orders` (write, 201) — the latter
   groups the requested suggestions into one draft purchase order per
