@@ -119,4 +119,4 @@ covers the whole suite (#227): `/procurement/suppliers`, `/procurement/items`,
 `/procurement/orders`, `/procurement/reorder`, `/procurement/ratings`, with
 nav entries gated on each area's read permission and `en`/`es` locales under
 `frontend/i18n/locales/`. Screen docs live under
-`docs/user-manual/{en,es}/procurement/`.
+`docs/user-manual/{en,es}/purchase_orders/`.

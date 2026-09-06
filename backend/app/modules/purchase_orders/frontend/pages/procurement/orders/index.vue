@@ -74,7 +74,7 @@
                 :color="statusColor(order.status)"
                 variant="soft"
               >
-                {{ order.status }}
+                {{ statusLabel(order.status) }}
               </UBadge>
             </div>
             <p class="text-sm text-muted-foreground">
@@ -86,13 +86,12 @@
             <UButton
               variant="ghost"
               icon="i-lucide-file-text"
-              :to="purchaseOrderPdfUrl(order.id, locale)"
-              target="_blank"
+              @click="downloadPdf(order.id)"
             >
               {{ t('procurement.orders.pdf') }}
             </UButton>
             <UButton
-              v-if="can(PERMISSIONS.purchaseOrders.write) && order.status !== 'received' && order.status !== 'cancelled'"
+              v-if="can(PERMISSIONS.purchaseOrders.write) && (order.status === 'sent' || order.status === 'confirmed')"
               icon="i-lucide-package-check"
               @click="openReceive(order)"
             >
@@ -208,7 +207,7 @@
                 :color="statusColor(detail.status)"
                 variant="soft"
               >
-                {{ detail.status }}
+                {{ statusLabel(detail.status) }}
               </UBadge>
             </div>
           </template>
@@ -240,7 +239,7 @@
                 :loading="saving"
                 @click="transition(detail, next)"
               >
-                {{ next }}
+                {{ statusLabel(next) }}
               </UButton>
             </div>
           </template>
@@ -320,7 +319,7 @@ const {
   createPurchaseOrder,
   transitionPurchaseOrder,
   receivePurchaseOrder,
-  purchaseOrderPdfUrl,
+  downloadPurchaseOrderPdf,
   listSuppliers,
   listInventoryItems
 } = useProcurement()
@@ -351,8 +350,12 @@ const receiveForm = ref<{ purchase_order_line_id: string, item_name: string, goo
 const STATUSES: PurchaseOrderStatus[] = ['draft', 'sent', 'confirmed', 'received', 'cancelled']
 const statusOptions = computed(() => [
   { label: t('procurement.orders.allStatuses'), value: 'all' },
-  ...STATUSES.map(s => ({ label: s, value: s }))
+  ...STATUSES.map(s => ({ label: statusLabel(s), value: s }))
 ])
+
+function statusLabel(status: string): string {
+  return t(`procurement.orders.statuses.${status}`)
+}
 
 function statusColor(status: string): 'primary' | 'success' | 'warning' | 'error' | 'neutral' {
   if (status === 'received') return 'success'
@@ -432,6 +435,14 @@ async function saveOrder() {
     toast.add({ title: t('procurement.common.loadError'), description: errorMessage(e, ''), color: 'error' })
   } finally {
     saving.value = false
+  }
+}
+
+async function downloadPdf(id: string) {
+  try {
+    await downloadPurchaseOrderPdf(id, locale.value)
+  } catch (e) {
+    toast.add({ title: t('procurement.common.loadError'), description: errorMessage(e, ''), color: 'error' })
   }
 }
 

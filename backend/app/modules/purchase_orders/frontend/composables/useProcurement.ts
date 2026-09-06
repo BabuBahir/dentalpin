@@ -182,6 +182,8 @@ function defined<T>(value: T | undefined | null | ''): T | undefined {
 
 export function useProcurement() {
   const api = useApi()
+  const auth = useAuth()
+  const config = useRuntimeConfig()
 
   // --- suppliers -------------------------------------------------------
   async function listSuppliers(params: SupplierListParams = {}): Promise<PaginatedResponse<ProcurementSupplier>> {
@@ -256,8 +258,27 @@ export function useProcurement() {
     return api.post<ApiResponse<PurchaseOrder>>(`/api/v1/purchase_orders/${id}/receive`, { lines })
   }
 
-  function purchaseOrderPdfUrl(id: string, locale = 'es'): string {
-    return `/api/v1/purchase_orders/${id}/pdf?locale=${locale}`
+  async function downloadPurchaseOrderPdf(id: string, locale = 'es'): Promise<void> {
+    // Raw fetch: the PDF needs the bearer token and comes back as a blob, so
+    // it cannot be a plain link (same pattern as billing's downloadPDF).
+    const pdfLocale = locale === 'en' ? 'en' : 'es'
+    const response = await fetch(
+      `${config.public.apiBaseUrl}/api/v1/purchase_orders/${id}/pdf?locale=${pdfLocale}`,
+      { headers: { Authorization: `Bearer ${auth.accessToken.value}` } }
+    )
+    if (!response.ok) {
+      const body = await response.json().catch(() => null)
+      throw new Error(body?.message || body?.detail || 'Failed to download PDF')
+    }
+    const url = window.URL.createObjectURL(await response.blob())
+    const link = document.createElement('a')
+    link.href = url
+    const disposition = response.headers.get('Content-Disposition')
+    link.download = disposition?.match(/filename="?([^"]+)"?/)?.[1] || `purchase_order_${id}.pdf`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
   }
 
   // --- reorder ------------------------------------------------------------
@@ -309,7 +330,7 @@ export function useProcurement() {
     createPurchaseOrder,
     transitionPurchaseOrder,
     receivePurchaseOrder,
-    purchaseOrderPdfUrl,
+    downloadPurchaseOrderPdf,
     listReorderSuggestions,
     generateReorderOrders,
     listSupplierRatings,

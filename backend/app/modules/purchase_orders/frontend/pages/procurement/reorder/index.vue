@@ -85,6 +85,7 @@
 <script setup lang="ts">
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
+import type { TableColumn } from '@nuxt/ui'
 import type { PurchaseOrder, ReorderSuggestion } from '../../../composables/useProcurement'
 
 const { t } = useI18n()
@@ -99,6 +100,7 @@ const generating = ref(false)
 const showResult = ref(false)
 const created = ref<PurchaseOrder[]>([])
 const rowSelection = ref<Record<string, boolean>>({})
+const UCheckbox = resolveComponent('UCheckbox')
 
 const selected = computed(() => {
   const rows = suggestions.value
@@ -111,7 +113,20 @@ const selected = computed(() => {
   return ids
 })
 
-const columns = computed(() => [
+const columns = computed<TableColumn<ReorderSuggestion>[]>(() => [
+  {
+    id: 'select',
+    header: ({ table }) => h(UCheckbox, {
+      'modelValue': table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
+      'onUpdate:modelValue': (value: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!value),
+      'aria-label': t('procurement.reorder.selectAll')
+    }),
+    cell: ({ row }) => h(UCheckbox, {
+      'modelValue': row.getIsSelected(),
+      'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+      'aria-label': t('procurement.reorder.selectRow')
+    })
+  },
   { accessorKey: 'item_name', header: t('procurement.reorder.item') },
   { accessorKey: 'usage_90d', header: t('procurement.reorder.usage90d') },
   { accessorKey: 'daily_usage', header: t('procurement.reorder.dailyUsage') },

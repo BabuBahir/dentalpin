@@ -86,7 +86,14 @@
       "statusChanged": "Estado actualizado.",
       "receivedOk": "Entrega registrada.",
       "created": "Pedido creado.",
-      "noLines": "Añade al menos una línea."
+      "noLines": "Añade al menos una línea.",
+      "statuses": {
+        "draft": "Borrador",
+        "sent": "Enviado",
+        "confirmed": "Confirmado",
+        "received": "Recibido",
+        "cancelled": "Cancelado"
+      }
     },
     "reorder": {
       "title": "Sugerencias de reposición",
@@ -103,7 +110,9 @@
       "generate": "Generar borradores",
       "generateOk": "Borradores creados, uno por proveedor.",
       "generateEmpty": "Selecciona al menos una sugerencia.",
-      "empty": "Sin sugerencias ahora mismo. Los artículos necesitan consumo en 90 días, enlace de proveedor y stock bajo el punto de pedido."
+      "empty": "Sin sugerencias ahora mismo. Los artículos necesitan consumo en 90 días, enlace de proveedor y stock bajo el punto de pedido.",
+      "selectAll": "Seleccionar todo",
+      "selectRow": "Seleccionar fila"
     },
     "ratings": {
       "title": "Valoraciones",
@@ -112,7 +121,7 @@
       "receivedCount": "Recibidos",
       "onTimeRate": "A tiempo",
       "rejectRate": "Rechazado",
-      "noData": "Sin historial de pedidos todavía.",
+      "noData": "Sin valoración manual todavía.",
       "setReview": "Valorar",
       "editReview": "Editar valoración",
       "score": "Nota (1-5)",

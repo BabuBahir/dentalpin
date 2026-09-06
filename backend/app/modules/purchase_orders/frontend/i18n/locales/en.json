@@ -86,7 +86,14 @@
       "statusChanged": "Status updated.",
       "receivedOk": "Delivery recorded.",
       "created": "Order created.",
-      "noLines": "Add at least one line."
+      "noLines": "Add at least one line.",
+      "statuses": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "confirmed": "Confirmed",
+        "received": "Received",
+        "cancelled": "Cancelled"
+      }
     },
     "reorder": {
       "title": "Reorder suggestions",
@@ -103,7 +110,9 @@
       "generate": "Generate draft orders",
       "generateOk": "Draft orders created, one per supplier.",
       "generateEmpty": "Select at least one suggestion.",
-      "empty": "No suggestions right now. Items need usage in the last 90 days, a vendor link and stock below the reorder point."
+      "empty": "No suggestions right now. Items need usage in the last 90 days, a vendor link and stock below the reorder point.",
+      "selectAll": "Select all",
+      "selectRow": "Select row"
     },
     "ratings": {
       "title": "Supplier ratings",
@@ -112,7 +121,7 @@
       "receivedCount": "Received",
       "onTimeRate": "On time",
       "rejectRate": "Rejected",
-      "noData": "No order history yet.",
+      "noData": "No manual rating yet.",
       "setReview": "Rate",
       "editReview": "Edit rating",
       "score": "Score (1-5)",
