@@ -22,6 +22,42 @@ standalone `razorpay` module (issue #263), resolving Martin's
 > original per-step commits were rewritten. Do not expect the old
 > hashes (`9ce2ecfd`, `6349a1d6`, `5bda7fac`) to exist anymore.
 
+## Getting started on the new machine
+
+1. Clone the fork and check out the branch (it tracks
+   `babubahir/feat/razorpay-payments`; push to `babubahir`, never to
+   `origin` — you have no write access to `dentalpin/dentalpin`):
+   ```bash
+   git clone https://github.com/BabuBahir/dentalpin
+   cd dentalpin
+   git pull
+   git checkout feat/razorpay-payments
+   git remote add origin https://github.com/dentalpin/dentalpin   # if not present
+   git fetch origin   # always rebase/verify against latest main
+   ```
+   If you cloned *after* the branch was already rewritten on GitHub, the
+   checkout above is enough. If you have an old local copy, hard-reset to
+   the rewritten branch:
+   ```bash
+   git fetch babubahir && git reset --hard babubahir/feat/razorpay-payments
+   ```
+2. Prerequisites: Python 3.11+, `uv`, Docker + Docker Compose, Node 22 +
+   npm (frontend is npm — `package-lock.json`, not bun/pnpm).
+3. Install deps + lock (**must be first** — the backend Docker image
+   installs from `uv.lock` (issue #356), and it is currently stale since
+   pyproject.toml gained `razorpay>=1.4.0`):
+   ```bash
+   cd backend && uv sync && uv lock
+   ```
+   Then `cd .. && docker compose up -d --build` so the backend image picks
+   up the updated lock.
+4. Frontend deps (only needed for frontend checks):
+   ```bash
+   cd frontend && npm ci
+   ```
+5. Demo login for manual verification: `admin@demo.clinic` / `demo1234`
+   (seed data: `./scripts/seed-demo.sh` after a fresh DB).
+
 Key decisions (do NOT revisit unless you find a bug):
 - Per-clinic Fernet-encrypted keys (`app.core.email.encryption`), never returned.
 - Server-side flow: create order -> checkout -> verify signature
@@ -58,6 +94,10 @@ Key decisions (do NOT revisit unless you find a bug):
    cd backend && python  ;# or: docker-compose exec backend python -m ...
    python scripts/generate_catalogs.py
    git status  # should now show docs/modules-catalog.md + docs/events-catalog.md updated
+   ```
+   Verify the commit (don't hand-edit the catalogs — the generated output
+   is the source of truth and CI checks for drift):
+   ```bash
    git add docs/modules-catalog.md docs/events-catalog.md
    git commit -m "docs: regenerate module catalog (razorpay)"
    ```
@@ -70,14 +110,11 @@ Key decisions (do NOT revisit unless you find a bug):
    ```
    Watch for: alembic head resolution on the `razorpay` branch, and the
    `test_uninstall_roundtrip` downgrade step.
-3. **uv lock** for the new package — REQUIRED before CI
-   (pyproject.toml already declares `razorpay>=1.4.0`, but main's
-   `backend/uv.lock` is stale; CI fails on drift until this runs):
-   ```bash
-   cd backend && uv lock
-   ```
-4. **Frontend lint + typecheck** (needs backend to wire the layer first —
-   run `docker-compose up -d backend frontend`, or regenerate modules.json):
+3. **uv lock** — already covered in bootstrap step 3; the `uv.lock` diff
+   from that step should land in the final commit so CI doesn't fail on
+   drift. It will show up as a modified `backend/uv.lock` — include it.
+4. **Frontend lint + typecheck** (module layer is wired via the committed
+   `frontend/modules.json`):
    ```bash
    cd frontend && npm run lint
    npm run typecheck:layers   # stop the frontend container first; modules.json auto-restores
@@ -103,3 +140,24 @@ Key decisions (do NOT revisit unless you find a bug):
 - Per-clinic encrypted settings + migration + settings page pattern:
   `backend/app/modules/whatsapp_webhook/`.
 - Module authoring source of truth: `docs/technical/creating-modules.md`.
+
+## Wrapping up (after the remaining steps pass)
+
+1. Before finishing, re-sync with the latest upstream and fix any drift:
+   ```bash
+   git fetch origin
+   git rebase origin/main
+   # re-run: generate_catalogs.py, backend tests+ruff, frontend lint/typecheck
+   ```
+2. Delete this file (command at the top), then commit the follow-up work
+   (`uv.lock`, regenerated catalogs, etc.) as one or more commits:
+   ```bash
+   git add -A
+   git commit -m "chore(razorpay): lockfile, catalogs, follow-up verification"
+   ```
+3. Push to the fork (never to origin):
+   ```bash
+   git push babubahir feat/razorpay-payments
+   ```
+4. The PR already exists in the dentalpin fork — or open one from
+   `babubahir:feat/razorpay-payments` into `dentalpin/dentalpin:main`.
