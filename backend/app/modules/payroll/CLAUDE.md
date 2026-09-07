@@ -17,10 +17,12 @@ Routes mounted at `/api/v1/payroll/` (all `payroll.*`-gated, admin only).
 - `POST   /periods`           — open a `YYYY-MM` draft period (201); `payroll.write`
 - `GET    /periods/{id}`      — single period; `payroll.read`
 - `POST   /periods/{id}/status` — draft → closed → paid; `payroll.write`
+- `DELETE /periods/{id}`      — delete an empty draft period (204); `payroll.write`
 - `GET    /periods/{id}/entries` — entries of a period; `payroll.read`
 - `POST   /entries`           — raw entry (201, draft periods only); `payroll.write`
 - `GET    /entries/{id}`      — single entry; `payroll.read`
 - `PATCH  /entries/{id}`      — edit a draft entry; `payroll.write`
+- `DELETE /entries/{id}`      — delete a draft entry (204); `payroll.write`
 - `GET    /reports/monthly?month=` — period rollup; `payroll.reports.read`
 - `GET    /reports/annual?year=`   — year rollup; `payroll.reports.read`
 
@@ -103,8 +105,11 @@ roundtrip uninstall test.
 - **Entries mutate only in draft periods** (409 otherwise); periods move
   strictly draft → closed → paid (409 on skips).
 - **`net` is validated, not computed** — unbalanced books are a 422.
-- **No hard deletes anywhere** — profiles deactivate via `is_active`;
-  periods/entries are immutable records (L7).
+- **No hard deletes except draft corrections (issue #390).** Profiles
+  deactivate via `is_active`; `DELETE /entries/{id}` and
+  `DELETE /periods/{id}` (204) work only in `draft` periods (409
+  otherwise; non-empty periods 409). Closed/paid records stay immutable
+  (L7).
 
 ## CHANGELOG
 

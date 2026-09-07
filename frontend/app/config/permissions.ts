@@ -92,7 +92,9 @@ export const PERMISSIONS = {
   },
   admin: {
     clinicRead: 'admin.clinic.read',
-    clinicWrite: 'admin.clinic.write'
+    clinicWrite: 'admin.clinic.write',
+    rolesRead: 'admin.roles.read',
+    rolesWrite: 'admin.roles.write'
   },
   migrationImport: {
     jobRead: 'migration_import.job.read',
@@ -136,6 +138,12 @@ export const PERMISSIONS = {
   whatsappWebhook: {
     settingsRead: 'whatsapp_webhook.settings.read',
     settingsWrite: 'whatsapp_webhook.settings.write'
+  },
+  navOnline: {
+    settingsRead: 'nav_online.settings.read',
+    settingsConfigure: 'nav_online.settings.configure',
+    recordsRead: 'nav_online.records.read',
+    queueManage: 'nav_online.queue.manage'
   },
   telephony: {
     settingsRead: 'telephony.settings.read',
