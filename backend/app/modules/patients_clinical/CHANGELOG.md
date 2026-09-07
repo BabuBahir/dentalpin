@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- feat(i18n): the frontend layer's directional spacing, borders, text alignment and inset positioning now resolve against the document direction (physical→logical CSS utilities, Arabic RTL support).
+
 - fix(data): deletes are now soft-deletes (audit DATA-01). `delete_*`
   sets `status = "archived"` instead of hard-deleting; lists show only
   active rows, gets still return archived rows for history, contact
