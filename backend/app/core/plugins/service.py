@@ -53,6 +53,8 @@ class ModuleInfo:
     summary: str
     depends: list[str]
     in_disk: bool
+    installable: bool
+    upgrade_available: bool
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -71,6 +73,8 @@ class ModuleInfo:
             "summary": self.summary,
             "depends": self.depends,
             "in_disk": self.in_disk,
+            "installable": self.installable,
+            "upgrade_available": self.upgrade_available,
         }
 
 
@@ -201,12 +205,14 @@ class ModuleService:
 
             if record.version != manifest.version:
                 logger.info(
-                    "Reconciled: %s version %s -> %s",
+                    "Reconciled: %s installed version %s drifts from disk %s (awaiting upgrade)",
                     manifest.name,
                     record.version,
                     manifest.version,
                 )
-                record.version = manifest.version
+                # NOTE: record.version intentionally keeps the last-applied
+                # version — it is the upgrade signal (see `upgrade()` and
+                # `upgrade_available`). Only the upgrade finalize advances it.
 
             # Always refresh the snapshot so DB stays in sync with disk.
             record.manifest_snapshot = manifest.to_snapshot()
@@ -295,6 +301,21 @@ class ModuleService:
                     summary=summary,
                     depends=depends,
                     in_disk=module is not None,
+                    installable=(
+                        manifest.installable
+                        if manifest is not None
+                        else (
+                            (record.manifest_snapshot or {}).get("installable", True)
+                            if record
+                            else True
+                        )
+                    ),
+                    upgrade_available=(
+                        record is not None
+                        and state == ModuleState.INSTALLED
+                        and manifest is not None
+                        and manifest.version != record.version
+                    ),
                 )
             )
 

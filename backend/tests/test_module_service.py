@@ -45,7 +45,12 @@ async def test_reconcile_empty_db_inserts_all_modules(db_session: AsyncSession) 
 
 
 @pytest.mark.asyncio
-async def test_reconcile_updates_version_change(db_session: AsyncSession) -> None:
+async def test_reconcile_keeps_installed_version_on_drift(db_session: AsyncSession) -> None:
+    """A disk version bump is an upgrade signal, not a silent absorb.
+
+    Reconcile keeps the last-applied ``record.version`` (and the installed
+    state) so ``upgrade()`` and ``upgrade_available`` stay reachable —
+    only the upgrade finalize advances the stored version."""
     svc = ModuleService(db_session)
     await svc.reconcile_with_db()
 
@@ -60,7 +65,8 @@ async def test_reconcile_updates_version_change(db_session: AsyncSession) -> Non
     refreshed = (
         await db_session.execute(select(ModuleRecord).where(ModuleRecord.name == "patients"))
     ).scalar_one()
-    assert refreshed.version != "0.0.1-old"
+    assert refreshed.version == "0.0.1-old"
+    assert refreshed.state == ModuleState.INSTALLED.value
 
 
 @pytest.mark.asyncio
