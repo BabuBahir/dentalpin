@@ -8,3 +8,9 @@
   lines, PRIVATE_PERSON/DOMESTIC customers, STORNO), a queued worker
   doing tokenExchange → manageInvoice → queryTransactionStatus with
   backoff and retry, test/prod environments, settings + records pages.
+- fix: `InvoiceData` lines carry the mandatory `lineExpressionIndicator`
+  (+ `lineNatureIndicator` SERVICE) and report the net **after** the
+  line discount; bare 8-digit adószám no longer invents vatCode/countyCode.
+- fix: `login`/`softwareDevContact` are XML-escaped in the envelope;
+  retry also accepts rows stuck in `sending`; uninstall refuses while
+  records reported to NAV (`sent`/`done`) exist, like verifactu.

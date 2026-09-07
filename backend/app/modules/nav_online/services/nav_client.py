@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from xml.sax.saxutils import escape
 
 import httpx
 from lxml import etree
@@ -87,7 +88,7 @@ def _header_user_software(
         "<common:headerVersion>1.0</common:headerVersion>"
         "</common:header>"
         "<common:user>"
-        f"<common:login>{creds.login}</common:login>"
+        f"<common:login>{escape(creds.login)}</common:login>"
         f'<common:passwordHash cryptoType="SHA-512">{crypto.password_hash(creds.password)}</common:passwordHash>'
         f"<common:taxNumber>{creds.tax_number}</common:taxNumber>"
         f'<common:requestSignature cryptoType="SHA3-512">{signature}</common:requestSignature>'
@@ -98,7 +99,7 @@ def _header_user_software(
         "<softwareOperation>LOCAL_SOFTWARE</softwareOperation>"
         f"<softwareMainVersion>{SOFTWARE_VERSION}</softwareMainVersion>"
         f"<softwareDevName>{SOFTWARE_NAME}</softwareDevName>"
-        f"<softwareDevContact>{creds.software_dev_contact or 'support@dentalpin.com'}</softwareDevContact>"
+        f"<softwareDevContact>{escape(creds.software_dev_contact or 'support@dentalpin.com')}</softwareDevContact>"
         "<softwareDevCountryCode>HU</softwareDevCountryCode>"
         "</software>"
     )

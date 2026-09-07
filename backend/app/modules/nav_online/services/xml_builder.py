@@ -48,8 +48,8 @@ def _rate(value: float | Decimal) -> str:
 @dataclass(frozen=True)
 class HungarianTaxNumber:
     taxpayer_id: str  # 8 digits
-    vat_code: str  # 1 digit
-    county_code: str  # 2 digits
+    vat_code: str | None = None  # 1 digit — optional in the XSD
+    county_code: str | None = None  # 2 digits — optional in the XSD
 
     @classmethod
     def parse(cls, raw: str | None) -> HungarianTaxNumber | None:
@@ -60,15 +60,16 @@ class HungarianTaxNumber:
         if len(digits) == 11:
             return cls(digits[:8], digits[8], digits[9:])
         if len(digits) == 8:
-            return cls(digits, "2", "41")  # bare törzsszám: assume ÁFA-alany, Budapest
+            return cls(digits)  # bare törzsszám: vatCode/countyCode are optional, don't guess
         return None
 
     def xml(self, tag: str) -> str:
-        return (
-            f"<{tag}><base:taxpayerId>{self.taxpayer_id}</base:taxpayerId>"
-            f"<base:vatCode>{self.vat_code}</base:vatCode>"
-            f"<base:countyCode>{self.county_code}</base:countyCode></{tag}>"
-        )
+        parts = [f"<base:taxpayerId>{self.taxpayer_id}</base:taxpayerId>"]
+        if self.vat_code:
+            parts.append(f"<base:vatCode>{self.vat_code}</base:vatCode>")
+        if self.county_code:
+            parts.append(f"<base:countyCode>{self.county_code}</base:countyCode>")
+        return f"<{tag}>{''.join(parts)}</{tag}>"
 
 
 @dataclass
@@ -82,7 +83,7 @@ def _address_xml(tag: str, address: dict[str, Any] | None, fallback_country: str
     a = address or {}
     return (
         f"<{tag}><base:simpleAddress>"
-        f"<base:countryCode>{escape(str(a.get('country_code') or fallback_country))[:2].upper()}</base:countryCode>"
+        f"<base:countryCode>{escape(str(a.get('country_code') or a.get('country') or fallback_country))[:2].upper()}</base:countryCode>"
         f"<base:postalCode>{escape(str(a.get('postal_code') or '0000'))}</base:postalCode>"
         f"<base:city>{escape(str(a.get('city') or '-'))}</base:city>"
         f"<base:additionalAddressDetail>{escape(str(a.get('street') or '-'))}</base:additionalAddressDetail>"
@@ -144,7 +145,9 @@ def build_invoice_data(
     net_total = Decimal("0")
     vat_total = Decimal("0")
     for idx, item in enumerate(invoice.items or [], start=1):
-        net = Decimal(str(item.line_subtotal or 0)) * sign
+        # Net after the line discount — billing keeps unit_price*quantity in
+        # line_subtotal and the discount apart; NAV wants the taxable base.
+        net = (Decimal(str(item.line_subtotal or 0)) - Decimal(str(item.line_discount or 0))) * sign
         rate = Decimal(str(item.vat_rate or 0))
         vat = (net * rate / Decimal(100)).quantize(_Q, rounding=ROUND_HALF_UP)
         gross = net + vat
@@ -168,6 +171,8 @@ def build_invoice_data(
         lines_xml.append(
             "<line>"
             f"<lineNumber>{idx}</lineNumber>"
+            "<lineExpressionIndicator>true</lineExpressionIndicator>"
+            "<lineNatureIndicator>SERVICE</lineNatureIndicator>"
             f"<lineDescription>{escape((item.description or '')[:512])}</lineDescription>"
             f"<quantity>{qty}</quantity><unitOfMeasure>PIECE</unitOfMeasure>"
             f"<unitPrice>{_money(unit_price)}</unitPrice>"

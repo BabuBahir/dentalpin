@@ -168,11 +168,15 @@ async def retry_record(
     _: Annotated[None, Depends(require_permission("nav_online.queue.manage"))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[NavRecordResponse]:
-    """Re-queue a rejected/aborted/failed row (after the invoice was fixed)."""
+    """Re-queue a rejected/aborted/failed row (after the invoice was fixed).
+
+    ``sending`` is accepted too: a worker that died between committing the
+    state and getting NAV's answer leaves the row stuck there for good.
+    """
     row = await db.get(NavOnlineRecord, record_id)
     if row is None or row.clinic_id != ctx.clinic_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Record not found")
-    if row.state not in ("rejected", "aborted", "failed"):
+    if row.state not in ("rejected", "aborted", "failed", "sending"):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Cannot retry a record in state {row.state}",

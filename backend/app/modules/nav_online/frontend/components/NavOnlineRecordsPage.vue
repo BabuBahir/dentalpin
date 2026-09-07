@@ -12,10 +12,10 @@ const total = ref(0)
 const page = ref(1)
 const pageSize = 20
 const loading = ref(true)
-const stateFilter = ref<string | undefined>(undefined)
+const stateFilter = ref('')
 
 const stateOptions = computed(() => [
-  { value: undefined, label: t('nav_online.records.allStates') },
+  { value: '', label: t('nav_online.records.allStates') },
   ...['pending', 'sending', 'sent', 'done', 'rejected', 'failed', 'aborted'].map(s => ({
     value: s,
     label: t(`nav_online.state.${s}`)
@@ -35,7 +35,7 @@ const stateColor: Record<string, 'success' | 'warning' | 'error' | 'neutral' | '
 async function load() {
   loading.value = true
   try {
-    const res = await fetchRecords({ page: page.value, page_size: pageSize, state: stateFilter.value })
+    const res = await fetchRecords({ page: page.value, page_size: pageSize, state: stateFilter.value || undefined })
     records.value = res.data
     total.value = res.total
   } finally {
@@ -171,7 +171,7 @@ async function onProcessNow() {
             </td>
             <td class="py-2 text-right">
               <UButton
-                v-if="['rejected', 'failed', 'aborted'].includes(r.state) && can(PERMISSIONS.navOnline.queueManage)"
+                v-if="['rejected', 'failed', 'aborted', 'sending'].includes(r.state) && can(PERMISSIONS.navOnline.queueManage)"
                 size="xs"
                 variant="soft"
                 icon="i-lucide-rotate-ccw"

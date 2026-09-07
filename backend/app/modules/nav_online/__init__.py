@@ -78,6 +78,18 @@ class NavOnlineModule(BaseModule):
         BillingHookRegistry.register(NavOnlineHook())
 
     async def uninstall(self, ctx) -> None:
+        from sqlalchemy import select
+
         from app.modules.billing.hooks import BillingHookRegistry
 
+        # Same posture as verifactu: once NAV has a transaction on file the
+        # local log (transaction ids, statuses) is the clinic's audit trail.
+        result = await ctx.db.execute(
+            select(NavOnlineRecord.id).where(NavOnlineRecord.state.in_(("sent", "done"))).limit(1)
+        )
+        if result.first() is not None:
+            raise RuntimeError(
+                "Cannot uninstall nav_online: invoices already reported to NAV. "
+                "Export the records before uninstalling."
+            )
         BillingHookRegistry.unregister("HU")

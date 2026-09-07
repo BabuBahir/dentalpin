@@ -78,7 +78,12 @@ to flip on without complete credentials.
   does not re-render it — billing's `regenerate_after_party_change` is a
   phase-2 item (NAV needs a MODIFY operation, not an overwrite).
 - **NAV rejects are terminal**; the worker never retries them — the admin
-  corrects and retries explicitly.
+  corrects and retries explicitly. Retry also accepts `sending` rows (a
+  worker that died mid-request leaves them there).
+- **Uninstall refuses** while any record is `sent`/`done` — the local log
+  is the audit trail of what NAV has on file.
+- **8-digit adószám** → only `taxpayerId`; `vatCode`/`countyCode` are
+  optional in the XSD and must not be guessed.
 - **Not tax advice**: the software registration (`softwareId`), the
   technical user and the choice of exemption codes are the clinic's
   accountant's call; the module ships sensible defaults.

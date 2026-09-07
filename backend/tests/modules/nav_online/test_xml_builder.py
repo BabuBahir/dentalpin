@@ -27,13 +27,15 @@ def _invoice(*, tax_id=None):
                 description="Fogkő-eltávolítás",
                 quantity=1,
                 line_subtotal=Decimal("15000"),
+                line_discount=Decimal("0"),
                 vat_rate=0.0,
                 vat_exempt_reason=None,
             ),
             SimpleNamespace(
                 description="Fogfehérítés",
                 quantity=2,
-                line_subtotal=Decimal("20000"),
+                line_subtotal=Decimal("25000"),
+                line_discount=Decimal("5000"),  # 20 % off → taxable base 20000
                 vat_rate=27.0,
                 vat_exempt_reason=None,
             ),
@@ -47,8 +49,10 @@ def _xp(root, path):
 
 def test_tax_number_parse():
     assert HungarianTaxNumber.parse("12345678-2-41") == HungarianTaxNumber("12345678", "2", "41")
-    assert HungarianTaxNumber.parse("12345678") == HungarianTaxNumber("12345678", "2", "41")
+    assert HungarianTaxNumber.parse("12345678") == HungarianTaxNumber("12345678")
     assert HungarianTaxNumber.parse("B12345678") is None
+    # Bare törzsszám: never invent vatCode/countyCode — both are optional in the XSD.
+    assert "vatCode" not in HungarianTaxNumber("12345678").xml("supplierTaxNumber")
 
 
 def test_private_person_invoice_lines_and_summary():
@@ -64,8 +68,17 @@ def test_private_person_invoice_lines_and_summary():
     assert _xp(root, "//d:supplierTaxNumber/base:taxpayerId/text()") == ["87654321"]
     lines = _xp(root, "//d:invoiceLines/d:line")
     assert len(lines) == 2
+    # Mandatory in the 3.0 schema and must precede lineDescription.
+    assert [c.tag.split("}")[1] for c in lines[0]][:4] == [
+        "lineNumber",
+        "lineExpressionIndicator",
+        "lineNatureIndicator",
+        "lineDescription",
+    ]
     assert _xp(lines[0], ".//d:vatExemption/d:case/text()") == ["TAM"]
     assert _xp(lines[1], ".//d:vatPercentage/text()") == ["0.27"]
+    # Discount applied: net 25000 − 5000 = 20000, VAT 27 % of the discounted base.
+    assert _xp(lines[1], ".//d:lineNetAmount/text()") == ["20000.00"]
     assert _xp(lines[1], ".//d:lineVatAmount/text()") == ["5400.00"]
     assert _xp(root, "//d:invoiceNetAmount/text()") == ["35000.00"]
     assert _xp(root, "//d:invoiceVatAmount/text()") == ["5400.00"]
