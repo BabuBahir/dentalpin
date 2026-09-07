@@ -72,8 +72,8 @@
             </div>
             <p class="text-sm text-muted-foreground truncate">
               {{ profile.base_amount ?? '—' }} {{ profile.currency }}
-              <span v-if="profile.has_bank_account">· {{ t('payroll.profiles.hasBank') }} (···{{ profile.bank_last_4 }})</span>
-              <span v-if="profile.has_tax_id">· {{ t('payroll.profiles.hasTax') }}</span>
+              <span v-if="profile.has_bank_account"> · {{ t('payroll.profiles.hasBank') }} (···{{ profile.bank_last_4 }})</span>
+              <span v-if="profile.has_tax_id"> · {{ t('payroll.profiles.hasTax') }}</span>
             </p>
           </div>
           <div
@@ -192,6 +192,7 @@ const { t } = useI18n()
 const { can } = usePermissions()
 const toast = useToast()
 const { listProfiles, createProfile, updateProfile, listStaff } = usePayroll()
+const { currency: clinicCurrency } = useCurrency()
 
 const profiles = ref<PayrollProfile[]>([])
 const staff = ref<StaffUser[]>([])
@@ -207,7 +208,7 @@ const form = ref({
   user_id: '',
   payment_type: 'monthly' as 'monthly' | 'hourly',
   base_amount: '' as string,
-  currency: 'EUR',
+  currency: clinicCurrency.value,
   bank_account: '',
   tax_id: '',
   is_active: true
@@ -260,7 +261,7 @@ function openCreate() {
     user_id: '',
     payment_type: 'monthly',
     base_amount: '',
-    currency: 'EUR',
+    currency: clinicCurrency.value,
     bank_account: '',
     tax_id: '',
     is_active: true

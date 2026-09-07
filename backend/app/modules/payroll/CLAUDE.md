@@ -40,7 +40,7 @@ driven nav via `useModules`, self-hides without the grants):
   outside draft. Remove actions wait for #399 (draft deletes).
 - `pages/payroll/reports/index.vue` — monthly + annual rollups.
 - `composables/usePayroll.ts` — typed endpoint wrappers.
-- 9 layer locales (`es en fr de pl it ar ta hu`); screen docs
+- 10 layer locales (`es en fr de pl it ar ta hu pt`); screen docs
   `docs/user-manual/{en,es}/payroll/screens/`.
 
 ## Data model

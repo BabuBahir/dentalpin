@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Admin-only frontend layer (issue #391): profiles, periods,
   period-detail entries and reports pages under `/payroll/*`, backend-
   driven nav (manifest `frontend.navigation`), `PERMISSIONS.payroll.*`
-  mirror, 9 layer locales, user-manual screens en/es. Entry/period
+  mirror, 10 layer locales, user-manual screens en/es. Profile form
+  defaults to the clinic currency. Entry/period
   remove actions wait for #399 (draft deletes) to merge.
 - Draft corrections (issue #390): `DELETE /entries/{id}` and
   `DELETE /periods/{id}` (204, `payroll.write`) — entries delete while
