@@ -194,9 +194,9 @@ Everything else in the issue is ordinary work once that model exists:
 
 ## How to verify the rule still holds
 
-- `docs/country-readiness` (or wherever the matrix lives) lists PT
-  billing as "not available: AT certification"; the Portuguese landing
-  page repeats it.
+- `docs/technical/country-readiness.md` lists PT billing as "not
+  available: AT certification"; the Portuguese landing page repeats
+  it.
 - Backend test: a clinic with country `PT` gets `409` from the issue
   endpoint of `billing` with the certification message (once the gate
   is implemented).
