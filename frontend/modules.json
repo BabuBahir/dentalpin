@@ -18,6 +18,7 @@
     "/module_layers/medical_reference/frontend",
     "/module_layers/medication_catalog/frontend",
     "/module_layers/migration_import/frontend",
+    "/module_layers/nav_online/frontend",
     "/module_layers/notifications/frontend",
     "/module_layers/odontogram/frontend",
     "/module_layers/patient_relationships/frontend",
@@ -25,7 +26,9 @@
     "/module_layers/patients/frontend",
     "/module_layers/patients_clinical/frontend",
     "/module_layers/payments/frontend",
+    "/module_layers/payroll/frontend",
     "/module_layers/periodontogram/frontend",
+    "/module_layers/purchase_orders/frontend",
     "/module_layers/recall_reminders/frontend",
     "/module_layers/recalls/frontend",
     "/module_layers/reports/frontend",
@@ -167,6 +170,11 @@
       "routes": []
     },
     {
+      "name": "nav_online",
+      "path": "/module_layers/nav_online/frontend",
+      "routes": []
+    },
+    {
       "name": "notifications",
       "path": "/module_layers/notifications/frontend",
       "routes": [
@@ -210,9 +218,30 @@
       ]
     },
     {
+      "name": "payroll",
+      "path": "/module_layers/payroll/frontend",
+      "routes": [
+        "/payroll/periods/:id",
+        "/payroll/periods",
+        "/payroll/profiles",
+        "/payroll/reports"
+      ]
+    },
+    {
       "name": "periodontogram",
       "path": "/module_layers/periodontogram/frontend",
       "routes": []
+    },
+    {
+      "name": "purchase_orders",
+      "path": "/module_layers/purchase_orders/frontend",
+      "routes": [
+        "/procurement/items",
+        "/procurement/orders",
+        "/procurement/ratings",
+        "/procurement/reorder",
+        "/procurement/suppliers"
+      ]
     },
     {
       "name": "recall_reminders",
