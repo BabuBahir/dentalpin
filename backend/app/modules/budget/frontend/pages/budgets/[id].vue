@@ -152,7 +152,7 @@ const isEditing = ref(false)
 const editForm = reactive({
   valid_from: '',
   valid_until: '',
-  global_discount_type: '',
+  global_discount_type: null as string | null,
   global_discount_value: '',
   internal_notes: '',
   patient_notes: ''
@@ -162,7 +162,7 @@ function startEditing() {
   if (!currentBudget.value) return
   editForm.valid_from = currentBudget.value.valid_from
   editForm.valid_until = currentBudget.value.valid_until || ''
-  editForm.global_discount_type = currentBudget.value.global_discount_type || ''
+  editForm.global_discount_type = currentBudget.value.global_discount_type || null
   editForm.global_discount_value = currentBudget.value.global_discount_value?.toString() || ''
   editForm.internal_notes = currentBudget.value.internal_notes || ''
   editForm.patient_notes = currentBudget.value.patient_notes || ''
@@ -735,7 +735,7 @@ function getItemName(item: DeepReadonly<BudgetItem>): string {
                   <USelect
                     v-model="editForm.global_discount_type"
                     :items="[
-                      { label: '-', value: '' },
+                      { label: '-', value: null },
                       { label: t('budget.percentage'), value: 'percentage' },
                       { label: t('budget.absolute'), value: 'absolute' }
                     ]"
