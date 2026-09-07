@@ -108,6 +108,11 @@ export const PERMISSIONS = {
     recordRefund: 'payments.record.refund',
     reportsRead: 'payments.reports.read'
   },
+  payroll: {
+    read: 'payroll.read',
+    write: 'payroll.write',
+    reportsRead: 'payroll.reports.read'
+  },
   verifactu: {
     settingsRead: 'verifactu.settings.read',
     settingsConfigure: 'verifactu.settings.configure',

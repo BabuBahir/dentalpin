@@ -26,6 +26,23 @@ Routes mounted at `/api/v1/payroll/` (all `payroll.*`-gated, admin only).
 - `GET    /reports/monthly?month=` — period rollup; `payroll.reports.read`
 - `GET    /reports/annual?year=`   — year rollup; `payroll.reports.read`
 
+## Frontend layer (issue #391, admin only)
+
+Nuxt layer under `frontend/` (manifest `frontend.navigation`, backend-
+driven nav via `useModules`, self-hides without the grants):
+
+- `pages/payroll/profiles/index.vue` — masked list + create/edit modal;
+  staff picker from `/api/v1/auth/users`; secrets replace-to-edit.
+- `pages/payroll/periods/index.vue` — open `YYYY-MM`, confirmed
+  draft → closed → paid transitions; closed/paid read-only.
+- `pages/payroll/periods/[id].vue` — per-period entries table with
+  client-side `net == gross - deductions` validation; edit disabled
+  outside draft. Remove actions wait for #399 (draft deletes).
+- `pages/payroll/reports/index.vue` — monthly + annual rollups.
+- `composables/usePayroll.ts` — typed endpoint wrappers.
+- 10 layer locales (`es en fr de pl it ar ta hu pt`); screen docs
+  `docs/user-manual/{en,es}/payroll/screens/`.
+
 ## Data model
 
 3 tables, all `clinic_id`-scoped:
