@@ -88,10 +88,12 @@ still needs its own CNDA attestation when it drives such an engine is
   for French practices does.
 - **Ségur du numérique, vague 2, LGC chirurgiens-dentistes**: state-
   funded (SONS) referencing of practice software on INS, DMP feeding,
-  MSSanté, Pro Santé Connect and e-prescription; the funding window
-  for LGC publishers opened on the Ségur portal in February 2026. It
-  is an incentive for the publisher and an expectation of the market,
-  not a legal condition for a practice to use a given software.
+  MSSanté, Pro Santé Connect and e-prescription. The dentist LGC
+  dispositif is still being prepared by the ANS; the ASP guichet that
+  opened in February 2026 covers the médecin de ville LGC only, so
+  the dentist window has no published date — **open**. It is an
+  incentive for the publisher and an expectation of the market, not a
+  legal condition for a practice to use a given software.
 
 ## Decision
 
