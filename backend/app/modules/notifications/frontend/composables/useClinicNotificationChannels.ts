@@ -29,6 +29,18 @@ export interface PatientContact {
 /** Stable render order — email first, then WhatsApp, then SMS. */
 const CHANNEL_ORDER: NotificationChannel[] = ['email', 'whatsapp', 'sms']
 
+/**
+ * Document-sending subset: invoice/budget PDFs travel over email/WhatsApp
+ * only — SMS carries no documents. Centralized here (issue #392 review)
+ * so every document send surface filters identically; pages must NOT copy
+ * this predicate.
+ */
+export type DocumentChannel = 'email' | 'whatsapp'
+
+export function isDocumentChannel(channel: string): channel is DocumentChannel {
+  return channel === 'email' || channel === 'whatsapp'
+}
+
 export function useClinicNotificationChannels() {
   const api = useApi()
 
@@ -80,6 +92,16 @@ export function useClinicNotificationChannels() {
       })
   }
 
+  /**
+   * Document-send variant of {@link buttonsForPatient}: same buttons minus
+   * non-document channels (SMS). Invoice/budget send surfaces use this.
+   */
+  function documentButtonsForPatient(
+    patient: PatientContact | null | undefined
+  ): ChannelButton[] {
+    return buttonsForPatient(patient).filter(b => isDocumentChannel(b.channel))
+  }
+
   return {
     isLoading: readonly(isLoading),
     availableChannels,
@@ -87,6 +109,7 @@ export function useClinicNotificationChannels() {
     fallbackEnabled,
     manualChannels,
     ensureLoaded,
-    buttonsForPatient
+    buttonsForPatient,
+    documentButtonsForPatient
   }
 }

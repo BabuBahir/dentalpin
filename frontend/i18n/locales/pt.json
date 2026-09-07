@@ -2421,11 +2421,15 @@
       "noEmail": "O paciente não tem email registado",
       "noPhone": "O paciente não tem telefone registado",
       "sms": "SMS",
-      "smsUnavailableHint": "SMS indisponível até que um fornecedor de SMS seja configurado."
+      "smsUnavailableHint": "SMS indisponível até que um fornecedor de SMS seja configurado.",
+      "smsConnect": "Configurar",
+      "smsDailyLimitLabel": "Limite diário de SMS",
+      "smsDailyLimitHelp": "Máximo de SMS enviados por dia para a clínica."
     },
     "channelSent": {
       "email": "Email enviado com sucesso",
-      "whatsapp": "Mensagem de WhatsApp enviada com sucesso"
+      "whatsapp": "Mensagem de WhatsApp enviada com sucesso",
+      "sms": "Mensagem SMS enviada com sucesso"
     },
     "prefs": {
       "title": "Preferências de notificação",

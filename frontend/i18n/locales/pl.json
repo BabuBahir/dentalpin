@@ -2421,11 +2421,15 @@
       "noEmail": "Pacjent nie ma e-maila w kartotece",
       "noPhone": "Pacjent nie ma telefonu w kartotece",
       "sms": "SMS",
-      "smsUnavailableHint": "SMS będą dostępne po skonfigurowaniu dostawcy SMS."
+      "smsUnavailableHint": "SMS będą dostępne po skonfigurowaniu dostawcy SMS.",
+      "smsConnect": "Konfiguruj",
+      "smsDailyLimitLabel": "Dzienny limit SMS",
+      "smsDailyLimitHelp": "Maksymalna liczba wychodzących SMS dziennie dla kliniki."
     },
     "channelSent": {
       "email": "E-mail wysłany pomyślnie",
-      "whatsapp": "Wiadomość WhatsApp wysłana pomyślnie"
+      "whatsapp": "Wiadomość WhatsApp wysłana pomyślnie",
+      "sms": "Wiadomość SMS wysłana pomyślnie"
     },
     "prefs": {
       "title": "Preferencje powiadomień",

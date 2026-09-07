@@ -37,10 +37,12 @@ const channelForm = reactive<{
   preferred_channel: NotificationChannel
   fallback_enabled: boolean
   manual_channels: string[]
+  sms_daily_limit: number
 }>({
   preferred_channel: 'email',
   fallback_enabled: true,
-  manual_channels: ['email']
+  manual_channels: ['email'],
+  sms_daily_limit: 100
 })
 
 const availableChannels = computed<readonly string[]>(() => settings.value?.available_channels ?? ['email'])
@@ -106,6 +108,7 @@ watch(settings, (newSettings) => {
     channelForm.preferred_channel = newSettings.preferred_channel ?? 'email'
     channelForm.fallback_enabled = newSettings.fallback_enabled ?? true
     channelForm.manual_channels = [...(newSettings.manual_channels ?? ['email'])]
+    channelForm.sms_daily_limit = newSettings.sms_daily_limit ?? 100
   }
 }, { immediate: true })
 
@@ -170,6 +173,7 @@ async function saveSettings() {
     preferred_channel: channelForm.preferred_channel,
     fallback_enabled: channelForm.fallback_enabled,
     manual_channels: channelForm.manual_channels,
+    sms_daily_limit: channelForm.sms_daily_limit,
     settings: localSettings.value
   })
   if (success) {
@@ -376,6 +380,21 @@ if (!isAdmin.value) {
             </div>
           </div>
 
+          <!-- SMS daily budget -->
+          <UFormField
+            :label="t('notifications.channels.smsDailyLimitLabel')"
+            :help="t('notifications.channels.smsDailyLimitHelp')"
+          >
+            <UInput
+              v-model="channelForm.sms_daily_limit"
+              type="number"
+              min="0"
+              step="1"
+              class="w-full sm:w-64"
+              @update:model-value="onSettingChange"
+            />
+          </UFormField>
+
           <!-- Manual send buttons -->
           <div>
             <p class="text-sm font-medium text-default mb-1">
@@ -442,6 +461,12 @@ if (!isAdmin.value) {
             />
             <p class="text-caption text-info">
               {{ t('notifications.channels.smsUnavailableHint') }}
+              <NuxtLink
+                to="/settings/sms-gateway"
+                class="underline font-medium"
+              >
+                {{ t('notifications.channels.smsConnect') }}
+              </NuxtLink>
             </p>
           </div>
         </div>

@@ -61,15 +61,10 @@ const creditNoteForm = ref({
 
 // Manual Send buttons follow the clinic channel config (issue #287).
 const {
-  buttonsForPatient,
+  documentButtonsForPatient,
   preferredChannel,
   ensureLoaded: ensureChannelsLoaded
 } = useClinicNotificationChannels()
-
-// Invoice PDFs only travel over email/WhatsApp — SMS carries no documents.
-function isDocumentChannel(b: { channel: string }): b is { channel: 'email' | 'whatsapp' } {
-  return b.channel === 'email' || b.channel === 'whatsapp'
-}
 
 // Send form — one option per clinic manual channel, plus "Mark as sent"
 // (no message) which is always available.
@@ -85,8 +80,7 @@ function channelDisabledReason(reason?: 'no_email' | 'no_phone' | 'channel_not_m
 }
 
 const sendMethodOptions = computed(() => {
-  const options = buttonsForPatient(currentInvoice.value?.patient ?? null)
-    .filter(b => isDocumentChannel(b))
+  const options = documentButtonsForPatient(currentInvoice.value?.patient ?? null)
     .map(btn => ({
       value: btn.channel as DocumentSendMethod,
       label: btn.channel === 'email' ? t('invoice.send.sendByEmail') : t('invoice.send.sendByWhatsapp'),
@@ -285,7 +279,7 @@ async function handleCreateCreditNote() {
 function openSendModal() {
   // Default to the clinic's preferred channel when the patient can
   // receive it; else the first viable channel; else "Mark as sent".
-  const enabled = buttonsForPatient(currentInvoice.value?.patient ?? null).filter(b => !b.disabled && isDocumentChannel(b))
+  const enabled = documentButtonsForPatient(currentInvoice.value?.patient ?? null).filter(b => !b.disabled)
   const preferred = enabled.find(b => b.channel === preferredChannel.value) ?? enabled[0]
   sendForm.value = {
     // SMS filtered above, but narrow explicitly: only email/WhatsApp

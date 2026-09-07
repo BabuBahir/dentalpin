@@ -2421,11 +2421,15 @@
       "noEmail": "Für den Patienten ist keine E-Mail hinterlegt",
       "noPhone": "Für den Patienten ist keine Telefonnummer hinterlegt",
       "sms": "SMS",
-      "smsUnavailableHint": "SMS ist erst verfügbar, wenn ein SMS-Anbieter konfiguriert ist."
+      "smsUnavailableHint": "SMS ist erst verfügbar, wenn ein SMS-Anbieter konfiguriert ist.",
+      "smsConnect": "Konfigurieren",
+      "smsDailyLimitLabel": "Tägliches SMS-Limit",
+      "smsDailyLimitHelp": "Maximal versendbare SMS pro Tag für die Klinik."
     },
     "channelSent": {
       "email": "E-Mail erfolgreich gesendet",
-      "whatsapp": "WhatsApp-Nachricht erfolgreich gesendet"
+      "whatsapp": "WhatsApp-Nachricht erfolgreich gesendet",
+      "sms": "SMS-Nachricht erfolgreich gesendet"
     },
     "prefs": {
       "title": "Benachrichtigungseinstellungen",

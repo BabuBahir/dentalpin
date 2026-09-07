@@ -2421,11 +2421,15 @@
       "noEmail": "A páciensnek nincs rögzített e-mail-címe",
       "noPhone": "A páciensnek nincs rögzített telefonszáma",
       "sms": "SMS",
-      "smsUnavailableHint": "Az SMS csak SMS-szolgáltató beállítása után érhető el."
+      "smsUnavailableHint": "Az SMS csak SMS-szolgáltató beállítása után érhető el.",
+      "smsConnect": "Beállítás",
+      "smsDailyLimitLabel": "Napi SMS-limit",
+      "smsDailyLimitHelp": "A klinikáról naponta küldhető SMS-ek maximális száma."
     },
     "channelSent": {
       "email": "E-mail sikeresen elküldve",
-      "whatsapp": "WhatsApp-üzenet sikeresen elküldve"
+      "whatsapp": "WhatsApp-üzenet sikeresen elküldve",
+      "sms": "SMS-üzenet sikeresen elküldve"
     },
     "prefs": {
       "title": "Értesítési beállítások",

@@ -2421,11 +2421,15 @@
       "noEmail": "The patient has no email on file",
       "noPhone": "The patient has no phone on file",
       "sms": "SMS",
-      "smsUnavailableHint": "SMS is not available until an SMS provider is configured."
+      "smsUnavailableHint": "SMS is not available until an SMS provider is configured.",
+      "smsConnect": "Configure",
+      "smsDailyLimitLabel": "SMS daily limit",
+      "smsDailyLimitHelp": "Max outbound SMS per day for the clinic."
     },
     "channelSent": {
       "email": "Email sent successfully",
-      "whatsapp": "WhatsApp message sent successfully"
+      "whatsapp": "WhatsApp message sent successfully",
+      "sms": "SMS message sent successfully"
     },
     "prefs": {
       "title": "Notification preferences",
