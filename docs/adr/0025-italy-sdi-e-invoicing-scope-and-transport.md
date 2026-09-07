@@ -1,6 +1,6 @@
 # 0025 — Italy: FatturaPA/SDI e-invoicing scope and transport for the `sdi_it` module
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-09-07
 - **Deciders:** maintainers (@martinezsalmeron)
 - **Tags:** modules, billing, compliance, italy

@@ -1,6 +1,6 @@
 # 0026 — Italy: Sistema Tessera Sanitaria expense submission for the `sistema_ts` module
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-09-07
 - **Deciders:** maintainers (@martinezsalmeron)
 - **Tags:** modules, billing, compliance, italy, privacy
