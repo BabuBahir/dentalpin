@@ -1,4 +1,4 @@
-# 0025 — Italy: Sistema Tessera Sanitaria expense submission for the `sistema_ts` module
+# 0026 — Italy: Sistema Tessera Sanitaria expense submission for the `sistema_ts` module
 
 - **Status:** proposed
 - **Date:** 2026-09-07
@@ -20,7 +20,7 @@ cittadini pages. Points not confirmed from those sources are marked
 **open**.
 
 This is the feature that matters to an Italian dental practice: the
-patient invoices that ADR 0024 keeps *out* of the SDI go *here*, and
+patient invoices that ADR 0025 keeps *out* of the SDI go *here*, and
 the two are exclusive by law (art. 10-bis DL 119/2018).
 
 ### 1. Who is obliged, and for which documents
@@ -38,7 +38,7 @@ the two are exclusive by law (art. 10-bis DL 119/2018).
   documento commerciale `D`) issued to a **natural person** for
   healthcare expenses, plus its refunds and corrections. Invoices to
   companies/insurers are not Sistema TS documents (they are the SDI
-  ones of ADR 0024).
+  ones of ADR 0025).
 
 ### 2. What is submitted (spec tables 1–6)
 
@@ -160,7 +160,7 @@ Per submitted document the module stores the exact request payload,
 environment. The `protocollo` is the only proof of a submission. No
 Sistema TS source states a retention period for it; the module keeps
 it as long as the fiscal document it belongs to (10 years, art. 2220
-c.c.; ADR 0024 §5), which also covers the sanction terms of art. 3
+c.c.; ADR 0025 §5), which also covers the sanction terms of art. 3
 c. 5-bis. Codici fiscali are health-related personal data (GDPR
 art. 9): the stored payload keeps them encrypted exactly as sent.
 
@@ -170,7 +170,7 @@ art. 9): the stored payload keeps them encrypted exactly as sent.
    in the `verifactu` shape (own `sistema_ts_*` tables, own Alembic
    branch, own Nuxt layer, hook through `BillingHookRegistry`,
    uninstall round-trip test). It handles invoices and credit notes
-   whose recipient is a natural person; B2B invoices are ADR 0024's.
+   whose recipient is a natural person; B2B invoices are ADR 0025's.
 2. Transport: the **synchronous web service** with basic auth and the
    practice's own Sistema TS credentials (username, password, pincode,
    the Sistema TS encryption certificate as an updatable setting),
@@ -235,7 +235,7 @@ art. 9): the stored payload keeps them encrypted exactly as sent.
 
 ## References
 
-- Issue #134; ADR 0024 (SDI); `docs/modules/verifactu.md`;
+- Issue #134; ADR 0025 (SDI); `docs/modules/verifactu.md`;
   `backend/app/modules/billing/hooks.py`
 - Sistema TS, "Strumenti per lo sviluppo" (specs, kit 20240214):
   <https://sistemats1.sanita.finanze.it/portale/it/spese-sanitarie/documenti-e-specifiche-tecniche-strumenti-per-lo-sviluppo>
