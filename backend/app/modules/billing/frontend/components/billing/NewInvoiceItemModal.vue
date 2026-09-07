@@ -185,7 +185,7 @@ watch(() => props.open, async (isOpen) => {
           </div>
         </template>
 
-        <div class="max-h-[60vh] overflow-y-auto pr-1">
+        <div class="max-h-[60vh] overflow-y-auto pe-1">
           <form
             class="space-y-4"
             @submit.prevent="handleSubmit"

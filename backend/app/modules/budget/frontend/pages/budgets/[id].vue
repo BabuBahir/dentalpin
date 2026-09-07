@@ -837,7 +837,7 @@ function getItemName(item: DeepReadonly<BudgetItem>): string {
                         #{{ item.tooth_number }}
                         <span
                           v-if="item.surfaces?.length"
-                          class="ml-1 text-subtle font-normal"
+                          class="ms-1 text-subtle font-normal"
                         >
                           {{ item.surfaces.join(', ') }}
                         </span>
@@ -865,11 +865,11 @@ function getItemName(item: DeepReadonly<BudgetItem>): string {
                       {{ item.notes }}
                     </p>
                   </div>
-                  <div class="text-right shrink-0">
+                  <div class="text-end shrink-0">
                     <p class="font-semibold tabular-nums">
                       <s
                         v-if="item.net_line_total < item.line_total"
-                        class="text-caption text-subtle font-normal mr-1"
+                        class="text-caption text-subtle font-normal me-1"
                       >{{ formatMoney(item.line_total) }}</s>{{ formatMoney(item.net_line_total) }}
                     </p>
                   </div>

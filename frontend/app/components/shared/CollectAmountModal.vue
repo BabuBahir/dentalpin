@@ -143,7 +143,7 @@ const submitText = computed(() => props.submitLabel ?? t('shared.collect.submit'
           </label>
           <div class="relative">
             <span
-              class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-xl text-subtle"
+              class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-xl text-subtle"
             >
               {{ fmt(0).replace(/[\d.,]/g, '').trim() }}
             </span>
@@ -153,7 +153,7 @@ const submitText = computed(() => props.submitLabel ?? t('shared.collect.submit'
               inputmode="decimal"
               step="0.01"
               min="0"
-              class="w-full rounded-md border border-default bg-elevated py-3 pl-10 pr-3 text-2xl font-semibold text-default focus:border-primary-accent focus:outline-none focus:ring-1 focus:ring-primary-accent"
+              class="w-full rounded-md border border-default bg-elevated py-3 ps-10 pe-3 text-2xl font-semibold text-default focus:border-primary-accent focus:outline-none focus:ring-1 focus:ring-primary-accent"
             >
           </div>
           <div
@@ -299,7 +299,7 @@ const submitText = computed(() => props.submitLabel ?? t('shared.collect.submit'
         >
           <UIcon
             :name="submitIcon"
-            class="mr-1 h-4 w-4"
+            class="me-1 h-4 w-4"
           />
           {{ submitText }} {{ fmt(amount) }}
         </UButton>
