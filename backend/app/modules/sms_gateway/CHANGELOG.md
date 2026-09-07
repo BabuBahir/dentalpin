@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Settings surface (issue #392 review): `GET /providers` (registered
+  backends only), 422 on unregistered provider names, admin settings
+  page under Settings → Integrations (`registerSettingsPage`), 10
+  layer locales, user-manual screens en/es. `POST /notifications/send`
+  accepts `sms` recipients with a patient phone (notifications).
 - Initial module (roadmap issue #231, PR2): SMS delivery via pluggable
   providers on the notifications `ChannelAdapter` contract.
 - `sms_gateway_settings` table (own Alembic branch `smg_0001`):

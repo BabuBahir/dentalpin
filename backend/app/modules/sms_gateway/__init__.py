@@ -37,6 +37,9 @@ class SmsGatewayModule(BaseModule):
         "auto_install": False,
         "removable": True,
         "role_permissions": {"admin": ["*"]},
+        # Settings-only frontend (issue #392 review): the provider page
+        # registers under Settings → Integrations; no nav entries.
+        "frontend": {"layer_path": "frontend", "navigation": []},
     }
 
     def get_models(self) -> list:

@@ -63,3 +63,8 @@ def register_provider(provider: SmsProvider) -> None:
 
 def get_provider(name: str) -> SmsProvider | None:
     return _PROVIDERS.get(name)
+
+
+def list_providers() -> list[str]:
+    """Names of registered wire backends (settings UI + validation)."""
+    return list(_PROVIDERS)

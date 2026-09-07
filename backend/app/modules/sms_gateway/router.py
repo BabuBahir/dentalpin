@@ -4,17 +4,30 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.dependencies import ClinicContext, get_clinic_context, require_permission
 from app.core.schemas import ApiResponse
 from app.database import get_db
 
+from . import providers as sms_providers
 from .schemas import SmsSettingsResponse, SmsSettingsUpdate, mask_settings
 from .service import SmsGatewayService
 
 router = APIRouter()
+
+
+@router.get("/providers", response_model=ApiResponse[list[str]])
+async def list_providers(
+    ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
+    _: Annotated[None, Depends(require_permission("sms_gateway.settings.read"))],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> ApiResponse[list[str]]:
+    """Wire backends actually registered (issue #392 review). The settings
+    page offers only these, so an admin can never select a backend that
+    fails every message."""
+    return ApiResponse(data=sorted(sms_providers.list_providers()))
 
 
 @router.get("/settings", response_model=ApiResponse[SmsSettingsResponse])
@@ -36,6 +49,13 @@ async def update_settings(
     _: Annotated[None, Depends(require_permission("sms_gateway.settings.write"))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[SmsSettingsResponse]:
+    if data.provider is not None and sms_providers.get_provider(data.provider) is None:
+        # A selectable-but-unimplemented backend (e.g. twilio in v1) must
+        # fail loudly here, never silently at send time (issue #392 review).
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Unknown SMS provider: {data.provider}",
+        )
     row = await SmsGatewayService.upsert_settings(
         db, ctx.clinic_id, data.model_dump(exclude_unset=True)
     )

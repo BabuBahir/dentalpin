@@ -11,7 +11,19 @@ Routes mounted at `/api/v1/sms_gateway/` (admin only).
 
 - `GET    /settings` — masked provider config; `sms_gateway.settings.read`
 - `PUT    /settings` — select provider, store credentials, toggle; `sms_gateway.settings.write`
+- `GET    /providers` — registered wire backends (the settings UI offers only these)
 - `POST   /test`     — dry-run honesty check (sends nothing); `sms_gateway.settings.write`
+
+Unregistered provider names are a loud 422 on PUT (never a silent
+dead-end at send time).
+
+## Frontend layer (issue #392 review, admin only)
+
+Settings page under Settings → Integrations (`registerSettingsPage`,
+kapso pattern): provider select from `GET /providers`, sender number,
+active toggle, Test button surfacing the `/test` honesty note.
+10 layer locales; screen docs
+`docs/user-manual/{en,es}/sms_gateway/screens/`.
 
 ## Data model
 

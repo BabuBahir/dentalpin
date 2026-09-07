@@ -198,3 +198,30 @@ async def test_sms_template_lookup_resolves_seeded_body(
     )
     assert found is not None
     assert found.body_text == "Su cita ha quedado confirmada."
+
+
+@pytest.mark.asyncio
+async def test_providers_lists_registered_backends(client, auth_headers, test_clinic):
+    """GET /providers answers the registered wire backends (issue #392)."""
+    response = await client.get("/api/v1/sms_gateway/providers", headers=auth_headers)
+    assert response.status_code == 200, response.text
+    assert response.json()["data"] == ["log"]
+
+
+@pytest.mark.asyncio
+async def test_update_rejects_unregistered_provider(client, auth_headers, test_clinic):
+    """PUT with a provider no backend implements is a loud 422, never a
+    silent dead-end at send time (issue #392 review)."""
+    response = await client.put(
+        "/api/v1/sms_gateway/settings",
+        json={"provider": "twilio", "is_active": True},
+        headers=auth_headers,
+    )
+    assert response.status_code == 422, response.text
+    ok = await client.put(
+        "/api/v1/sms_gateway/settings",
+        json={"provider": "log", "is_active": True},
+        headers=auth_headers,
+    )
+    assert ok.status_code == 200, ok.text
+    assert ok.json()["data"]["provider"] == "log"
