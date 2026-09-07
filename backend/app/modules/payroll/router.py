@@ -153,6 +153,18 @@ async def transition_period(
     return ApiResponse(data=PayrollPeriodResponse.model_validate(row))
 
 
+@router.delete("/periods/{period_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_period(
+    period_id: UUID,
+    ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
+    _: Annotated[None, Depends(require_permission("payroll.write"))],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    """Delete an empty draft period (issue #390). 409 when closed/paid or
+    when entries exist; the lookup is clinic-scoped so foreign ids are 404."""
+    await PeriodService.delete_period(db, ctx.clinic_id, period_id)
+
+
 # ---------------------------------------------------------------------------
 # Entries
 # ---------------------------------------------------------------------------
@@ -217,6 +229,21 @@ async def update_entry(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
     row = await EntryService.update_entry(db, row, data)
     return ApiResponse(data=PayrollEntryResponse.model_validate(row))
+
+
+@router.delete("/entries/{entry_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_entry(
+    entry_id: UUID,
+    ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
+    _: Annotated[None, Depends(require_permission("payroll.write"))],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    """Delete a draft-period entry (issue #390) — e.g. added to the wrong
+    user. 409 once the period leaves draft."""
+    row = await EntryService.get_entry(db, ctx.clinic_id, entry_id)
+    if not row:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entry not found")
+    await EntryService.delete_entry(db, row)
 
 
 # ---------------------------------------------------------------------------

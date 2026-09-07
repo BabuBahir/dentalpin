@@ -31,6 +31,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `medical_reference` | 0.4.0 | community | patients_clinical, patients | manual | yes | 2 | 0 | 0 | yes |
 | `medication_catalog` | 0.1.0 | community | — | manual | yes | 2 | 0 | 1 | yes |
 | `migration_import` | 0.1.0 | official | patients, patients_clinical, clinical_notes, agenda, schedules, recalls, catalog, budget, odontogram, treatment_plan, billing, payments, media | manual | yes | 4 | 5 | 0 | yes |
+| `nav_online` | 0.1.0 | official | billing | manual | yes | 4 | 0 | 0 | yes |
 | `notifications` | 0.1.0 | official | patients, agenda, budget, billing, catalog | auto | no | 8 | 7 | 7 | yes |
 | `odontogram` | 0.3.0 | official | patients, catalog | auto | no | 4 | 7 | 0 | yes |
 | `patient_relationships` | 0.2.0 | community | patients | manual | yes | 2 | 0 | 0 | yes |
@@ -38,7 +39,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `patients` | 0.1.0 | official | — | auto | no | 2 | 3 | 0 | yes |
 | `patients_clinical` | 0.1.0 | official | patients | auto | no | 4 | 1 | 0 | yes |
 | `payments` | 0.1.0 | official | patients, budget | auto | no | 4 | 3 | 2 | yes |
-| `payroll` | 0.1.0 | official | — | manual | yes | 3 | 2 | 0 | no |
+| `payroll` | 0.1.0 | official | — | manual | yes | 3 | 2 | 0 | yes |
 | `periodontogram` | 0.1.0 | official | patients, odontogram | manual | yes | 2 | 1 | 2 | yes |
 | `purchase_orders` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 3 | 0 | yes |
 | `recall_reminders` | 0.1.0 | community | recalls, notifications, patients | manual | yes | 0 | 0 | 1 | yes |
@@ -538,6 +539,25 @@ Importa datos de pacientes, citas, presupuestos, pagos y documentos desde un arc
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/migration_import/CLAUDE.md`](../backend/app/modules/migration_import/CLAUDE.md)
 
+### `nav_online` — v0.1.0
+
+NAV Online Számla — valós idejű számlaadat-szolgáltatás (HU).
+
+- **Author:** DentalPin Core Team
+- **License:** BSL-1.1
+- **Category:** official
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `billing`
+- **Frontend layer:** `frontend`
+- **Permissions:**
+  - `nav_online.queue.manage`
+  - `nav_online.records.read`
+  - `nav_online.settings.configure`
+  - `nav_online.settings.read`
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/nav_online/CLAUDE.md`](../backend/app/modules/nav_online/CLAUDE.md)
+
 ### `notifications` — v0.1.0
 
 Email templates, preferences, SMTP, event-driven sending.
@@ -742,7 +762,7 @@ Staff payroll with encrypted bank/tax data, periods, entries and reports.
 - **Category:** official
 - **Install policy:** installable=True · auto_install=False · removable=True
 - **Depends:** —
-- **Frontend layer:** —
+- **Frontend layer:** `frontend`
 - **Permissions:**
   - `payroll.read`
   - `payroll.reports.read`
