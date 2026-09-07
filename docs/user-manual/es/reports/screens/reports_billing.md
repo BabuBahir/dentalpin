@@ -43,10 +43,11 @@ preparación de IVA.
   fiscal del periodo.
 - **Vencidos y huecos** — facturas pasadas de fecha y series con
   saltos en la numeración (gaps), si los hay.
-- **Antigüedad** — totales pendientes por tramo
-  (0–30/31–60/61–90/90+ días, solo importes emitidos). Los mismos
-  números que la tarjeta del panel; añade `?format=csv` al endpoint
-  para la hoja de cálculo.
+- **Antigüedad** — totales emitidos pendientes por tramo
+  (no vencidas aparte, luego 0–30/31–60/61–90/90+ días, solo importes
+  emitidos). Etiquetado como antigüedad de facturas — definición
+  distinta de la tarjeta de cobros del panel (ganado-menos-cobrado
+  por paciente).
 - **Tendencia emitida** — totales emitidos por mes del rango
   (`?format=csv` disponible).
 
@@ -71,6 +72,7 @@ no compara contra `invoiced`.
 | Lo que ves / puedes hacer | Permiso |
 |---------------------------|---------|
 | Ver cualquiera de las secciones | `reports.billing.read` |
+| Ver antigüedad de facturas y tendencia emitida | `reports.financial.read` |
 | Acceder al listado base de facturas (drill-down) | `billing.read` |
 
 ## Resolución de problemas

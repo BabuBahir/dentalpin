@@ -5,8 +5,8 @@ Clinic-scoped; RBAC via the existing ``reports.*`` strings.
 
 **Off-books boundary (project rule):** the billing tools expose the
 *invoice axis only* (gross invoiced amounts). They never return settled,
-pending / overdue / remainder figures, because those equal the
-single-axis difference that clinics keep off-record. The
+collected or remainder figures, because those equal the invoiced-minus-
+collected difference that clinics keep off-record. The
 payments module owns the collection axis (see ``payments/tools.py``); the
 two axes are deliberately kept apart and the copilot system prompt
 forbids surfacing their difference.

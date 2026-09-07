@@ -14,11 +14,12 @@ from __future__ import annotations
 from pathlib import Path
 
 FORBIDDEN_TOKENS = (
+    # Code identifiers only (never prose words): a docstring saying
+    # "collected" must stay writable — the rule guards code paths.
     "InvoicePayment",
-    "allocated",
-    "refunded",
+    ".allocated",
+    ".refunded",
     "balance_due",
-    "collected",
 )
 
 FAMILY_SOURCES = (

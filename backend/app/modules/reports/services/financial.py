@@ -28,6 +28,7 @@ from app.modules.billing.models import Invoice
 OPEN_STATUSES = ("issued", "partial")
 
 BUCKETS: tuple[tuple[str, int | None, int | None], ...] = (
+    ("not_due", None, -1),
     ("0-30", 0, 30),
     ("31-60", 31, 60),
     ("61-90", 61, 90),
@@ -42,9 +43,11 @@ class FinancialReportService:
     async def aging_buckets(db: AsyncSession, clinic_id: UUID) -> list[dict]:
         """Outstanding invoice totals per age bucket (due-date anchored).
 
-        An invoice with no due date counts as current (0-30). Buckets
-        carry the issued total (never netted against anything else) plus
-        invoice and distinct-patient counts.
+        Not-yet-due invoices get their own ``not_due`` ("no vencidas")
+        bucket instead of folding into 0-30; invoices with no due date
+        count as current (0-30). Buckets carry the issued total (never
+        netted against anything else) plus invoice and distinct-patient
+        counts.
         """
         today = date.today()
         rows = (
@@ -69,9 +72,15 @@ class FinancialReportService:
             for label, _, _ in BUCKETS
         }
         for due_date, total, count, patients in rows:
-            # Not-yet-due invoices are current outstanding (0-30).
-            age = max(0, (today - due_date).days) if due_date else 0
-            label = next(lbl for lbl, lo, hi in BUCKETS if lo <= age and (hi is None or age <= hi))
+            if due_date is None:
+                label = "0-30"
+            else:
+                age = (today - due_date).days
+                label = next(
+                    lbl
+                    for lbl, lo, hi in BUCKETS
+                    if (lo is None or age >= lo) and (hi is None or age <= hi)
+                )
             slot = buckets[label]
             slot["total"] += total or Decimal("0")
             slot["count"] += count

@@ -43,9 +43,11 @@ reconciliation, and VAT filing.
   fiscal return.
 - **Overdue and gaps** — past-due invoices and numbering gaps in
   series, if any.
-- **Aging** — outstanding invoice totals per age bucket
-  (0–30/31–60/61–90/90+ days past due, issued amounts only). Same
-  numbers as the dashboard aging card; append `?format=csv` to the
+- **Aging** — outstanding issued invoice totals per age bucket
+  (not-yet-due/"no vencidas" apart, then 0–30/31–60/61–90/90+ days
+  past due, issued amounts only). Labelled as invoice aging — a
+  different definition from the dashboard receivables card
+  (earned-minus-paid per patient). Append `?format=csv` to the
   endpoint for the spreadsheet.
 - **Issued trend** — issued totals per month over the range
   (`?format=csv` available).
@@ -70,6 +72,7 @@ which does not compare against `invoiced`.
 | What you see / can do | Permission |
 |-----------------------|------------|
 | View any of the sections | `reports.billing.read` |
+| View the invoice-aging and issued-trend sections | `reports.financial.read` |
 | Open the underlying invoice list (drill-down) | `billing.read` |
 
 ## Troubleshooting

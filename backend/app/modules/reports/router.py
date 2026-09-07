@@ -169,21 +169,23 @@ def _csv_response(filename: str, header: list[str], rows: list[list]) -> Respons
     )
 
 
-@router.get("/billing/aging")
+@router.get("/billing/aging", response_model=ApiResponse[AgingReport])
 async def get_aging_buckets(
     ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
     _: Annotated[None, Depends(require_permission("reports.financial.read"))],
     db: Annotated[AsyncSession, Depends(get_db)],
-    format: str = Query(default="json", pattern="^(json|csv)$"),
+    response_format: str = Query(default="json", pattern="^(json|csv)$", alias="format"),
 ):
     """Outstanding invoice totals per age bucket (invoice axis only).
 
-    Buckets are due-date anchored (0-30/31-60/61-90/90+); invoices with
-    no due date count as current. Totals are issued amounts, never net
-    of collected ones. Same shape the dashboard aging card renders.
+    Buckets are due-date anchored (not-yet-due/"no vencidas" plus
+    0-30/31-60/61-90/90+); invoices with no due date count as current.
+    Totals are issued amounts, never net of collected ones. Labelled as
+    invoice aging wherever rendered — never as the earned-paid
+    receivables card.
     """
     buckets = await FinancialReportService.aging_buckets(db, ctx.clinic_id)
-    if format == "csv":
+    if response_format == "csv":
         return _csv_response(
             "aging.csv",
             ["bucket", "total", "invoices", "patients"],
@@ -197,21 +199,21 @@ async def get_aging_buckets(
     )
 
 
-@router.get("/billing/issued-trend")
+@router.get("/billing/issued-trend", response_model=ApiResponse[IssuedTrend])
 async def get_issued_trend(
     ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
     _: Annotated[None, Depends(require_permission("reports.financial.read"))],
     db: Annotated[AsyncSession, Depends(get_db)],
     date_from: date = Query(..., description="Start date for the trend window"),
     date_to: date = Query(..., description="End date for the trend window"),
-    format: str = Query(default="json", pattern="^(json|csv)$"),
+    response_format: str = Query(default="json", pattern="^(json|csv)$", alias="format"),
 ):
     """Issued invoice totals per month (invoice axis only).
 
     Drafts, cancelled, voided and soft-deleted invoices never count.
     """
     points = await FinancialReportService.issued_trend(db, ctx.clinic_id, date_from, date_to)
-    if format == "csv":
+    if response_format == "csv":
         return _csv_response(
             "issued-trend.csv",
             ["month", "total", "invoices"],

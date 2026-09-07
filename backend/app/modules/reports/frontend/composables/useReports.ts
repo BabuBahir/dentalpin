@@ -199,6 +199,19 @@ export interface PaymentsTrends {
   points: PaymentsTrendsPoint[]
 }
 
+export interface InvoiceAgingBucket {
+  label: string
+  total: string
+  count: number
+  patient_count: number
+}
+
+export interface IssuedTrendPoint {
+  month: string
+  total: string
+  count: number
+}
+
 export function useReports() {
   const api = useApi()
   const { t } = useI18n()
@@ -646,10 +659,8 @@ export function useReports() {
     options?: { signal?: AbortSignal }
   ): Promise<PaymentsAgingBuckets | null> {
     try {
-      // Single source: the reports invoice-axis aging family (off-books
-      // rule). Same {currency, buckets[]} shape as before.
       const response = await api.get<ApiResponse<PaymentsAgingBuckets>>(
-        '/api/v1/reports/billing/aging',
+        '/api/v1/payments/reports/aging-receivables',
         { signal: options?.signal, errorToast: false }
       )
       return response.data
@@ -658,6 +669,41 @@ export function useReports() {
       console.error('Failed to fetch aging receivables:', e)
       fetchFailed.value = true
       return null
+    }
+  }
+
+  // ============================================================================
+  // Financial family (invoice axis only, issue #230): aging buckets +
+  // issued trend for the /reports/billing sections. Labelled as invoice
+  // aging wherever rendered — never as the earned-paid receivables card.
+  // ============================================================================
+
+  async function fetchInvoiceAging(): Promise<InvoiceAgingBucket[]> {
+    try {
+      const response = await api.get<
+        ApiResponse<{ currency: string, buckets: InvoiceAgingBucket[] }>
+      >('/api/v1/reports/billing/aging', { errorToast: false })
+      return response.data.buckets
+    } catch (e) {
+      console.error('Failed to fetch invoice aging:', e)
+      fetchFailed.value = true
+      return []
+    }
+  }
+
+  async function fetchIssuedTrend(from: string, to: string): Promise<IssuedTrendPoint[]> {
+    try {
+      const response = await api.get<
+        ApiResponse<{ currency: string, points: IssuedTrendPoint[] }>
+      >(
+        '/api/v1/reports/billing/issued-trend',
+        { query: { date_from: from, date_to: to }, errorToast: false }
+      )
+      return response.data.points
+    } catch (e) {
+      console.error('Failed to fetch issued trend:', e)
+      fetchFailed.value = true
+      return []
     }
   }
 
@@ -732,6 +778,8 @@ export function useReports() {
     fetchBillingByProfessional,
     fetchVatSummary,
     fetchNumberingGaps,
+    fetchInvoiceAging,
+    fetchIssuedTrend,
     // Budget
     fetchBudgetSummary,
     fetchBudgetsByProfessional,
