@@ -6,9 +6,10 @@
  * layers × up to 10 locales today, and the prod build's peak memory grows
  * with that count, not with the number of keys (measured on #322: moving
  * host keys into layers pushed the build from 3.9 GB to OOM). This local
- * module runs before `@nuxtjs/i18n` (Nuxt installs `modules/` before the
- * `modules` array), merges every layer's locale files into one generated
- * file per locale, hands that single file to the host locale entry, and
+ * module rewrites the layer configs during its setup; `@nuxtjs/i18n` only
+ * reads them in its `modules:done` hook, so install order does not matter.
+ * It merges every layer's locale files into one generated file per
+ * locale, hands that single file to the host locale entry, and
  * removes the per-layer i18n config so the bundler sees 10 files instead
  * of ~220.
  *
