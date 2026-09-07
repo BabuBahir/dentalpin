@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: the discount-type selects (item modal and global discount in the budget detail page) crashed on open — reka-ui rejects `''` as an item value (`A <ComboboxItem /> must have a value prop that is not an empty string`), which left the modal half-unmounted (`Cannot read properties of null (reading 'parentNode')`). The 'no discount' option now uses `null`.
+
 - feat(i18n): the frontend layer's directional spacing, borders, text alignment and inset positioning now resolve against the document direction (physical→logical CSS utilities, Arabic RTL support).
 
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.

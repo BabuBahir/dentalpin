@@ -12,10 +12,10 @@ const total = ref(0)
 const page = ref(1)
 const pageSize = 20
 const loading = ref(true)
-const stateFilter = ref('')
+const stateFilter = ref<string | null>(null)
 
 const stateOptions = computed(() => [
-  { value: '', label: t('nav_online.records.allStates') },
+  { value: null, label: t('nav_online.records.allStates') },
   ...['pending', 'sending', 'sent', 'done', 'rejected', 'failed', 'aborted'].map(s => ({
     value: s,
     label: t(`nav_online.state.${s}`)

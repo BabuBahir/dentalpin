@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: the discount-type select in the invoice item modals crashed on open — reka-ui rejects `''` as an item value; the 'no discount' option now uses `null`.
+
 - fix(#326): the invoice-series onboarding rule carries `permission: 'billing.read'` — it no longer renders or fires its load for a clinic where billing isn't active.
 
 - refactor(#126): invoice-line descriptions resolve catalog names through the shared `app.core.i18n_names.catalog_name` helper (same chain, one source of truth).
