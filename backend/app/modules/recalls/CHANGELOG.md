@@ -4,6 +4,7 @@
 
 - fix(#126): de/it/pl locale parity with en (confirms.cancel / confirms.done).
 
+- feat(i18n): Arabic (ar) locale for the module's frontend layer.
 - feat(i18n): the frontend layer's directional spacing, borders, text alignment and inset positioning now resolve against the document direction (physical→logical CSS utilities, Arabic RTL support).
 
 

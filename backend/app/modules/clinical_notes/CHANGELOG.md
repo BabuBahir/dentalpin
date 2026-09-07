@@ -8,6 +8,7 @@
 
 - fix(#325): the attachment-owner registration moved from import time to `on_activate()` (ADR 0020).
 
+- feat(i18n): Arabic (ar) locale for the module's frontend layer.
 - feat(i18n): the frontend layer's directional spacing, borders, text alignment and inset positioning now resolve against the document direction (physical→logical CSS utilities, Arabic RTL support).
 
 
