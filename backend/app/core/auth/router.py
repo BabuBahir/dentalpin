@@ -78,6 +78,10 @@ async def _role_is_valid_for_clinic(db: AsyncSession, clinic_id: UUID, role: str
     ``clinic_id`` (issue #46 allows admins to assign clinic-created roles)."""
     if role in ROLES:
         return True
+    if not settings.RBAC_FROM_DB:
+        # The static grant map knows nothing about custom roles; assigning one
+        # would lock the member out of everything.
+        return False
     return (
         await db.execute(select(Role.id).where(Role.clinic_id == clinic_id, Role.name == role))
     ).scalars().first() is not None

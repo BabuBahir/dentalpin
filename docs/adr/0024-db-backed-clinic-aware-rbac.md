@@ -34,7 +34,8 @@ exactly so there is **no parallel source of truth**.
 - The five system roles (`admin`, `dentist`, `hygienist`, `assistant`,
   `receptionist`) are rows with `clinic_id IS NULL`; a clinic-created
   **custom role** is a row with `clinic_id` set.
-- `seed_rbac` (boot + after module install/uninstall) reconciles system
+- `seed_rbac` (every boot, flag or not; module install/uninstall restarts
+  the backend) reconciles system
   roles' `role_permissions` to be identical to the legacy
   `get_role_permissions()` merge — the parity test
   (`tests/test_rbac_database_parity.py`) is the gate.
@@ -45,7 +46,10 @@ exactly so there is **no parallel source of truth**.
 - `require_permission` keeps its signature (zero route churn); internally
   it resolves via `ctx.clinic_id`. A `RBAC_FROM_DB` flag (issue #46 release,
   default off) switches the firewall/`/me` to the DB path; once parity and
-  review clear it, the flag flips on and the static map is dropped.
+  review clear it, the flag flips on and the static map is dropped. While
+  it is off, custom roles can be prepared but not assigned to members (the
+  static map would resolve them to nothing), and the `admin` system role
+  never accepts revoke overrides (a clinic could lock itself out).
 - `clinic_memberships.role` string stays this release as the read path /
   insert default; the new nullable `role_id` FK becomes the authority in a
   follow-up (dropping `role`).

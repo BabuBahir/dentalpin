@@ -224,3 +224,74 @@ async def test_roles_endpoints_forbid_non_admin(client, auth_headers, test_clini
             "/api/v1/roles", json={"name": "nope", "permissions": []}, headers=headers
         )
     ).status_code == 403
+
+
+async def test_rename_custom_role_follows_memberships(
+    client, auth_headers, test_clinic, db_session
+):
+    """Renaming a custom role must not orphan the members holding it."""
+    created = (
+        await client.post(
+            "/api/v1/roles", json={"name": "oldname", "permissions": []}, headers=auth_headers
+        )
+    ).json()["data"]
+    user_id = (await client.get("/api/v1/auth/me", headers=auth_headers)).json()["data"]["user"][
+        "id"
+    ]
+    db_session.add(
+        ClinicMembership(id=uuid4(), user_id=user_id, clinic_id=test_clinic.id, role="oldname")
+    )
+    await db_session.commit()
+
+    resp = await client.put(
+        f"/api/v1/roles/{created['id']}", json={"name": "newname"}, headers=auth_headers
+    )
+    assert resp.status_code == 200
+    roles = set(
+        (
+            await db_session.execute(
+                select(ClinicMembership.role).where(ClinicMembership.clinic_id == test_clinic.id)
+            )
+        ).scalars()
+    )
+    assert "newname" in roles and "oldname" not in roles
+
+
+async def test_admin_role_cannot_be_revoked(client, auth_headers, test_clinic, db_session):
+    """An admin must not be able to lock the clinic out by revoking ``*``."""
+    admin = (await db_session.execute(select(Role).where(Role.name == "admin"))).scalars().first()
+    resp = await client.put(
+        f"/api/v1/roles/{admin.id}/overrides",
+        json={"granted": [], "revoked": ["*"]},
+        headers=auth_headers,
+    )
+    assert resp.status_code == 422
+    assert (await client.get("/api/v1/roles", headers=auth_headers)).status_code == 200
+
+
+async def test_custom_role_assignment_requires_db_rbac(client, auth_headers, test_clinic):
+    """With the static grant map active, a custom role cannot be assigned."""
+    from app.config import settings
+
+    await client.post(
+        "/api/v1/roles", json={"name": "gated", "permissions": []}, headers=auth_headers
+    )
+    payload = {
+        "email": "gated@test.clinic",
+        "password": "Str0ngPassw0rd!!",
+        "first_name": "G",
+        "last_name": "U",
+        "role": "gated",
+    }
+    original = settings.RBAC_FROM_DB
+    try:
+        settings.RBAC_FROM_DB = False
+        assert (
+            await client.post("/api/v1/auth/users", json=payload, headers=auth_headers)
+        ).status_code == 422
+        settings.RBAC_FROM_DB = True
+        assert (
+            await client.post("/api/v1/auth/users", json=payload, headers=auth_headers)
+        ).status_code == 201
+    finally:
+        settings.RBAC_FROM_DB = original

@@ -14,7 +14,7 @@ from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.plugins import module_registry
@@ -295,6 +295,14 @@ async def update_role(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Role '{data.name}' already exists in this clinic",
             )
+        # Memberships reference the role by name this release, so a rename
+        # must follow them or the holders end up with a role that resolves to
+        # nothing.
+        await db.execute(
+            update(ClinicMembership)
+            .where(ClinicMembership.clinic_id == ctx.clinic_id, ClinicMembership.role == role.name)
+            .values(role=data.name)
+        )
         role.name = data.name
     if data.description is not None:
         role.description = data.description
@@ -354,6 +362,12 @@ async def set_role_overrides(
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Overrides apply to system roles only; edit the custom role's permissions",
+        )
+    if role.name == "admin" and data.revoked:
+        # Revoking ``*`` from admin locks the clinic out of this very API.
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="The admin role cannot lose grants",
         )
 
     valid: set[str] = set(await _available_permission_codes(db))
