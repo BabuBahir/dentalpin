@@ -49,6 +49,8 @@ export interface ModuleInfo {
   summary: string
   depends: string[]
   in_disk: boolean
+  installable: boolean
+  upgrade_available: boolean
 }
 
 export interface ModuleStatus {
