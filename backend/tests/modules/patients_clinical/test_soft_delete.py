@@ -6,6 +6,7 @@ the archived row for historical reference (M2); contact upserts revive.
 """
 
 import pytest
+from httpx import AsyncClient
 
 from app.modules.patients_clinical.service import PatientsClinicalService
 
@@ -131,3 +132,22 @@ async def test_replace_preserves_history(db_session, test_patient):
     # The superseded row survives, archived, instead of being destroyed.
     kept = await PatientsClinicalService.get_allergy(db_session, old_row.id)
     assert kept is not None and kept.status == "archived" and kept.name == "Penicilina"
+
+
+@pytest.mark.asyncio
+async def test_deleted_contact_reads_as_absent_over_http(
+    client: AsyncClient, auth_headers: dict, test_patient
+):
+    """The patient page treats GET data=null as "no contact": an archived
+    row must not resurface there after DELETE."""
+    base = f"/api/v1/patients_clinical/patients/{test_patient.id}"
+    for path in ("emergency-contact", "legal-guardian"):
+        res = await client.put(
+            f"{base}/{path}",
+            json={"name": "Ana", "phone": "+34111111", "relationship": "parent"},
+            headers=auth_headers,
+        )
+        assert res.status_code == 200, res.text
+        assert (await client.delete(f"{base}/{path}", headers=auth_headers)).status_code == 204
+        res = await client.get(f"{base}/{path}", headers=auth_headers)
+        assert res.status_code == 200 and res.json()["data"] is None

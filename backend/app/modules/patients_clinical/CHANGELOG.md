@@ -7,6 +7,8 @@
   active rows, gets still return archived rows for history, contact
   upserts revive, and the bulk replace archives the superseded set.
   New `status` column (`pc_0003`, existing rows backfill `active`).
+  The 1:1 contact GETs answer `data: null` for an archived row so the
+  patient page does not resurface a removed contact.
 
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 
