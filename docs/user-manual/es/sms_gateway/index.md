@@ -10,8 +10,9 @@ paciente y límite diario.
 
 ## Flujos
 
-- **Configurar**: elige el marcador `log` (registra envíos en el log,
-  no envía nada — marcado "not sending") o un futuro proveedor con
+- **Configurar**: Ajustes → Integraciones → SMS ([pantalla](./screens/settings.md)).
+  Elige el marcador `log` (registra envíos en el log,
+  no envía nada - marcado "not sending") o un futuro proveedor con
   sus credenciales. Solo administradores.
 - **Probar**: `/test` informa de lo que pasaría sin enviar.
 - **Pacientes**: el SMS sigue el teléfono del paciente y su

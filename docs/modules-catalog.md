@@ -46,7 +46,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `recalls` | 0.1.0 | official | patients, agenda | auto | yes | 3 | 4 | 5 | yes |
 | `reports` | 0.1.0 | official | patients, agenda, catalog, budget, billing, payments | auto | no | 3 | 0 | 0 | yes |
 | `schedules` | 0.1.0 | official | agenda | auto | yes | 8 | 0 | 4 | yes |
-| `sms_gateway` | 0.1.0 | community | notifications | manual | yes | 2 | 0 | 0 | no |
+| `sms_gateway` | 0.1.0 | community | notifications | manual | yes | 2 | 0 | 0 | yes |
 | `staff_tasks` | 0.1.0 | community | — | manual | yes | 2 | 2 | 0 | yes |
 | `supplier_items` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 0 | 0 | no |
 | `supplier_ratings` | 0.1.0 | official | contacts, purchase_orders | manual | yes | 2 | 0 | 0 | no |
@@ -910,7 +910,7 @@ SMS delivery for notifications via pluggable providers.
 - **Category:** community
 - **Install policy:** installable=True · auto_install=False · removable=True
 - **Depends:** `notifications`
-- **Frontend layer:** —
+- **Frontend layer:** `frontend`
 - **Permissions:**
   - `sms_gateway.settings.read`
   - `sms_gateway.settings.write`

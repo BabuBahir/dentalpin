@@ -10,8 +10,9 @@ notification outbox with per-patient opt-out and a daily cap.
 
 ## Workflows
 
-- **Configure**: pick the `log` placeholder (records sends in the
-  server log, sends nothing — clearly labelled "not sending") or a
+- **Configure**: Settings → Integrations → SMS gateway ([screen](./screens/settings.md)).
+  Pick the `log` placeholder (records sends in the
+  server log, sends nothing - clearly labelled "not sending") or a
   future provider with its credentials. Only admins.
 - **Dry-run**: `/test` reports what would happen without sending.
 - **Patients**: SMS follows the patient's phone number and their
