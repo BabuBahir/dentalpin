@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix(#365): the two post-merge follow-ups from #370 — two *concurrent* `record_payment` calls with one `idempotency_key` no longer 500 on the unique index (savepoint + `IntegrityError` → the loser adopts the winner's row), and the shared `CollectAmountModal` (budget / invoice collect flows) offers `upi` / `netbanking` behind the same IN gate; `useClinicCountry()` moved to the host so host and layer components share one gate.
+
 - feat(#365): payment-gateway prerequisites — `upi` + `netbanking` methods (IN-gated chip in the create modal, labels in all 9 locales); four `payments.*` extension slots (`collect.actions`, `list.row.meta`, `ledger.row.meta`, `detail.sections`) rendering nothing by default; `idempotency_key` on `record_payment` / `POST /payments` / the agent tool with a per-clinic partial unique index (`pay_0005`). The IN gate also covers the list's method filter (`useClinicCountry`), and the refund modal always offers the source payment's method.
 
 - feat(#263): `payments.create.modal` slot — a provider module (e.g. `razorpay`) may register a full replacement for `PaymentCreateModal` behind the unchanged "New payment" / "Cobrar" trigger, resolved via `resolveSlot()` at each call site (`/payments`, `PatientPaymentsPanel`). No entry ⇒ the built-in modal renders exactly as before. `payments.list.row.meta` `ctx` also now carries `clinic` for provider country gating.
@@ -9,6 +11,10 @@
 - fix(#126): ledger treatment names had a bare es → en fallback — items named only in other locales degraded to nothing; now resolved through the shared `app.core.i18n_names.catalog_name` chain with an any-non-empty catch-all.
 
 - feat(#334): Hungarian (hu) locale for the module's frontend layer.
+
+- feat(i18n): Arabic (ar) locale for the module's frontend layer.
+- feat(i18n): the frontend layer's directional spacing, borders, text alignment and inset positioning now resolve against the document direction (physical→logical CSS utilities, Arabic RTL support).
+
 
 - fix(#101): the module's frontend adopts the useApi error contract — 400/409/422 failures the UI used to swallow now toast the backend's message; calls whose surrounding code already presents the error pass `errorToast: false` (single toast), and hand-built error reads use the shared `errorMessage`/`errorDetail` helpers.
 

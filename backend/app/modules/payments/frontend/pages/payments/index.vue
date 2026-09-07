@@ -404,7 +404,7 @@ function formatDate(s: string | undefined): string {
                 {{ a.amount }} <span class="opacity-60">· {{ a.label }}</span>
               </span>
             </div>
-            <div class="shrink-0 text-right min-w-[100px]">
+            <div class="shrink-0 text-end min-w-[100px]">
               <Money
                 :value="p.amount"
                 strong
@@ -447,7 +447,7 @@ function formatDate(s: string | undefined): string {
                   :ctx="{ payment: p, clinic: currentClinic }"
                 />
               </div>
-              <div class="text-right shrink-0">
+              <div class="text-end shrink-0">
                 <Money
                   :value="p.amount"
                   strong
