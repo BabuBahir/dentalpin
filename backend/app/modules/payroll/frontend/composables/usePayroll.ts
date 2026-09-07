@@ -120,8 +120,7 @@ export function usePayroll() {
 
   async function listProfiles(page = 1, pageSize = 20) {
     return api.get<PaginatedResponse<PayrollProfile>>('/api/v1/payroll/profiles', {
-      page,
-      page_size: pageSize
+      query: { page, page_size: pageSize }
     })
   }
 
@@ -135,8 +134,7 @@ export function usePayroll() {
 
   async function listPeriods(page = 1, pageSize = 20) {
     return api.get<PaginatedResponse<PayrollPeriod>>('/api/v1/payroll/periods', {
-      page,
-      page_size: pageSize
+      query: { page, page_size: pageSize }
     })
   }
 
@@ -153,7 +151,7 @@ export function usePayroll() {
   async function listEntries(periodId: string, page = 1, pageSize = 50) {
     return api.get<PaginatedResponse<PayrollEntry>>(
       `/api/v1/payroll/periods/${periodId}/entries`,
-      { page, page_size: pageSize }
+      { query: { page, page_size: pageSize } }
     )
   }
 
@@ -166,17 +164,16 @@ export function usePayroll() {
   }
 
   async function monthlyReport(month: string) {
-    return api.get<ApiResponse<PeriodReport>>('/api/v1/payroll/reports/monthly', { month })
+    return api.get<ApiResponse<PeriodReport>>('/api/v1/payroll/reports/monthly', { query: { month } })
   }
 
   async function annualReport(year: string) {
-    return api.get<ApiResponse<AnnualReport>>('/api/v1/payroll/reports/annual', { year })
+    return api.get<ApiResponse<AnnualReport>>('/api/v1/payroll/reports/annual', { query: { year } })
   }
 
   async function listStaff() {
     return api.get<PaginatedResponse<StaffUser>>('/api/v1/auth/users', {
-      page: 1,
-      page_size: 200
+      query: { page: 1, page_size: 200 }
     })
   }
 

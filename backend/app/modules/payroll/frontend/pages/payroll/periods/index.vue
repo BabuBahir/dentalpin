@@ -162,7 +162,7 @@ const pendingTo = ref<PayrollPeriodStatus | null>(null)
 
 const monthValid = computed(() => /^\d{4}-(0[1-9]|1[0-2])$/.test(newMonth.value))
 
-function statusColor(status: string): string {
+function statusColor(status: string): 'success' | 'neutral' | 'primary' {
   if (status === 'paid') return 'success'
   if (status === 'closed') return 'neutral'
   return 'primary'
