@@ -1,4 +1,4 @@
-# 0024 — Italy: FatturaPA/SDI e-invoicing scope and transport for the `sdi_it` module
+# 0025 — Italy: FatturaPA/SDI e-invoicing scope and transport for the `sdi_it` module
 
 - **Status:** proposed
 - **Date:** 2026-09-07
@@ -40,11 +40,11 @@ permanent — the normattiva page consulted shows the text "vigente"
 with no expiry).
 
 Consequences for a dental practice (an *odontoiatra* is an obliged
-Sistema TS sender, see ADR 0025):
+Sistema TS sender, see ADR 0026):
 
 - An invoice for dental treatment issued to a natural person is issued
   in analogue form (paper or PDF) and its data go to the Sistema TS
-  (ADR 0025 / issue #134). It never goes to the SDI, whether or not
+  (ADR 0026 / issue #134). It never goes to the SDI, whether or not
   the patient would like it to.
 - Invoices to *soggetti passivi IVA* (insurers, funds, companies,
   other professionals, a PA) are ordinary electronic invoices under
@@ -218,7 +218,7 @@ configuration recommendation, not a code constraint.
 ### Bad / accepted trade-offs
 
 - A practice whose revenue is almost all B2C gets little from this
-  module; the feature that matters to them is ADR 0025. The website
+  module; the feature that matters to them is ADR 0026. The website
   copy must not promise "invoicing through SDI" for patients.
 - PEC needs mailbox credentials in the settings screen and IMAP
   polling in the worker; receipts can take up to 40 h (PEC) before
@@ -251,7 +251,7 @@ configuration recommendation, not a code constraint.
 
 ## References
 
-- Issue #133; ADR 0025 (Sistema TS); `docs/modules/verifactu.md`
+- Issue #133; ADR 0026 (Sistema TS); `docs/modules/verifactu.md`
 - `backend/app/modules/billing/hooks.py` (`BillingComplianceHook`,
   `BillingHookRegistry`)
 - Art. 10-bis DL 119/2018 (testo vigente):
