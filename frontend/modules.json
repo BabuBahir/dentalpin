@@ -1,5 +1,7 @@
 {
   "layers": [
+    "/module_layers/accounting_export/frontend",
+    "/module_layers/activity_journal/frontend",
     "/module_layers/agenda/frontend",
     "/module_layers/billing/frontend",
     "/module_layers/budget/frontend",
@@ -7,23 +9,52 @@
     "/module_layers/clinical_notes/frontend",
     "/module_layers/contacts/frontend",
     "/module_layers/copilot/frontend",
+    "/module_layers/documents/frontend",
+    "/module_layers/expenses/frontend",
+    "/module_layers/india_gst/frontend",
     "/module_layers/inventory/frontend",
+    "/module_layers/lab_orders/frontend",
     "/module_layers/media/frontend",
     "/module_layers/medical_reference/frontend",
+    "/module_layers/medication_catalog/frontend",
+    "/module_layers/migration_import/frontend",
     "/module_layers/nav_online/frontend",
     "/module_layers/notifications/frontend",
     "/module_layers/odontogram/frontend",
+    "/module_layers/patient_relationships/frontend",
     "/module_layers/patient_timeline/frontend",
     "/module_layers/patients/frontend",
     "/module_layers/patients_clinical/frontend",
     "/module_layers/payments/frontend",
+    "/module_layers/periodontogram/frontend",
     "/module_layers/purchase_orders/frontend",
+    "/module_layers/recall_reminders/frontend",
     "/module_layers/recalls/frontend",
     "/module_layers/reports/frontend",
     "/module_layers/schedules/frontend",
-    "/module_layers/treatment_plan/frontend"
+    "/module_layers/staff_tasks/frontend",
+    "/module_layers/telephony/frontend",
+    "/module_layers/treatment_consumables/frontend",
+    "/module_layers/treatment_plan/frontend",
+    "/module_layers/verifactu/frontend",
+    "/module_layers/whatsapp_kapso/frontend",
+    "/module_layers/whatsapp_webhook/frontend"
   ],
   "modules": [
+    {
+      "name": "accounting_export",
+      "path": "/module_layers/accounting_export/frontend",
+      "routes": [
+        "/accounting-export"
+      ]
+    },
+    {
+      "name": "activity_journal",
+      "path": "/module_layers/activity_journal/frontend",
+      "routes": [
+        "/journal"
+      ]
+    },
     {
       "name": "agenda",
       "path": "/module_layers/agenda/frontend",
@@ -81,10 +112,40 @@
       ]
     },
     {
+      "name": "documents",
+      "path": "/module_layers/documents/frontend",
+      "routes": [
+        "/documents"
+      ]
+    },
+    {
+      "name": "expenses",
+      "path": "/module_layers/expenses/frontend",
+      "routes": [
+        "/expenses"
+      ]
+    },
+    {
+      "name": "india_gst",
+      "path": "/module_layers/india_gst/frontend",
+      "routes": [
+        "/reports/india-gst",
+        "/settings/india-gst"
+      ]
+    },
+    {
       "name": "inventory",
       "path": "/module_layers/inventory/frontend",
       "routes": [
         "/inventory"
+      ]
+    },
+    {
+      "name": "lab_orders",
+      "path": "/module_layers/lab_orders/frontend",
+      "routes": [
+        "/lab-orders",
+        "/lab-orders/new"
       ]
     },
     {
@@ -95,6 +156,16 @@
     {
       "name": "medical_reference",
       "path": "/module_layers/medical_reference/frontend",
+      "routes": []
+    },
+    {
+      "name": "medication_catalog",
+      "path": "/module_layers/medication_catalog/frontend",
+      "routes": []
+    },
+    {
+      "name": "migration_import",
+      "path": "/module_layers/migration_import/frontend",
       "routes": []
     },
     {
@@ -112,6 +183,11 @@
     {
       "name": "odontogram",
       "path": "/module_layers/odontogram/frontend",
+      "routes": []
+    },
+    {
+      "name": "patient_relationships",
+      "path": "/module_layers/patient_relationships/frontend",
       "routes": []
     },
     {
@@ -141,6 +217,11 @@
       ]
     },
     {
+      "name": "periodontogram",
+      "path": "/module_layers/periodontogram/frontend",
+      "routes": []
+    },
+    {
       "name": "purchase_orders",
       "path": "/module_layers/purchase_orders/frontend",
       "routes": [
@@ -150,6 +231,11 @@
         "/procurement/reorder",
         "/procurement/suppliers"
       ]
+    },
+    {
+      "name": "recall_reminders",
+      "path": "/module_layers/recall_reminders/frontend",
+      "routes": []
     },
     {
       "name": "recalls",
@@ -174,6 +260,27 @@
       "routes": []
     },
     {
+      "name": "staff_tasks",
+      "path": "/module_layers/staff_tasks/frontend",
+      "routes": [
+        "/tasks"
+      ]
+    },
+    {
+      "name": "telephony",
+      "path": "/module_layers/telephony/frontend",
+      "routes": [
+        "/calls"
+      ]
+    },
+    {
+      "name": "treatment_consumables",
+      "path": "/module_layers/treatment_consumables/frontend",
+      "routes": [
+        "/treatment-consumables"
+      ]
+    },
+    {
       "name": "treatment_plan",
       "path": "/module_layers/treatment_plan/frontend",
       "routes": [
@@ -181,6 +288,28 @@
         "/treatment-plans",
         "/treatment-plans/new"
       ]
+    },
+    {
+      "name": "verifactu",
+      "path": "/module_layers/verifactu/frontend",
+      "routes": [
+        "/settings/verifactu/certificate",
+        "/settings/verifactu",
+        "/settings/verifactu/producer",
+        "/settings/verifactu/queue",
+        "/settings/verifactu/records",
+        "/settings/verifactu/vat-mapping"
+      ]
+    },
+    {
+      "name": "whatsapp_kapso",
+      "path": "/module_layers/whatsapp_kapso/frontend",
+      "routes": []
+    },
+    {
+      "name": "whatsapp_webhook",
+      "path": "/module_layers/whatsapp_webhook/frontend",
+      "routes": []
     }
   ],
   "version": 1
