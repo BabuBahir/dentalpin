@@ -106,6 +106,11 @@ export const PERMISSIONS = {
     recordRefund: 'payments.record.refund',
     reportsRead: 'payments.reports.read'
   },
+  razorpay: {
+    settingsRead: 'razorpay.settings.read',
+    settingsWrite: 'razorpay.settings.write',
+    collect: 'razorpay.collect'
+  },
   verifactu: {
     settingsRead: 'verifactu.settings.read',
     settingsConfigure: 'verifactu.settings.configure',
@@ -199,5 +204,25 @@ export const PERMISSIONS = {
   generatedDocuments: {
     read: 'documents.read',
     write: 'documents.write'
+  },
+  suppliers: {
+    read: 'suppliers.read',
+    write: 'suppliers.write'
+  },
+  supplierItems: {
+    read: 'supplier_items.read',
+    write: 'supplier_items.write'
+  },
+  purchaseOrders: {
+    read: 'purchase_orders.read',
+    write: 'purchase_orders.write'
+  },
+  inventoryReorder: {
+    read: 'inventory_reorder.read',
+    write: 'inventory_reorder.write'
+  },
+  supplierRatings: {
+    read: 'supplier_ratings.read',
+    write: 'supplier_ratings.write'
   }
 } as const

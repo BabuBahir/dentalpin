@@ -26,6 +26,28 @@ jobs:
       - name: Run ruff format check
         run: ruff format --check backend/
 
+  python-lock-freshness:
+    # backend/uv.lock is the reproducible-build contract (#356): the
+    # Dockerfile installs with `uv sync --frozen`, so a pyproject.toml
+    # dependency change without a regenerated lock must fail here, not
+    # at the next prod build. Authors fix drift with:
+    #   cd backend && uv lock
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        run: pip install "uv==0.12.9"
+
+      - name: Lock is in sync with pyproject.toml
+        working-directory: backend
+        run: uv lock --check
+
   backend-test:
     runs-on: ubuntu-latest
     services:
@@ -379,6 +401,10 @@ jobs:
           NUXT_API_BASE_URL_SERVER: http://localhost:8000
           NITRO_HOST: 0.0.0.0
           NITRO_PORT: "3000"
+          # Enforce the CSP under e2e (#355) so a new inline handler or
+          # external origin fails here — tests/e2e/csp.spec.ts asserts
+          # zero "Refused to …" console lines on login + dashboard.
+          NUXT_CSP_MODE: enforce
         run: |
           nohup node .output/server/index.mjs > /tmp/nuxt.log 2>&1 &
           echo "nuxt started (pid $!)"

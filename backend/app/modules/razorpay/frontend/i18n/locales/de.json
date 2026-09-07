@@ -1,0 +1,35 @@
+{
+  "razorpay": {
+    "settings": {
+      "title": "Razorpay",
+      "description": "Online-Zahlungen (UPI, Überweisung, Karten) über Razorpay für indische Praxen.",
+      "credentials": "Zahlungsanbieter-Zugangsdaten",
+      "active": "Aktiv",
+      "inactive": "Nicht konfiguriert",
+      "keyId": "Key ID",
+      "keyIdHelp": "Öffentlicher Schlüssel aus dem Razorpay-Dashboard (Settings → API Keys).",
+      "keySecret": "Key secret",
+      "keySecretHelp": "Wird serverseitig verschlüsselt gespeichert; die Zahlungsschaltfläche erscheint, sobald die Zugangsdaten gespeichert sind.",
+      "keySecretStored": "Es ist bereits ein Schlüssel gespeichert. Feld leer lassen, um ihn zu behalten, oder neuen eingeben, um zu rotieren.",
+      "activeLabel": "Online-Zahlungen akzeptieren",
+      "saved": "Razorpay-Einstellungen gespeichert",
+      "saveError": "Razorpay-Einstellungen konnten nicht gespeichert werden",
+      "loadError": "Razorpay-Einstellungen konnten nicht geladen werden",
+      "howTo": "So konfigurieren Sie",
+      "howToHelp": "Razorpay-Konto erstellen, API-Schlüssel (Key ID + Key secret) kopieren und hier speichern. Danach erscheint die Online-Zahlungsschaltfläche im Zahlungsscreen und im Patientenledger."
+    },
+    "collect": {
+      "button": "Mit Razorpay bezahlen",
+      "title": "Online kassieren",
+      "description": "Praxiszahlung",
+      "patient": "Patient",
+      "budget": "Kostenvoranschlag",
+      "amount": "Betrag",
+      "invalidAmount": "Geben Sie einen gültigen Betrag größer als 0 ein.",
+      "pay": "Bezahlen",
+      "loadError": "Der Razorpay-Checkout konnte nicht geladen werden.",
+      "error": "Die Zahlung konnte nicht gestartet werden.",
+      "verifyError": "Die Zahlung konnte nicht bestätigt werden."
+    }
+  }
+}

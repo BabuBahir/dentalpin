@@ -1,0 +1,35 @@
+{
+  "razorpay": {
+    "settings": {
+      "title": "Razorpay",
+      "description": "Pagamenti online (UPI, bonifico, carte) tramite Razorpay per studi indiani.",
+      "credentials": "Credenziali del gateway",
+      "active": "Attivo",
+      "inactive": "Non configurato",
+      "keyId": "Key ID",
+      "keyIdHelp": "Identificatore pubblico della dashboard Razorpay (Settings → API Keys).",
+      "keySecret": "Key secret",
+      "keySecretHelp": "Salvato cifrato sul server; il pulsante di pagamento appare non appena salvate le credenziali.",
+      "keySecretStored": "È già salvata una chiave. Lasciare il campo vuoto per mantenerla oppure inserirne una nuova per ruotarla.",
+      "activeLabel": "Accetta pagamenti online",
+      "saved": "Impostazioni Razorpay salvate",
+      "saveError": "Impossibile salvare le impostazioni Razorpay",
+      "loadError": "Impossibile caricare le impostazioni Razorpay",
+      "howTo": "Come configurare",
+      "howToHelp": "Creare un account Razorpay, copiare le chiavi API (Key ID + Key secret) e salvarle qui. Il pulsante di pagamento online appare quindi nella schermata pagamenti e nel registro del paziente."
+    },
+    "collect": {
+      "button": "Paga con Razorpay",
+      "title": "Incassa online",
+      "description": "Pagamento dello studio",
+      "patient": "Paziente",
+      "budget": "Preventivo",
+      "amount": "Importo",
+      "invalidAmount": "Inserisci un importo valido maggiore di 0.",
+      "pay": "Paga",
+      "loadError": "Impossibile caricare il checkout Razorpay.",
+      "error": "Impossibile avviare il pagamento.",
+      "verifyError": "Impossibile confermare il pagamento."
+    }
+  }
+}

@@ -287,6 +287,15 @@ class EventType:
     STAFF_TASK_CREATED = "staff_task.created"
     STAFF_TASK_STATUS_CHANGED = "staff_task.status_changed"
 
+    # Purchase order events (purchase_orders module — procurement execution
+    # layer, roadmap #227). PUBLISHED in the same transaction as the change
+    # (ADR 0019). No bundled subscriber today; `inventory_reorder` (#227-4)
+    # and `supplier_ratings` (#227-5) are expected to subscribe without
+    # importing purchase_orders.
+    PURCHASE_ORDER_CREATED = "purchase_order.created"
+    PURCHASE_ORDER_STATUS_CHANGED = "purchase_order.status_changed"
+    PURCHASE_ORDER_RECEIVED = "purchase_order.received"
+
     # Telephony events (telephony module — CTI screen-pop + call log,
     # issue #64). Fired by the inbound CTI webhook after normalization
     # and caller→patient matching. Payload: (clinic_id, call_log_id,
@@ -300,3 +309,28 @@ class EventType:
     CALL_ENDED = "call.ended"
     CALL_MISSED = "call.missed"
     CALL_UNKNOWN_CALLER = "call.unknown_caller"
+
+    # GDPR compliance events (gdpr module — data-subject rights, issue #44).
+    # Published by the gdpr module's services so optional subscribers
+    # (patient_timeline / notifications / audit exports) react to rights
+    # lifecycle without importing gdpr models.
+    # Payload: (clinic_id, request_id, patient_id, request_type).
+    GDPR_REQUEST_CREATED = "gdpr.request.created"
+    # Payload: (clinic_id, request_id, patient_id, from_status, to_status,
+    # changed_by).
+    GDPR_REQUEST_STATUS_CHANGED = "gdpr.request.status_changed"
+    # Consent grant / withdrawal. Payload:
+    # (clinic_id, consent_id, patient_id, purpose).
+    GDPR_CONSENT_GRANTED = "gdpr.consent.granted"
+    GDPR_CONSENT_WITHDRAWN = "gdpr.consent.withdrawn"
+    # Partial erasure executed. Payload: (clinic_id, patient_id, request_id,
+    # erased_categories, retained_categories).
+    GDPR_ERASURE_EXECUTED = "gdpr.erasure.executed"
+    # Breach reported. Payload: (clinic_id, breach_id, affected_people).
+    GDPR_BREACH_REPORTED = "gdpr.breach.reported"
+
+    # Payroll events (payroll module — admin-only compliance data).
+    # Payloads are masked: profile events carry ids only, never amounts
+    # or bank/tax values (plaintext or ciphertext).
+    PAYROLL_PROFILE_UPDATED = "payroll.profile.updated"
+    PAYROLL_PERIOD_STATUS_CHANGED = "payroll.period.status_changed"
