@@ -29,6 +29,11 @@ services:
       # Copilot agentic layer (app/core/llm/). Set OPENAI_API_KEY in .env
       # (gitignored). Empty default keeps the stack bootable without it.
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      # scripts/check_docs_coverage.py and tests/test_module_docs.py need
+      # both `docs/` and `backend/` under one root to run EN/ES user-manual
+      # parity checks inside this container (the `./backend:/app` mount
+      # alone only exposes backend/, not the monorepo root).
+      DENTALPIN_REPO_ROOT: /repo
     ports:
       - "8000:8000"
     depends_on:
@@ -47,6 +52,9 @@ services:
       # Mount the frontend root read-write so the backend can regenerate
       # modules.json when a module with a Nuxt layer is installed.
       - ./frontend:/host_frontend
+      # Read-only monorepo root so DENTALPIN_REPO_ROOT above resolves —
+      # see comment there.
+      - .:/repo:ro
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --proxy-headers --forwarded-allow-ips=*
 
   frontend:

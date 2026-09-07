@@ -103,6 +103,8 @@ telephony = "app.modules.telephony:TelephonyModule"
 suppliers = "app.modules.suppliers:SuppliersModule"
 supplier_items = "app.modules.supplier_items:SupplierItemsModule"
 purchase_orders = "app.modules.purchase_orders:PurchaseOrdersModule"
+payment_gateways = "app.modules.payment_gateways:PaymentGatewaysModule"
+razorpay = "app.modules.razorpay:RazorpayModule"
 
 [tool.setuptools.packages.find]
 where = ["."]
