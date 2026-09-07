@@ -92,7 +92,9 @@ export const PERMISSIONS = {
   },
   admin: {
     clinicRead: 'admin.clinic.read',
-    clinicWrite: 'admin.clinic.write'
+    clinicWrite: 'admin.clinic.write',
+    rolesRead: 'admin.roles.read',
+    rolesWrite: 'admin.roles.write'
   },
   migrationImport: {
     jobRead: 'migration_import.job.read',
