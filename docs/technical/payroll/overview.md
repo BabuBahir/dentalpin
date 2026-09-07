@@ -1,6 +1,6 @@
 ---
 module: payroll
-last_verified_commit: 0f333000
+last_verified_commit: 14ec616c
 ---
 
 # payroll — overview
@@ -29,10 +29,12 @@ Routes:
 - `POST /api/v1/payroll/periods` — open a draft period (201)
 - `GET /api/v1/payroll/periods/{id}` — one period
 - `POST /api/v1/payroll/periods/{id}/status` — draft → closed → paid
+- `DELETE /api/v1/payroll/periods/{id}` — delete an empty draft period (204)
 - `GET /api/v1/payroll/periods/{id}/entries` — entries of a period
 - `POST /api/v1/payroll/entries` — raw entry (201, draft only)
 - `GET /api/v1/payroll/entries/{id}` — one entry
 - `PATCH /api/v1/payroll/entries/{id}` — edit a draft entry
+- `DELETE /api/v1/payroll/entries/{id}` — delete a draft entry (204)
 - `GET /api/v1/payroll/reports/monthly?month=` — period rollup
 - `GET /api/v1/payroll/reports/annual?year=` — year rollup
 
@@ -76,8 +78,11 @@ are invisible (404, never 403).
 ## Constraints
 
 Own Alembic branch (`payroll`); `manifest.depends = []`. No agent
-tools. No hard deletes — profiles deactivate, periods/entries are
-immutable records.
+tools. No hard deletes except draft corrections (issue #390):
+`DELETE /entries/{id}` and `DELETE /periods/{id}` (both 204,
+`payroll.write`) work only while the period is `draft` — 409 once
+closed/paid, 409 for a period that still has entries. Profiles
+deactivate; closed/paid records stay immutable.
 
 See [`./permissions.md`](./permissions.md) and [`./events.md`](./events.md)
 for full detail.
