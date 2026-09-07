@@ -364,7 +364,7 @@ function goBack() {
                   {{ getPaymentMethodLabel(pm.payment_method) }}
                 </span>
               </div>
-              <div class="text-right">
+              <div class="text-end">
                 <p class="font-semibold text-default">
                   {{ formatCurrency(pm.total_amount) }}
                 </p>
@@ -397,16 +397,16 @@ function goBack() {
             <table class="min-w-full divide-y divide-[var(--color-border-subtle)]">
               <thead>
                 <tr>
-                  <th class="px-3 py-2 text-left text-xs font-medium text-subtle uppercase">
+                  <th class="px-3 py-2 text-start text-xs font-medium text-subtle uppercase">
                     {{ t('reports.billing.vatType') }}
                   </th>
-                  <th class="px-3 py-2 text-right text-xs font-medium text-subtle uppercase">
+                  <th class="px-3 py-2 text-end text-xs font-medium text-subtle uppercase">
                     {{ t('reports.billing.base') }}
                   </th>
-                  <th class="px-3 py-2 text-right text-xs font-medium text-subtle uppercase">
+                  <th class="px-3 py-2 text-end text-xs font-medium text-subtle uppercase">
                     {{ t('reports.billing.tax') }}
                   </th>
-                  <th class="px-3 py-2 text-right text-xs font-medium text-subtle uppercase">
+                  <th class="px-3 py-2 text-end text-xs font-medium text-subtle uppercase">
                     {{ t('invoice.total') }}
                   </th>
                 </tr>
@@ -419,13 +419,13 @@ function goBack() {
                   <td class="px-3 py-2 text-sm text-muted">
                     {{ vat.vat_name }} ({{ vat.vat_rate }}%)
                   </td>
-                  <td class="px-3 py-2 text-sm text-right text-muted">
+                  <td class="px-3 py-2 text-sm text-end text-muted">
                     {{ formatCurrency(vat.base_amount) }}
                   </td>
-                  <td class="px-3 py-2 text-sm text-right text-muted">
+                  <td class="px-3 py-2 text-sm text-end text-muted">
                     {{ formatCurrency(vat.tax_amount) }}
                   </td>
-                  <td class="px-3 py-2 text-sm text-right font-medium text-default">
+                  <td class="px-3 py-2 text-sm text-end font-medium text-default">
                     {{ formatCurrency(vat.total_amount) }}
                   </td>
                 </tr>
@@ -466,7 +466,7 @@ function goBack() {
                   {{ prof.professional_name }}
                 </span>
               </div>
-              <div class="text-right">
+              <div class="text-end">
                 <p class="font-semibold text-default">
                   {{ formatCurrency(prof.total_invoiced) }}
                 </p>
@@ -519,7 +519,7 @@ function goBack() {
                     {{ inv.patient_name }}
                   </p>
                 </div>
-                <div class="text-right">
+                <div class="text-end">
                   <p class="font-semibold text-danger-accent">
                     {{ formatCurrency(inv.balance_due) }}
                   </p>

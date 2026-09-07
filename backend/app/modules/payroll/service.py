@@ -250,6 +250,39 @@ class PeriodService:
         )
         return row
 
+    @staticmethod
+    async def delete_period(db: AsyncSession, clinic_id: UUID, period_id: UUID) -> None:
+        """Delete an EMPTY draft period (issue #390).
+
+        Closed/paid periods are formal records and stay immutable; a period
+        with entries keeps them addressable. No event: drafts are pre-formal.
+        """
+        row = await PeriodService.get_period(db, clinic_id, period_id)
+        if row is None:
+            raise HTTPException(http_status.HTTP_404_NOT_FOUND, "period not found")
+        if row.status != "draft":
+            raise HTTPException(
+                http_status.HTTP_409_CONFLICT,
+                "only draft periods can be deleted",
+            )
+        entry_count = (
+            await db.execute(
+                select(func.count())
+                .select_from(PayrollEntry)
+                .where(
+                    PayrollEntry.clinic_id == clinic_id,
+                    PayrollEntry.period_id == period_id,
+                )
+            )
+        ).scalar_one()
+        if entry_count:
+            raise HTTPException(
+                http_status.HTTP_409_CONFLICT,
+                "period has entries; remove them first",
+            )
+        await db.delete(row)
+        await db.commit()
+
 
 def _assert_balanced(gross: Decimal, deductions: Decimal, net: Decimal) -> None:
     if net != gross - deductions:
@@ -328,6 +361,15 @@ class EntryService:
         await db.commit()
         await db.refresh(row)
         return row
+
+    @staticmethod
+    async def delete_entry(db: AsyncSession, row: PayrollEntry) -> None:
+        """Delete a draft-period entry (issue #390) — e.g. added to the wrong
+        user. Reuses the draft guard: 404 on a missing period, 409 once the
+        period leaves draft."""
+        await EntryService._assert_draft_period(db, row.clinic_id, row.period_id)
+        await db.delete(row)
+        await db.commit()
 
     @staticmethod
     async def list_entries(

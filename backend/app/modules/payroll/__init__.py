@@ -36,6 +36,35 @@ class PayrollModule(BaseModule):
         "role_permissions": {
             "admin": ["*"],
         },
+        # Payroll frontend (issue #391): admin-only pages. Navigation is
+        # backend-driven via useModules; entries self-hide without the
+        # payroll grants.
+        "frontend": {
+            "layer_path": "frontend",
+            "navigation": [
+                {
+                    "label": "payroll.nav.profiles",
+                    "to": "/payroll/profiles",
+                    "icon": "i-lucide-users",
+                    "permission": "payroll.read",
+                    "order": 90,
+                },
+                {
+                    "label": "payroll.nav.periods",
+                    "to": "/payroll/periods",
+                    "icon": "i-lucide-calendar-days",
+                    "permission": "payroll.read",
+                    "order": 91,
+                },
+                {
+                    "label": "payroll.nav.reports",
+                    "to": "/payroll/reports",
+                    "icon": "i-lucide-chart-column",
+                    "permission": "payroll.reports.read",
+                    "order": 92,
+                },
+            ],
+        },
     }
 
     def get_models(self) -> list:
