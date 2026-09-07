@@ -41,8 +41,8 @@ templates are contributed.
 |---|---|---|---|---|---|
 | Spain | ✅ `es` | ✅ | ✅ `verifactu` module (AEAT) | n/a | — |
 | India | ✅ `en` + `ta` | ✅ | ✅ `india_gst` module (CGST/SGST/IGST, GSTIN checksum, FY numbering; e-invoice is applicability-tracking only) | ❓ ABDM voluntary? DPDP audit | #145 (e-invoicing GSP/IRP, DPDP, ABDM) |
-| France | ✅ `fr` | ✅ | ❌ e-invoicing reform (partner platforms, e-reporting); invoicing outside the Assurance Maladie flow only | ❌ SESAM-Vitale: no FSE / tiers payant for a self-hosted open-source product (ADR 0028); self-hosted installations are outside HDS, hosted offers need an HDS host | #141 (answered), #142 |
-| Portugal | ✅ `pt` | ✅ | ❌ AT certification is not possible for a self-hosted, modifiable program (producer-exclusive signing key, Portaria 363/2010 art. 3; ADR 0027) — invoice with a certified program; certified-edition route recorded | n/a | #140 (answered) |
+| France | ✅ `fr` | ✅ | ❌ e-invoicing reform (partner platforms, e-reporting); invoicing outside the Assurance Maladie flow until the FSE connector exists | ❌ `fr_ccam` (CCAM dentaire, tariffs, 100 % Santé baskets, devis conventionnel) then `fr_fse` connector to a homologated engine sold as API (ADR 0028); no in-house homologation; self-hosted installations are outside HDS, hosted offers need an HDS host | #411 (fr_ccam), #141 (answered), #142 |
+| Portugal | ✅ `pt` | ✅ | ❌ AT certification is not possible for a self-hosted, modifiable program (producer-exclusive signing key, Portaria 363/2010 art. 3; ADR 0027) — `pt_invoicing` connector to a certified invoicing API (InvoiceXpress, Moloni, Vendus…) pending; until then invoice with a certified program | n/a | #140 (answered) |
 | United States | ✅ `en` | ✅ | ✅ patient invoicing works as-is | ❌ CDT coding, X12 837D claims; HIPAA gap analysis | #137 |
 | Mexico | ✅ `es` | ✅ | ❌ CFDI stamping through a PAC | n/a | #138 |
 | Brazil | ✅ `pt` | ✅ | ❌ NFS-e | ❌ TISS | #139 |

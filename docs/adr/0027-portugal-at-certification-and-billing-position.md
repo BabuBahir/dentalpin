@@ -94,8 +94,10 @@ obstacle; **self-hosting is**, for two independent reasons:
    cover; the certificate number printed on its invoices would be
    false.
 
-Both objections disappear under one model, and only that one: a
-**certified edition** in which (a) the signing step, and therefore
+Both objections disappear when the certified program is not the one
+the practice runs: the simplest form is a certified invoicing service
+driven through its API (the Decision); the other is a **certified
+edition** in which (a) the signing step, and therefore
 the private key, lives in a service operated by the producer (a
 DentalPin-operated signing endpoint or a partner's), (b) the
 installation sends the five signature fields and receives the
@@ -146,20 +148,37 @@ Everything else in the issue is ordinary work once that model exists:
    may modify, cannot be an AT-certified invoicing program.** The
    blocker is art. 3 b)/d) of Portaria 363/2010 (producer-exclusive
    private key, unalterable program), not the licence.
-2. **DentalPin's position in Portugal is "clinical record and
-   schedule; invoice with a certified program"** until a certified
-   edition exists. The website's Portuguese pages and the country
-   readiness matrix say so plainly; a `PT` clinic sees `billing`'s
-   invoice issuing disabled with that explanation (budgets, treatment
-   plans and payments stay).
-3. The only viable path to invoicing is a **certified edition**:
-   producer-held key behind a remote signing service, a frozen billing
-   code path, ATCUD series webservice, QR code and SAF-T (PT) export,
-   filed for certification by an entity with a Portuguese NIF. This
-   ADR records the shape so the door stays open; it does not commit
-   anyone to building it.
-4. No `pt_at` module is started until a producer decides to run the
-   signing service and file the certification.
+2. **Invoices for a Portuguese practice are issued by a certified
+   invoicing service through its API**, not by DentalPin. Certified
+   SaaS invoicing programs with public REST APIs are the norm for
+   small businesses in Portugal (InvoiceXpress, Moloni, Vendus,
+   TOConline, KeyInvoice, among others); they hold the private key,
+   assign the ATCUD, print the QR and communicate the invoice to AT.
+   DentalPin sends the recipient and the lines, and stores what comes
+   back: the provider's number, ATCUD, signature characters and PDF.
+   The provider's document is the legal invoice; DentalPin's invoice
+   number is an internal reference.
+3. This is a **`PT`-gated connector module (`pt_invoicing`)** in the
+   `verifactu` shape, registered through `BillingHookRegistry`: one
+   provider driver first, others behind the same interface if demand
+   appears. Numbering, ATCUD and PDF come from the provider via the
+   hook, so `billing` learns nothing about Portugal.
+4. **Until the connector exists, DentalPin's position in Portugal is
+   "clinical record and schedule; invoice with a certified program"**:
+   the website's Portuguese pages and the country readiness matrix
+   say so, and a `PT` clinic sees `billing`'s invoice issuing disabled
+   with that explanation (budgets, treatment plans and payments stay).
+5. One question is asked of AT before the connector ships, in
+   writing: whether a program that only feeds a certified program
+   through its API needs a certificate of its own. The market reading
+   is that it does not, because the certified program issues the
+   invoice; the answer is recorded here when it arrives — **open**.
+6. The certified-edition route (producer-held key behind a signing
+   service, frozen billing path, own ATCUD/QR/SAF-T, filed with a
+   Portuguese NIF) stays documented in the Context as the only way
+   for DentalPin itself to be the certified program. It is not
+   pursued: the connector delivers the same outcome for the practice
+   at a subscription instead of a certification programme.
 
 ## Consequences
 
@@ -167,19 +186,32 @@ Everything else in the issue is ordinary work once that model exists:
 
 - The website stops implying something the law forbids, which is the
   outcome the issue asked for in the "no" case.
-- The certified-edition shape is written down with its legal anchors,
-  so a future producer (DentalPin the company, or a Portuguese
-  partner) can cost it instead of re-reading the Portaria.
+- The practice invoices legally from inside DentalPin once the
+  connector exists, with no DentalPin-operated service and no
+  certification filing.
+- The connector pattern (a third party issues, DentalPin mirrors) is
+  the same one France needs for FSE (ADR 0028); the hook interface is
+  shared.
 
 ### Bad / accepted trade-offs
 
-- A Portuguese practice cannot invoice from DentalPin today; the
-  product is weaker in Portugal than the UI translation suggests.
-- The certified edition is a hosted dependency inside a self-hosted
-  product; some users will reject that on principle.
+- A Portuguese practice cannot invoice from DentalPin until the
+  connector ships; the product is weaker in Portugal than the UI
+  translation suggests.
+- The practice pays a second subscription and depends on a commercial
+  provider's API and uptime; DentalPin holds a mirror, not the legal
+  document.
+- The provider's PDF replaces DentalPin's invoice template in
+  Portugal; per-clinic invoice branding is whatever the provider
+  offers.
 
 ## Alternatives considered
 
+- **Certified edition operated by DentalPin.** — Legally sound (the
+  key stays with the producer) but it means a signing service, a
+  frozen billing path, ATCUD/QR/SAF-T and a certification filing by
+  an entity with a Portuguese NIF, for the same practical result the
+  connector gives. Kept in the Context in case a producer wants it.
 - **Certify the self-hosted build and ship the private key with it.**
   — Violates art. 3 b) as read by AT (FAQ R32); the signatures would
   be invalid and the certificate revocable.
@@ -189,17 +221,20 @@ Everything else in the issue is ordinary work once that model exists:
 - **Ignore certification for small practices.** — DL 28/2019 art. 4
   n.º 1 b) applies to anyone using an invoicing program; no volume
   exemption survives (FAQ 4307 for ATCUD).
-- **Build ATCUD/QR/SAF-T now and certify later.** — Wasted until the
-  key/hosting question is decided; the ADR keeps the design instead.
+- **Build ATCUD/QR/SAF-T in DentalPin now and certify later.** —
+  Wasted; in the connector model all three belong to the provider.
 
 ## How to verify the rule still holds
 
-- `docs/technical/country-readiness.md` lists PT billing as "not
-  available: AT certification"; the Portuguese landing page repeats
-  it.
-- Backend test: a clinic with country `PT` gets `409` from the issue
-  endpoint of `billing` with the certification message (once the gate
-  is implemented).
+- `docs/technical/country-readiness.md` lists PT billing as "through
+  a certified invoicing service (connector)"; the Portuguese landing
+  page repeats it.
+- Backend test: a clinic with country `PT` and no connector installed
+  gets `409` from the issue endpoint of `billing` with the
+  certification message (once the gate is implemented).
+- `pt_invoicing` never generates an invoice number, ATCUD, signature
+  or QR locally; every one of them comes from the provider's
+  response.
 
 ## References
 
