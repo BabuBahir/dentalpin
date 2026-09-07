@@ -110,6 +110,20 @@ frontend as a Nuxt layer under its own Python package.
   with a documented free-text gap (#361, #357), Node 22 in CI and BSL
   wording on every README (#363, #352).
 
+### Changed
+
+- **Physical→logical CSS utilities across the core app and all module
+  layers** for right-to-left readiness: directional spacing
+  (`ml→ms`, `mr→me`, `pl→ps`, `pr→pe`), borders (`border-l/r→s/e`),
+  text alignment (`text-left/right→start/end`), inset positioning
+  (`left/right-*→start/end-*`) and the inline-style equivalents
+  (`margin/padding/border-inline-*`, `text-align: start/end`) now
+  resolve against the document direction. Identical pixels in LTR;
+  mirrored under `dir="rtl"`. Tailwind v4 already emits `space-x*`/
+  `divide-x*`/`gap-x*` with logical properties, so those need no
+  change. `translate-x*` transitions stay physical (CSS transforms
+  are direction-agnostic).
+
 ### Fixed
 
 - Production deploy hardening (#351): `docker-compose.prod.yml` pulls

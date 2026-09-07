@@ -132,6 +132,12 @@ export const PERMISSIONS = {
     settingsRead: 'whatsapp_webhook.settings.read',
     settingsWrite: 'whatsapp_webhook.settings.write'
   },
+  navOnline: {
+    settingsRead: 'nav_online.settings.read',
+    settingsConfigure: 'nav_online.settings.configure',
+    recordsRead: 'nav_online.records.read',
+    queueManage: 'nav_online.queue.manage'
+  },
   telephony: {
     settingsRead: 'telephony.settings.read',
     settingsWrite: 'telephony.settings.write',
