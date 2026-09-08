@@ -7,6 +7,11 @@
   before main's global HTTP exception handler) and pin the order test to an
   INR clinic so the currency assertion is stable against main's EUR clinic
   default.
+- chore: removed the dead global `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`
+  from `backend/app/config.py` (hardcoded test keys, never read) plus the
+  env pass-through in `docker-compose.yml` and `.env.example`. Gateway
+  credentials are per-clinic via `razorpay_settings`; nothing else changed.
+
 - fix: the checkout popup now receives the Razorpay payment `key` option
   (the clinic's public key id) instead of `key_id`, matching the checkout.js
   contract the SDK expects.
