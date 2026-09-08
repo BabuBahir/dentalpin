@@ -126,7 +126,7 @@ async def test_order_creates_order_server_side(
     data = res.json()["data"]
     assert data["order_id"] == ORDER_ID
     assert data["amount"] == 1000  # paise
-    assert data["currency"] == "INR"
+    assert data["currency"] == test_clinic.currency
     assert data["key_id"] == KEY_ID
 
 
