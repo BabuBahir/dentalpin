@@ -87,8 +87,11 @@ def create_refresh_token(
 
     With ``jti``/``family_id`` the token is backed by an
     ``auth_refresh_tokens`` row (ADR 0023) and can be rotated and revoked
-    individually; without them it is a legacy stateless token, still
-    accepted once by :func:`rotate_refresh_token` during the transition.
+    individually; without them it is a legacy stateless token from before
+    ADR 0023. :func:`rotate_refresh_token` still accepts those during the
+    transition release and migrates them into a tracked family, but nothing
+    marks them as used: a legacy token stays replayable until its own
+    ``exp`` (``REFRESH_TOKEN_EXPIRE_DAYS``), after which none exist.
     """
     expire = datetime.now(UTC) + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     payload = {
@@ -180,8 +183,10 @@ async def rotate_refresh_token(
 
     jti = payload.get("jti")
     if jti is None:
-        # Legacy stateless token from before ADR 0023: honour it once and
-        # start a tracked family; it stays valid only until its own expiry.
+        # Legacy stateless token from before ADR 0023: accept it and start
+        # a tracked family. Not single-use (there is no row to revoke); it
+        # dies with its own ``exp``, at most REFRESH_TOKEN_EXPIRE_DAYS after
+        # the deploy. Transition-only.
         new_token, family_id = await issue_refresh_token(
             db, user, user_agent=user_agent, client_ip=client_ip
         )

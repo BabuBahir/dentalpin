@@ -46,8 +46,9 @@ export function useApi() {
   const { csrfHeaders } = useSessionRequest()
   // SSR: the browser's session cookies arrive on the incoming request;
   // forward them to the backend so server-rendered pages authenticate
-  // the same way the client does (ADR 0023).
-  const ssrCookie = import.meta.server ? useRequestHeaders(['cookie']) : {}
+  // the same way the client does (ADR 0023). Read per call, not once:
+  // a server-side refresh earlier in the same render rotates the jar.
+  const { cookieHeaders } = useSsrCookies()
   const { t } = useI18n()
   const toast = useToast()
 
@@ -69,8 +70,7 @@ export function useApi() {
     // Session cookie auth (ADR 0023): the browser attaches the HttpOnly
     // cookies itself; unsafe methods add the double-submit CSRF header.
     if (!skipAuth) {
-      Object.assign(headers, csrfHeaders(method))
-      if (import.meta.server && ssrCookie.cookie) headers.cookie = ssrCookie.cookie
+      Object.assign(headers, csrfHeaders(method), cookieHeaders())
     }
 
     const url = _withQuery(path, query)
@@ -100,8 +100,9 @@ export function useApi() {
         // Try to refresh token
         const refreshed = await auth.refresh()
         if (refreshed) {
-          // Retry with the rotated cookies (+ the fresh CSRF token).
-          Object.assign(headers, csrfHeaders(method))
+          // Retry with the rotated cookies (+ the CSRF token, unchanged
+          // across refreshes but re-read in case this was a fresh login).
+          Object.assign(headers, csrfHeaders(method), cookieHeaders())
           return await $fetch<T>(url, {
             baseURL: apiBaseUrl.value,
             method,

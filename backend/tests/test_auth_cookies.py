@@ -55,7 +55,10 @@ async def test_login_sets_httponly_session_cookies_and_keeps_body(client: AsyncC
     csrf = _cookie_flags(resp, "dp_csrf")
     assert "HttpOnly" in access and "HttpOnly" in refresh
     assert "HttpOnly" not in csrf  # the readable double-submit half
-    assert "Path=/api/v1/auth/refresh" in refresh
+    # All three on path=/ so a page request carries dp_refresh and SSR can
+    # refresh an expired access cookie in place (review of #394).
+    assert "Path=/" in refresh and "Path=/api" not in refresh
+    assert "Domain=" not in refresh  # host-only unless COOKIE_DOMAIN is set
     assert "SameSite=lax" in access.lower().replace("samesite=lax", "SameSite=lax")
 
     # Transition release: bearer clients still get the pair in the body.
@@ -147,10 +150,13 @@ async def test_refresh_via_cookie_only(client: AsyncClient) -> None:
     await _bootstrap(client)
     await _login(client)
     csrf = client.cookies.get("dp_csrf")
-    # No body: the path-scoped dp_refresh cookie is the credential.
+    # No body: the dp_refresh cookie is the credential.
     resp = await client.post(REFRESH, headers={"X-CSRF-Token": csrf})
     assert resp.status_code == 200, resp.text
     assert _cookie_flags(resp, "dp_refresh")
+    # The CSRF token is per family: unchanged by rotation, so a tab that
+    # captured it before another tab refreshed keeps passing the gate.
+    assert _cookie_flags(resp, "dp_csrf").startswith(f"dp_csrf={csrf};")
     # The rotated session keeps working.
     me = await client.get(ME)
     assert me.status_code == 200
@@ -181,9 +187,11 @@ async def test_logout_revokes_family_and_clears_cookies(
 
 
 @pytest.mark.asyncio
-async def test_legacy_stateless_refresh_token_is_honoured_once(client: AsyncClient) -> None:
+async def test_legacy_stateless_refresh_token_is_migrated(client: AsyncClient) -> None:
     """Tokens issued before ADR 0023 (no jti) still refresh during the
-    transition and get migrated into a tracked family."""
+    transition and get migrated into a tracked family. They are not
+    single-use (nothing marks them consumed); they expire with their own
+    ``exp``."""
     from app.core.auth.service import create_refresh_token
 
     await _bootstrap(client)
@@ -196,3 +204,26 @@ async def test_legacy_stateless_refresh_token_is_honoured_once(client: AsyncClie
     resp = await client.post(REFRESH, json={"refresh_token": legacy})
     assert resp.status_code == 200, resp.text
     assert resp.json()["refresh_token"] != legacy
+
+
+@pytest.mark.asyncio
+async def test_cookie_domain_setting_widens_cookies_for_split_hosts(
+    client: AsyncClient, monkeypatch
+) -> None:
+    """Split-host deployments (app and API on sibling hosts) set COOKIE_DOMAIN
+    so the browser sends the cookies to both and the app can read dp_csrf."""
+    from app.config import settings
+
+    await _bootstrap(client)
+    monkeypatch.setattr(settings, "COOKIE_DOMAIN", ".example.com")
+    resp = await _login(client)
+    assert resp.status_code == 200, resp.text
+    for name in ("dp_access", "dp_refresh", "dp_csrf"):
+        assert "Domain=.example.com" in _cookie_flags(resp, name)
+    # httpx's jar ignores a cookie for a foreign domain, as a browser on
+    # another host would; read the token from the header instead.
+    csrf = _cookie_flags(resp, "dp_csrf").split(";")[0].split("=", 1)[1]
+    out = await client.post(LOGOUT, headers={"X-CSRF-Token": csrf})
+    assert out.status_code == 204
+    # Clearing must target the same domain or the browser keeps the cookies.
+    assert all("Domain=.example.com" in h for h in out.headers.get_list("set-cookie"))

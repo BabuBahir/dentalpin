@@ -18,6 +18,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 15
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    # Session cookies (ADR 0023) are host-only by default, which is what a
+    # single-host deployment and the e2e stack need. Split-host topologies
+    # (app on demo.example.com, API on api-demo.example.com) set the shared
+    # parent domain, e.g. ".example.com", so the browser sends the cookies
+    # to both hosts and the app can read ``dp_csrf``.
+    COOKIE_DOMAIN: str = ""
     ALGORITHM: str = "HS256"
     # Independent secret used to sign the public-budget verification
     # cookies (ADR 0006). Falls back to ``SECRET_KEY`` for local/dev
@@ -38,6 +44,12 @@ class Settings(BaseSettings):
 
     # Testing
     TESTING: bool = False
+    # RBAC source of truth. When False (default), permission checks use the
+    # legacy static grant map and custom roles cannot be assigned. When True,
+    # require_permission resolves through the DB-backed, clinic-aware tables
+    # (roles/role_permissions/permissions/clinic_role_overrides, issue #46)
+    # populated by the seed_rbac seeder at every boot.
+    RBAC_FROM_DB: bool = False
 
     # Module system
     DENTALPIN_DEV_MODULE_SCAN: bool = True  # Fallback filesystem scan for dev

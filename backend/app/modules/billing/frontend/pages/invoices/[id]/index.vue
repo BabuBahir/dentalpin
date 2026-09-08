@@ -812,7 +812,7 @@ function goToCreditNoteFor() {
                         #{{ item.tooth_number }}
                         <span
                           v-if="item.surfaces?.length"
-                          class="ml-1 text-subtle font-normal"
+                          class="ms-1 text-subtle font-normal"
                         >
                           {{ item.surfaces.join(', ') }}
                         </span>
@@ -825,7 +825,7 @@ function goToCreditNoteFor() {
                       {{ item.internal_code }}
                     </p>
                   </div>
-                  <div class="text-right">
+                  <div class="text-end">
                     <p class="text-caption text-subtle">
                       {{ item.quantity }} x {{ formatCurrency(item.unit_price) }}
                     </p>

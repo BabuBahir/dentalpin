@@ -16,9 +16,10 @@ from app.config import settings
 from app.core.log_context import set_request_context
 from app.database import get_db
 
-from .cookies import ACCESS_COOKIE, CSRF_COOKIE, CSRF_HEADER, SAFE_METHODS  # noqa: E402
+from .cookies import ACCESS_COOKIE, CSRF_COOKIE, CSRF_HEADER, SAFE_METHODS
 from .models import Clinic, ClinicMembership, User
 from .permissions import has_permission
+from .rbac import has_permission_in_clinic
 from .service import decode_token
 
 # auto_error=False: a missing bearer header is not a 401 by itself any
@@ -197,8 +198,13 @@ def require_permission(permission: str) -> Callable:
 
     async def permission_checker(
         ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
+        db: Annotated[AsyncSession, Depends(get_db)],
     ) -> None:
-        if not has_permission(ctx.role, permission):
+        if settings.RBAC_FROM_DB:
+            allowed = await has_permission_in_clinic(db, ctx.clinic_id, ctx.role, permission)
+        else:
+            allowed = has_permission(ctx.role, permission)
+        if not allowed:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=f"Permission denied: {permission}",

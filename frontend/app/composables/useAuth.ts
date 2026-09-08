@@ -8,22 +8,6 @@ import type { User, LoginCredentials, AuthResponse, MeResponse, ApiResponse } fr
 // never touch it during SSR.
 let clientRefreshInFlight: Promise<boolean> | null = null
 
-/** Overlay freshly issued Set-Cookie values onto the incoming cookie
- *  header (SSR only), so the follow-up /me call uses the rotated session. */
-function _mergeCookieHeader(incoming: string | undefined, setCookies: string[]): string {
-  const jar = new Map<string, string>()
-  for (const part of (incoming || '').split(';')) {
-    const [k, ...v] = part.trim().split('=')
-    if (k) jar.set(k, v.join('='))
-  }
-  for (const sc of setCookies) {
-    const [pair] = sc.split(';')
-    const [k, ...v] = (pair || '').trim().split('=')
-    if (k) jar.set(k, v.join('='))
-  }
-  return Array.from(jar, ([k, v]) => `${k}=${v}`).join('; ')
-}
-
 export function useAuth() {
   const config = useRuntimeConfig()
   const router = useRouter()
@@ -40,10 +24,11 @@ export function useAuth() {
   // never sees them. ``dp_csrf`` (readable) doubles as the "a session
   // probably exists" hint, so anonymous visitors don't cost a /me call.
   const { csrfHeaders, hasSession } = useSessionRequest()
-  const ssrCookie = import.meta.server ? useRequestHeaders(['cookie']) : {}
+  // SSR forwards the (possibly rotated) cookie jar per call, see useSsrCookies.
+  const { cookieHeaders, applySetCookies } = useSsrCookies()
   const sessionHeaders = (method = 'GET'): Record<string, string> => ({
     ...csrfHeaders(method),
-    ...(import.meta.server && ssrCookie.cookie ? { cookie: ssrCookie.cookie } : {})
+    ...cookieHeaders()
   })
 
   // Computed
@@ -119,21 +104,21 @@ export function useAuth() {
 
     const run = (async (): Promise<boolean> => {
       try {
-        // The refresh cookie is path-scoped to this endpoint; the browser
-        // attaches it, the backend rotates it and re-sets the cookies.
+        // The browser (or SSR, forwarding the page request's jar) presents
+        // the refresh cookie; the backend rotates it and re-sets the cookies.
         const raw = await $fetch.raw<AuthResponse>('/api/v1/auth/refresh', {
           baseURL: apiBaseUrl.value,
           method: 'POST',
           credentials: 'include',
           headers: sessionHeaders('POST')
         })
-        // SSR: the rotated cookies came back on the *backend* response;
-        // relay them onto the Nuxt response or the browser keeps the old
-        // (now revoked) refresh token and burns the family next time.
-        const setCookies: string[] = import.meta.server ? (raw.headers.getSetCookie?.() ?? []) : []
+        // SSR: the rotated cookies came back on the *backend* response.
+        // Relay them onto the Nuxt response (or the browser keeps the old,
+        // now revoked refresh token and burns the family next time) and
+        // switch this render's forwarded jar to them, so every later
+        // backend call in the same render uses the live session.
         if (import.meta.server) {
-          const event = useRequestEvent()
-          if (event) for (const c of setCookies) appendResponseHeader(event, 'set-cookie', c)
+          applySetCookies(raw.headers.getSetCookie?.() ?? [])
         }
         const response = raw._data as AuthResponse
         user.value = response.user
@@ -145,9 +130,7 @@ export function useAuth() {
         const me = await $fetch<ApiResponse<MeResponse>>('/api/v1/auth/me', {
           baseURL: apiBaseUrl.value,
           credentials: 'include',
-          headers: import.meta.server
-            ? { cookie: _mergeCookieHeader(ssrCookie.cookie, setCookies) }
-            : {}
+          headers: cookieHeaders()
         })
         user.value = me.data.user
         permissions.value = me.data.permissions
