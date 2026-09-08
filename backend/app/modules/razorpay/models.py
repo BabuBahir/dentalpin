@@ -41,6 +41,6 @@ class RazorpaySettings(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     last_error_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
 
-    clinic: Mapped["Clinic"] = relationship(foreign_keys=[clinic_id])
+    clinic: Mapped[Clinic] = relationship(foreign_keys=[clinic_id])
 
     __table_args__ = (Index("idx_razorpay_settings_clinic", "clinic_id"),)

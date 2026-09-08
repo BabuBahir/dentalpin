@@ -83,6 +83,8 @@ async function confirmCollect() {
     error.value = t('razorpay.collect.invalidAmount')
     return
   }
+  const patientIdValue = patientId.value
+  const amountValue = amount.value
   error.value = null
   paying.value = true
   try {
@@ -92,7 +94,7 @@ async function confirmCollect() {
       return
     }
 
-    const order = await createOrder(patientId.value, amount.value)
+    const order = await createOrder(patientIdValue, amountValue)
 
     if (!window.Razorpay) {
       error.value = t('razorpay.collect.loadError')
@@ -109,7 +111,7 @@ async function confirmCollect() {
       handler: async (response: RazorpayCheckoutResponse) => {
         try {
           await verifyAndRecord({
-            patient_id: patientId.value,
+            patient_id: patientIdValue,
             payment_date: new Date().toISOString().slice(0, 10),
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_order_id: response.razorpay_order_id,
@@ -117,7 +119,7 @@ async function confirmCollect() {
             allocations: [{
               target_type: budgetId.value ? 'budget' : 'on_account',
               target_id: budgetId.value,
-              amount: amount.value
+              amount: amountValue
             }]
           })
           open.value = false
