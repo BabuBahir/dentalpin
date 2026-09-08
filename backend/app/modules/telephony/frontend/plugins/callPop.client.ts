@@ -24,11 +24,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   let lastStatusCheck = 0
   let timer: ReturnType<typeof setInterval> | undefined
 
+  const t = (nuxtApp.$i18n as { t: (k: string) => string }).t
   const { user } = useAuth()
   const { can } = usePermissions()
   const api = useApi(t)
   const toast = useToast()
-  const t = (nuxtApp.$i18n as { t: (k: string) => string }).t
 
   function remember(id: string) {
     seen.add(id)
