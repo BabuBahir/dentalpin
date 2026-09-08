@@ -1,5 +1,7 @@
 import { test, expect } from './_fixtures'
 
+const API_BASE = process.env.E2E_API_BASE || 'http://localhost:8000'
+
 /**
  * ADR 0023: reloading a deep link after the access cookie expired must
  * land on that URL, refreshed server-side, with no detour through /login.
@@ -36,7 +38,7 @@ test.describe('session expiry', () => {
     expect(after.find(c => c.name === 'dp_csrf')?.value).toBe(csrfBefore)
 
     // The rotated session keeps working for a mutation from this page.
-    const res = await loggedIn.request.patch('/api/v1/auth/clinic/settings/communications', {
+    const res = await loggedIn.request.patch(`${API_BASE}/api/v1/auth/clinic/settings/communications`, {
       headers: { 'X-CSRF-Token': csrfBefore || '' },
       data: {}
     })
