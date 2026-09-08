@@ -164,11 +164,11 @@ export function usePayroll() {
   }
 
   async function deleteEntry(id: string) {
-    await api.del<null>(`/api/v1/payroll/entries/${id}`)
+    await api.del<null>(`/api/v1/payroll/entries/${id}`, { errorToast: false })
   }
 
   async function deletePeriod(id: string) {
-    await api.del<null>(`/api/v1/payroll/periods/${id}`)
+    await api.del<null>(`/api/v1/payroll/periods/${id}`, { errorToast: false })
   }
 
   async function monthlyReport(month: string) {
