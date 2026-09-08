@@ -11,6 +11,8 @@
  * per-request and visible to every composable, however early it was
  * created.
  */
+import { appendResponseHeader } from 'h3'
+
 const CONTEXT_KEY = 'dpCookieHeader'
 
 /** Overlay ``Set-Cookie`` values onto a cookie header. */
@@ -29,13 +31,19 @@ export function mergeCookieHeader(incoming: string | undefined, setCookies: stri
 }
 
 export function useSsrCookies() {
+  // Capture the request event and the incoming header once, synchronously,
+  // while the Nuxt instance is available. The composable is used after
+  // awaits (middleware, retries), where calling useRequestEvent() /
+  // useRequestHeaders() again would throw "nuxt instance unavailable";
+  // reading event.context is a plain property access and always works.
+  const event = import.meta.server ? useRequestEvent() : undefined
+  const incoming = import.meta.server ? useRequestHeaders(['cookie']).cookie : undefined
+
   /** Current cookie header to forward (server only; ``undefined`` on the client). */
   function cookieHeader(): string | undefined {
     if (!import.meta.server) return undefined
-    const event = useRequestEvent()
     const stored = event?.context[CONTEXT_KEY] as string | undefined
-    if (stored !== undefined) return stored
-    return useRequestHeaders(['cookie']).cookie
+    return stored !== undefined ? stored : incoming
   }
 
   /** Headers object carrying the forwarded cookie (empty on the client). */
@@ -46,9 +54,7 @@ export function useSsrCookies() {
 
   /** Record rotated cookies for the rest of this render and relay them to the browser. */
   function applySetCookies(setCookies: string[]): void {
-    if (!import.meta.server || setCookies.length === 0) return
-    const event = useRequestEvent()
-    if (!event) return
+    if (!import.meta.server || setCookies.length === 0 || !event) return
     event.context[CONTEXT_KEY] = mergeCookieHeader(cookieHeader(), setCookies)
     for (const c of setCookies) appendResponseHeader(event, 'set-cookie', c)
   }
