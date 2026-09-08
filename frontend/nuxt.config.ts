@@ -98,8 +98,10 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-    // Server-side only (for SSR inside Docker)
-    apiBaseUrlServer: process.env.API_BASE_URL_SERVER || 'http://backend:8000',
+    // Server-side only (SSR). Defaults to localhost for host dev; Docker
+    // deployments (dev/compose.prod/compose.coolify) must set
+    // API_BASE_URL_SERVER=http://backend:8000 explicitly.
+    apiBaseUrlServer: process.env.API_BASE_URL_SERVER || 'http://localhost:8000',
     // Content-Security-Policy mode for the Nitro middleware (#355):
     // off | report | enforce — overridden at runtime by NUXT_CSP_MODE.
     cspMode: process.env.NUXT_CSP_MODE || 'off',
