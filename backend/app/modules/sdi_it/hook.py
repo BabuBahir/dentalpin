@@ -15,20 +15,18 @@ to the admin, the PEC transport (later) sends it.
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth.models import Clinic
 from app.modules.billing.hooks import BillingComplianceHook
+from app.modules.billing.models import Invoice
 
 from .models import SdiItRecord, SdiItSettings
 from .services.tax_ids import PartitaIva, is_business_recipient
 from .services.xml_builder import Party, SdiBuildError, build_fattura, progressivo_invio
-
-if TYPE_CHECKING:
-    from app.modules.billing.models import Invoice
 
 NOT_APPLICABLE_REASON = "b2c_healthcare_art_10bis"
 
@@ -105,6 +103,57 @@ async def build_record(
     return record
 
 
+async def requeue(
+    db: AsyncSession,
+    rejected: SdiItRecord,
+    invoice: Invoice,
+    settings: SdiItSettings,
+    *,
+    original: Invoice | None,
+) -> SdiItRecord:
+    """After a scarto: new file (same number and date, new progressivo);
+    the rejected record stays as history."""
+    new = await build_record(db, invoice, settings, original=original)
+    new.attempts = rejected.attempts
+    rejected.finished_at = rejected.finished_at or datetime.now(UTC)
+    return new
+
+
+async def latest_record(db: AsyncSession, invoice: Invoice) -> SdiItRecord | None:
+    return (
+        await db.execute(
+            select(SdiItRecord)
+            .where(SdiItRecord.invoice_id == invoice.id, SdiItRecord.clinic_id == invoice.clinic_id)
+            .order_by(SdiItRecord.created_at.desc())
+            .limit(1)
+        )
+    ).scalar_one_or_none()
+
+
+async def original_invoice(db: AsyncSession, invoice: Invoice) -> Invoice | None:
+    if invoice.credit_note_for_id is None:
+        return None
+    return (
+        await db.execute(
+            select(Invoice).where(
+                Invoice.id == invoice.credit_note_for_id, Invoice.clinic_id == invoice.clinic_id
+            )
+        )
+    ).scalar_one_or_none()
+
+
+def _queued(record: SdiItRecord) -> dict[str, Any]:
+    return {
+        "IT": {
+            "sdi": "queued",
+            "record_id": str(record.id),
+            "tipo_documento": record.tipo_documento,
+            "file_name": record.file_name,
+            "state": record.state,
+        }
+    }
+
+
 class SdiItHook(BillingComplianceHook):
     @property
     def country_code(self) -> str:
@@ -152,12 +201,28 @@ class SdiItHook(BillingComplianceHook):
         except SdiBuildError as exc:
             settings.last_error = str(exc)[:500]
             return {"IT": {"sdi": "error", "error": str(exc)}}
-        return {
-            "IT": {
-                "sdi": "queued",
-                "record_id": str(record.id),
-                "tipo_documento": record.tipo_documento,
-                "file_name": record.file_name,
-                "state": record.state,
-            }
-        }
+        return _queued(record)
+
+    async def can_edit_billing_party(self, invoice, db) -> tuple[bool, str | None]:
+        """Only after a scarto: the SDI never accepted the file, so the
+        corrected recipient goes out with the same number and date (ADR 0025 §4)."""
+        record = await latest_record(db, invoice)
+        if record is not None and record.state == "rejected":
+            return True, None
+        return False, "Il destinatario si può correggere solo dopo uno scarto dell'SDI."
+
+    async def regenerate_after_party_change(self, invoice, db) -> dict[str, Any]:
+        record = await latest_record(db, invoice)
+        settings = await get_settings(db, invoice.clinic_id)
+        if record is None or record.state != "rejected" or settings is None or not settings.enabled:
+            return {}
+        if not is_business_recipient(invoice.billing_tax_id):
+            return {"IT": {"sdi": "not_applicable", "reason": NOT_APPLICABLE_REASON}}
+        await db.refresh(invoice, attribute_names=["items"])
+        original = await original_invoice(db, invoice) if record.tipo_documento == "TD04" else None
+        try:
+            new = await requeue(db, record, invoice, settings, original=original)
+        except SdiBuildError as exc:
+            settings.last_error = str(exc)[:500]
+            return {"IT": {"sdi": "error", "error": str(exc)}}
+        return _queued(new)

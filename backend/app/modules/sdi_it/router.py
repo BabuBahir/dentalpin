@@ -22,7 +22,7 @@ from app.core.schemas import ApiResponse, PaginatedApiResponse
 from app.database import get_db
 from app.modules.billing.models import Invoice
 
-from .hook import build_record, get_settings
+from .hook import get_settings, requeue
 from .models import SdiItRecord, SdiItSettings
 from .schemas import (
     ReceiptImport,
@@ -193,16 +193,15 @@ async def requeue_record(
     if invoice is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Fattura non trovata")
     try:
-        new = await build_record(
+        new = await requeue(
             db,
+            row,
             invoice,
             settings,
             original=invoice.credit_note_for if row.tipo_documento == "TD04" else None,
         )
     except SdiBuildError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
-    new.attempts = row.attempts
-    row.finished_at = row.finished_at or datetime.now(UTC)
     await db.commit()
     await db.refresh(new)
     return ApiResponse(data=SdiRecordResponse.model_validate(new))

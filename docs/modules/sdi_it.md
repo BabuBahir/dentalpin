@@ -16,7 +16,7 @@ SDI returns:
 |---|---|---|
 | `RC` ricevuta di consegna | `delivered` | nothing |
 | `MC` impossibilità di recapito | `undeliverable` | tell the recipient the invoice is in their area riservata |
-| `NS` notifica di scarto | `rejected` | fix the invoice data, **Requeue** (same number and date, new progressivo) within 5 days |
+| `NS` notifica di scarto | `rejected` | fix the data and resend within 5 days: editing the recipient on the invoice (billing's *edit billing party*, allowed only while the latest record is `rejected`) queues a new file automatically; after fixing clinic data use **Requeue**. Same number and date, new progressivo |
 
 Invoices to natural persons never produce a record: healthcare invoices to
 persone fisiche may not be electronic (art. 10-bis DL 119/2018). They are
