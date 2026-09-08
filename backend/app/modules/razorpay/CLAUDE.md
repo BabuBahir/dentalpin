@@ -86,10 +86,19 @@ None (`get_tools()` → `[]`). Recording stays on the HTTP trust boundary.
 
 - **`payments.collect.actions` slot** — `RazorpayCollectButton.vue` renders
   only when the clinic's server-side country is `IN` and a patient is
-  resolvable. It creates the order, opens the Razorpay checkout popup
-  (`checkout.js` from the CDN), and forwards the callback ids + signature to
-  `/verify`. On success it reloads the current route so the payments hosts
-  (which only refresh on their own modal events) reconcile.
+  resolvable. It runs the shared `useRazorpayCheckout` runner (order →
+  popup → `/verify`). On success it reloads the current route so the
+  payments hosts (which only refresh on their own modal events) reconcile.
+- **Gateway providers** — `plugins/collect-gateway.client.ts` claims the
+  `upi` / `netbanking` / `card` methods through the host seam
+  `useCollectGateway`, so those chips in the create-payment modal launch
+  this checkout (IN + `razorpay.collect` gated per provider). When the
+  clinic has no configured keys the provider reports `unconfigured` and the
+  modal falls back to a manual record with a warning toast.
+- **`useRazorpayCheckout`** — the shared order→popup→`/verify` runner used
+  by both the collect button and the gateway providers. Returns a settled
+  outcome (`{ ok, payment } | { ok:false, reason: unconfigured|cancelled|error }`)
+  so hosts branch, never guess.
 - **Settings → Integrations** — `razorpay` page (`RazorpaySettingsPage.vue`)
   with the per-clinic key id + secret (blank secret = keep the stored one).
 - **i18n**: 9 locales (en, es, fr, pt, ta, de, pl, it, hu) under `razorpay.*`.

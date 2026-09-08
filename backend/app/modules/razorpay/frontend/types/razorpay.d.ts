@@ -17,6 +17,8 @@ export interface RazorpayOptions {
   description?: string
   notes?: Record<string, string | number | null>
   handler: (response: RazorpayCheckoutResponse) => void
+  /** Popup-dismissal callback (checkout.js v1 ``modal.ondismiss``). */
+  modal?: { ondismiss?: () => void }
 }
 
 export interface RazorpayInstance {

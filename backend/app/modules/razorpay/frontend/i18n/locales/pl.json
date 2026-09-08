@@ -30,6 +30,9 @@
       "loadError": "Nie udało się wczytać kasy Razorpay.",
       "error": "Nie udało się rozpocząć płatności.",
       "verifyError": "Nie udało się potwierdzić płatności."
+    },
+    "gateway": {
+      "notConfigured": "Razorpay nie jest skonfigurowany — zostanie zarejestrowana jako płatność ręczna."
     }
   }
 }

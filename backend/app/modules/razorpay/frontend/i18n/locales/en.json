@@ -30,6 +30,9 @@
       "loadError": "Could not load the Razorpay checkout.",
       "error": "The payment could not be started.",
       "verifyError": "The payment could not be confirmed."
+    },
+    "gateway": {
+      "notConfigured": "Razorpay is not configured — recording this as a manual payment."
     }
   }
 }

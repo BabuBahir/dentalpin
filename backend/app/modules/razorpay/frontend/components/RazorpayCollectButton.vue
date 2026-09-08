@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorDetail } from '~~/app/utils/error'
-import { useRazorpay, useRazorpayCountry } from '../composables/useRazorpay'
-import type { RazorpayCheckoutResponse } from '../types/razorpay'
+import { useRazorpayCountry } from '../composables/useRazorpay'
+import { useRazorpayCheckout } from '../composables/useRazorpayCheckout'
 
 /**
  * "Pagar con Razorpay" — registers into `payments.collect.actions`
@@ -28,9 +28,8 @@ const props = defineProps<{
 
 const { t } = useI18n()
 const { can } = usePermissions()
-const toast = useToast()
 const country = useRazorpayCountry()
-const { createOrder, verifyAndRecord } = useRazorpay()
+const { checkoutOnce } = useRazorpayCheckout()
 
 const patientId = computed(() => (
   props.ctx?.patient?.id
@@ -64,20 +63,6 @@ function startCollect() {
   open.value = true
 }
 
-function loadRazorpayScript(): Promise<boolean> {
-  return new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true)
-      return
-    }
-    const script = document.createElement('script')
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-    script.onload = () => resolve(true)
-    script.onerror = () => resolve(false)
-    document.head.appendChild(script)
-  })
-}
-
 async function confirmCollect() {
   if (!patientId.value || !amount.value || amount.value <= 0) {
     error.value = t('razorpay.collect.invalidAmount')
@@ -88,55 +73,27 @@ async function confirmCollect() {
   error.value = null
   paying.value = true
   try {
-    const loaded = await loadRazorpayScript()
-    if (!loaded) {
-      error.value = t('razorpay.collect.loadError')
-      return
-    }
-
-    const order = await createOrder(patientIdValue, amountValue)
-
-    if (!window.Razorpay) {
-      error.value = t('razorpay.collect.loadError')
-      return
-    }
-
-    const rzp = new window.Razorpay({
-      key_id: order.key_id,
-      amount: order.amount,
-      currency: order.currency,
-      order_id: order.order_id,
-      name: 'DentalPin',
-      description: t('razorpay.collect.description'),
-      handler: async (response: RazorpayCheckoutResponse) => {
-        try {
-          await verifyAndRecord({
-            patient_id: patientIdValue,
-            payment_date: new Date().toISOString().slice(0, 10),
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            allocations: [{
-              target_type: budgetId.value ? 'budget' : 'on_account',
-              target_id: budgetId.value,
-              amount: amountValue
-            }]
-          })
-          open.value = false
-          // The payment is now real on the backend. The hosts that
-          // render this slot refresh on their own modal events, so
-          // reconcile server state with a reload to the same route.
-          await reloadNuxtApp()
-        } catch (e) {
-          toast.add({
-            title: t('razorpay.collect.verifyError'),
-            description: errorDetail(e),
-            color: 'error'
-          })
-        }
-      }
+    const outcome = await checkoutOnce({
+      patient_id: patientIdValue,
+      amount: amountValue,
+      payment_date: new Date().toISOString().slice(0, 10),
+      allocations: [{
+        target_type: budgetId.value ? 'budget' : 'on_account',
+        target_id: budgetId.value ?? undefined,
+        amount: amountValue
+      }]
     })
-    rzp.open()
+    if (outcome.ok) {
+      open.value = false
+      // The payment is now real on the backend. The hosts that
+      // render this slot refresh on their own modal events, so
+      // reconcile server state with a reload to the same route.
+      await reloadNuxtApp()
+    } else if (outcome.reason === 'error' || outcome.reason === 'unconfigured') {
+      error.value = outcome.error ?? t('razorpay.collect.error')
+    }
+    // 'cancelled' → popup dismissed without paying; keep the modal open so
+    // the user can retry or adjust the amount.
   } catch (e) {
     error.value = errorDetail(e) ?? t('razorpay.collect.error')
   } finally {

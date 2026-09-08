@@ -7,6 +7,14 @@
   before main's global HTTP exception handler) and pin the order test to an
   INR clinic so the currency assertion is stable against main's EUR clinic
   default.
+- feat(#263): the create-payment modal's `upi` / `netbanking` / `card`
+  chips now launch the Razorpay checkout for Indian clinics instead of a
+  manual record, via the new host seam `useCollectGateway` (provider gated
+  on `razorpay.collect` + country `IN`). When the clinic has no configured
+  gateway keys, the chip falls back to a manual record with a warning toast.
+  The order→popup→`/verify` glue moved from `RazorpayCollectButton.vue` into
+  the shared `useRazorpayCheckout` composable (settled outcome:
+  `ok / unconfigured / cancelled / error`).
 
 - feat(#263, PR #373): Razorpay online payments module, refactored out of
   the payments module (which gained the `payments.collect.actions` slot and

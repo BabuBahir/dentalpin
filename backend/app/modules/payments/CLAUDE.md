@@ -104,6 +104,20 @@ nothing. Country gating is the gateway's `condition` (same as
 | `payments.ledger.row.meta` | patient ledger row, under the meta line | `{ entry }` |
 | `payments.detail.sections` | payments list row, above the refund action (there is no dedicated detail view yet — this is its stand-in) | `{ payment }` |
 
+**Gateway providers** (not slots, #263): a gateway module can claim a
+payment *method* so the create-payment modal's chip launches its checkout
+instead of a manual record. Mechanism: the host seam
+`useCollectGateway` (`frontend/app/composables/useCollectGateway.ts`,
+mirrors `useModuleSlots`). The modal calls
+`useCollectGateway().resolve(method)` before submitting; when a provider
+matches it delegates to `provider.collect({ patient_id, amount,
+payment_date, allocations })` and the returned Payment flows through the
+normal `created` event. Providers carry their own `permission` + `countries`
+gates (razorpay claims `upi` / `netbanking` / `card` for IN clinics), so the
+host stays method-string-based and never imports a gateway module. A
+cancelled popup or failed checkout leaves the modal open; an unconfigured
+gateway falls back to a manual record with a warning toast.
+
 ## Frontend slots consumed
 
 | Slot | Component | Permission |
