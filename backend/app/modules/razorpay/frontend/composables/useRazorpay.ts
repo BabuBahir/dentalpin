@@ -28,8 +28,8 @@ export interface RazorpayAllocation {
   amount: number
 }
 
-export function useRazorpay() {
-  const api = useApi()
+export function useRazorpay(t?: import('~~/app/composables/useApi').ApiTranslator) {
+  const api = useApi(t)
 
   async function fetchSettings() {
     return (await api.get<ApiResponse<RazorpaySettings>>(

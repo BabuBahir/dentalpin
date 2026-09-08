@@ -52,6 +52,8 @@ function truthy(value: string | undefined): string | undefined {
 
 export function useManagedDocuments() {
   const api = useApi()
+  const config = useRuntimeConfig()
+  const auth = useAuth()
 
   async function listDocuments(params: DocumentListParams = {}): Promise<PaginatedResponse<ManagedDocument>> {
     return api.get<PaginatedResponse<ManagedDocument>>('/api/v1/documents', {
@@ -104,8 +106,7 @@ export function useManagedDocuments() {
    * ``Content-Disposition`` filename preserved.
    */
   async function downloadDocument(document_id: string): Promise<void> {
-    const baseUrl = useRuntimeConfig().public.apiBaseUrl
-    const auth = useAuth()
+    const baseUrl = config.public.apiBaseUrl as string
 
     const response = await fetch(
       `${baseUrl}/api/v1/documents/${document_id}/download`,

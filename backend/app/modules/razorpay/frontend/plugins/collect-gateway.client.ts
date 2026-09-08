@@ -26,8 +26,9 @@ import { useRazorpayCheckout } from '../composables/useRazorpayCheckout'
 
 const GATEWAY_METHODS = ['upi', 'netbanking', 'card'] as const
 
-export default defineNuxtPlugin(() => {
-  const { checkoutOnce } = useRazorpayCheckout()
+export default defineNuxtPlugin((nuxtApp) => {
+  const t = (nuxtApp.$i18n as { t: (k: string, ...args: unknown[]) => string }).t
+  const { checkoutOnce } = useRazorpayCheckout(t)
 
   async function collect(params: CollectGatewayParams): Promise<CollectGatewayResult> {
     return checkoutOnce(params)

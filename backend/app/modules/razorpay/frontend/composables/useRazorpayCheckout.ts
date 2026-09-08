@@ -33,9 +33,16 @@ export interface RazorpayCheckoutParams {
   allocations: PaymentAllocationCreate[]
 }
 
-export function useRazorpayCheckout() {
-  const { t } = useI18n()
-  const { createOrder, verifyAndRecord } = useRazorpay()
+/**
+ * Translator used for collect-flow user-facing strings. When invoked from a
+ * component setup, ``useI18n().t`` is used; hosts without a Vue component
+ * instance (Nuxt plugins) must pass ``nuxtApp.$i18n.t`` instead.
+ */
+export type RazorpayCheckoutT = (key: string, ...args: unknown[]) => string
+
+export function useRazorpayCheckout(t?: RazorpayCheckoutT) {
+  const translate = t ?? useI18n().t
+  const { createOrder, verifyAndRecord } = useRazorpay(t)
 
   function loadRazorpayScript(): Promise<boolean> {
     return new Promise((resolve) => {
@@ -54,7 +61,7 @@ export function useRazorpayCheckout() {
   async function checkoutOnce(params: RazorpayCheckoutParams): Promise<RazorpayCheckoutOutcome> {
     const loaded = await loadRazorpayScript()
     if (!loaded) {
-      return { ok: false, reason: 'error', error: t('razorpay.collect.loadError') }
+      return { ok: false, reason: 'error', error: translate('razorpay.collect.loadError') }
     }
 
     let order
@@ -67,12 +74,12 @@ export function useRazorpayCheckout() {
       if (errorStatus(e) === 400) {
         return { ok: false, reason: 'unconfigured', error: errorDetail(e) }
       }
-      return { ok: false, reason: 'error', error: errorDetail(e) ?? t('razorpay.collect.error') }
+      return { ok: false, reason: 'error', error: errorDetail(e) ?? translate('razorpay.collect.error') }
     }
 
     const RazorpayCtor = window.Razorpay
     if (!RazorpayCtor) {
-      return { ok: false, reason: 'error', error: t('razorpay.collect.loadError') }
+      return { ok: false, reason: 'error', error: translate('razorpay.collect.loadError') }
     }
 
     return new Promise<RazorpayCheckoutOutcome>((resolve) => {
@@ -82,7 +89,7 @@ export function useRazorpayCheckout() {
         currency: order.currency,
         order_id: order.order_id,
         name: 'DentalPin',
-        description: t('razorpay.collect.description'),
+        description: translate('razorpay.collect.description'),
         handler: async (response: RazorpayCheckoutResponse) => {
           try {
             const payment = await verifyAndRecord({
@@ -101,7 +108,7 @@ export function useRazorpayCheckout() {
             })
             resolve({ ok: true, payment })
           } catch (e) {
-            resolve({ ok: false, reason: 'error', error: errorDetail(e) ?? t('razorpay.collect.verifyError') })
+            resolve({ ok: false, reason: 'error', error: errorDetail(e) ?? translate('razorpay.collect.verifyError') })
           }
         },
         modal: {

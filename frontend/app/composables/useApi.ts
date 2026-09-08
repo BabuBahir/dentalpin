@@ -40,10 +40,18 @@ function _withQuery(path: string, query?: UseApiOptions['query']): string {
   return path.includes('?') ? `${path}&${s}` : `${path}?${s}`
 }
 
-export function useApi() {
+/**
+ * Translator used for the auto error-toast strings. Defaults to
+ * ``useI18n().t`` (component context); hosts without a Vue component
+ * instance (Nuxt plugins) must pass ``nuxtApp.$i18n.t`` — calling
+ * ``useI18n()`` there throws "Must be called at the top of a setup".
+ */
+export type ApiTranslator = (key: string, ...args: unknown[]) => string
+
+export function useApi(t?: ApiTranslator) {
   const config = useRuntimeConfig()
   const auth = useAuth()
-  const { t } = useI18n()
+  const translate = t ?? useI18n().t
   const toast = useToast()
 
   // Use different API URL for server (Docker internal) vs client (browser)
@@ -108,8 +116,8 @@ export function useApi() {
 
       if (fetchError.statusCode === 403) {
         toast.add({
-          title: t('common.error'),
-          description: t('common.forbidden', 'Acceso denegado'),
+          title: translate('common.error'),
+          description: translate('common.forbidden', 'Acceso denegado'),
           color: 'error'
         })
         throw error
@@ -131,8 +139,8 @@ export function useApi() {
         // is no longer silent (#101). Callers that present the error
         // themselves suppress this with ``errorToast: false``.
         toast.add({
-          title: t('common.error'),
-          description: errorDetail(error) ?? t('common.serverError'),
+          title: translate('common.error'),
+          description: errorDetail(error) ?? translate('common.serverError'),
           color: 'error'
         })
         throw error
@@ -148,8 +156,8 @@ export function useApi() {
 
       if (fetchError.statusCode && fetchError.statusCode >= 500) {
         toast.add({
-          title: t('common.error'),
-          description: t('common.serverError'),
+          title: translate('common.error'),
+          description: translate('common.serverError'),
           color: 'error'
         })
         throw error
@@ -158,8 +166,8 @@ export function useApi() {
       // Network error
       if (!fetchError.statusCode) {
         toast.add({
-          title: t('common.error'),
-          description: t('common.networkError'),
+          title: translate('common.error'),
+          description: translate('common.networkError'),
           color: 'error'
         })
       }
