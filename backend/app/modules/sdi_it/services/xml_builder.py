@@ -240,9 +240,10 @@ def build_fattura(
         groups[(ln.aliquota, ln.natura)] = (base, tax)
     exempt_total = sum((b for (_, n), (b, _) in groups.items() if n), Decimal(0))
     bollo = bool(bollo_virtuale and exempt_total > BOLLO_THRESHOLD)
-    total = sum((b + t for b, t in groups.values()), Decimal(0)) + (
-        BOLLO_AMOUNT if bollo else Decimal(0)
-    )
+    # The stamp is the issuer's cost: billing has no bollo line, so the
+    # document total stays what the client owes (re-charging it would need
+    # an explicit N1 line in the invoice).
+    total = sum((b + t for b, t in groups.values()), Decimal(0))
 
     address = invoice.billing_address or {}
     codice_dest = str(address.get("sdi_code") or "").strip().upper()

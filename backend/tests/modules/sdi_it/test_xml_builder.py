@@ -83,10 +83,14 @@ def test_exempt_invoice_validates_with_natura_n4_and_bollo():
     riepilogo = doc.find(body + "DatiBeniServizi/DatiRiepilogo")
     assert riepilogo.find("Natura").text == "N4"
     assert "art. 10 n. 18" in riepilogo.find("RiferimentoNormativo").text
-    # 180.00 exempt > 77.47 → virtual €2 stamp, added to the document total
+    # 180.00 exempt > 77.47 → virtual €2 stamp; the issuer bears it, the
+    # document total stays the invoice total
     assert _text(doc, body + "DatiGenerali/DatiGeneraliDocumento/DatiBollo/ImportoBollo") == "2.00"
-    assert res.gross_amount == Decimal("182.00")
-    assert _text(doc, body + "DatiPagamento/DettaglioPagamento/ImportoPagamento") == "182.00"
+    assert res.gross_amount == Decimal("180.00")
+    assert (
+        _text(doc, body + "DatiGenerali/DatiGeneraliDocumento/ImportoTotaleDocumento") == "180.00"
+    )
+    assert _text(doc, body + "DatiPagamento/DettaglioPagamento/ImportoPagamento") == "180.00"
     assert res.file_name == "IT01234567897_00001.xml"
     assert res.codice_destinatario == "0000000"
     header = "FatturaElettronicaHeader/"

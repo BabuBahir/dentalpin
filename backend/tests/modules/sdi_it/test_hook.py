@@ -93,8 +93,11 @@ async def test_b2b_invoice_is_queued_with_valid_file(db_session):
     assert out["IT"]["sdi"] == "queued" and out["IT"]["tipo_documento"] == "TD01"
     rec = (await db_session.execute(select(SdiItRecord))).scalar_one()
     assert rec.state == "pending" and rec.file_name == "IT01234567897_00001.xml"
-    assert rec.codice_destinatario == "0000000" and rec.gross_amount == Decimal("152.00")  # + bollo
-    assert "<Natura>N4</Natura>" in rec.xml_payload
+    assert rec.codice_destinatario == "0000000" and rec.gross_amount == Decimal("150.00")
+    assert (
+        "<Natura>N4</Natura>" in rec.xml_payload
+        and "<ImportoBollo>2.00</ImportoBollo>" in rec.xml_payload
+    )
     settings = (await db_session.execute(select(SdiItSettings))).scalar_one()
     assert settings.progressivo_invio == 1
 
@@ -169,3 +172,28 @@ async def test_credit_note_is_td04_referencing_the_original(db_session):
         await db_session.execute(select(SdiItRecord).where(SdiItRecord.invoice_id == note.id))
     ).scalar_one()
     assert "<IdDocumento>E/2026/0001</IdDocumento>" in rec.xml_payload
+
+
+@pytest.mark.asyncio
+async def test_recipient_edit_is_allowed_only_after_a_scarto_and_requeues(db_session):
+    clinic, invoice = await _setup(db_session)
+    hook = SdiItHook()
+    await hook.on_invoice_issued(invoice, db_session)
+    rec = (await db_session.execute(select(SdiItRecord))).scalar_one()
+    assert (await hook.can_edit_billing_party(invoice, db_session))[0] is False
+    assert await hook.regenerate_after_party_change(invoice, db_session) == {}
+
+    rec.state = "rejected"
+    await db_session.flush()
+    assert await hook.can_edit_billing_party(invoice, db_session) == (True, None)
+    invoice.billing_tax_id = "IT01234567897"  # corrected partita IVA
+    out = await hook.regenerate_after_party_change(invoice, db_session)
+    assert out["IT"]["sdi"] == "queued" and out["IT"]["file_name"] == "IT01234567897_00002.xml"
+    records = (
+        (await db_session.execute(select(SdiItRecord).order_by(SdiItRecord.created_at)))
+        .scalars()
+        .all()
+    )
+    assert [r.state for r in records] == ["rejected", "pending"]
+    assert records[0].finished_at is not None
+    assert "<IdCodice>01234567897</IdCodice>" in records[1].xml_payload
