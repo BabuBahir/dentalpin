@@ -1,0 +1,35 @@
+# Single origin for demo.dentalpin.in, behind Coolify's proxy.
+#
+# Identical to the repo's root Caddyfile except the site address: this
+# one is a bare :80, because Coolify's Traefik terminates TLS for
+# demo.dentalpin.in on the host and forwards plain HTTP to this
+# container. Nothing here ever talks to Let's Encrypt.
+
+:80 {
+	handle /api/* {
+		reverse_proxy backend:8000 {
+			# The copilot streams SSE; without this Caddy buffers the
+			# response and the chat appears frozen until the turn ends.
+			flush_interval -1
+		}
+	}
+
+	handle /health* {
+		reverse_proxy backend:8000
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+
+	encode gzip
+
+	header {
+		# HSTS is still correct: the browser only ever sees https via
+		# Coolify's proxy, which is the origin this header applies to.
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Content-Security-Policy "frame-ancestors 'self'"
+	}
+}
