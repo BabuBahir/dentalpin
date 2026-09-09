@@ -73,8 +73,6 @@ async def test_settings_disabled_mid_stream(client: AsyncClient, auth_headers, t
 
 
 @pytest.mark.asyncio
-async def test_settings_requires_key_id_and_secret(
-    client: AsyncClient, auth_headers, test_clinic
-):
+async def test_settings_requires_key_id_and_secret(client: AsyncClient, auth_headers, test_clinic):
     res = await client.put(SETTINGS, json={"key_id": ""}, headers=auth_headers)
     assert res.status_code == 422

@@ -21,9 +21,7 @@ SETTINGS = "/api/v1/razorpay/settings"
 
 
 @pytest_asyncio.fixture
-async def razorpay_clinic(
-    db_session: AsyncSession, auth_headers, client: AsyncClient
-) -> Clinic:
+async def razorpay_clinic(db_session: AsyncSession, auth_headers, client: AsyncClient) -> Clinic:
     from uuid import uuid4
 
     from app.core.auth.models import Clinic as _Clinic
@@ -42,9 +40,7 @@ async def razorpay_clinic(
     )
     db_session.add(clinic)
     await db_session.flush()
-    db_session.add(
-        _Membership(id=uuid4(), user_id=user_id, clinic_id=clinic.id, role="admin")
-    )
+    db_session.add(_Membership(id=uuid4(), user_id=user_id, clinic_id=clinic.id, role="admin"))
     db_session.add(
         Cabinet(
             id=uuid4(),
@@ -74,9 +70,7 @@ async def role_headers(db_session: AsyncSession, razorpay_clinic: Clinic):
         db_session.add(user)
         await db_session.flush()
         db_session.add(
-            ClinicMembership(
-                id=uuid4(), user_id=user.id, clinic_id=razorpay_clinic.id, role=role
-            )
+            ClinicMembership(id=uuid4(), user_id=user.id, clinic_id=razorpay_clinic.id, role=role)
         )
         await db_session.commit()
         token = create_access_token(user.id, token_version=user.token_version)
@@ -85,9 +79,7 @@ async def role_headers(db_session: AsyncSession, razorpay_clinic: Clinic):
     return _make
 
 
-async def test_receptionist_can_collect_but_not_configure(
-    client: AsyncClient, role_headers
-):
+async def test_receptionist_can_collect_but_not_configure(client: AsyncClient, role_headers):
     headers = await role_headers("receptionist")
 
     res = await client.post(

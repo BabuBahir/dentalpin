@@ -21,6 +21,11 @@ from app.core.auth.dependencies import ClinicContext, get_clinic_context, requir
 from app.core.schemas import ApiResponse, PaginatedApiResponse
 from app.database import get_db
 
+from .razorpay_service import (
+    RazorpayNotConfiguredError,
+    create_order,
+    verify_signature,
+)
 from .schemas import (
     AgingBuckets,
     AllocationResponse,
@@ -43,11 +48,6 @@ from .schemas import (
     RefundCreate,
     RefundResponse,
     RefundsReport,
-)
-from .razorpay_service import (
-    RazorpayNotConfigured,
-    create_order,
-    verify_signature,
 )
 from .service import (
     LedgerService,
@@ -162,7 +162,7 @@ async def razorpay_create_order(
 ) -> ApiResponse[RazorpayOrderResponse]:
     try:
         order = create_order(amount=float(payload.amount), currency=payload.currency)
-    except RazorpayNotConfigured as exc:
+    except RazorpayNotConfiguredError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return ApiResponse(
         data=RazorpayOrderResponse(
@@ -187,7 +187,7 @@ async def razorpay_verify(
             payload.razorpay_order_id,
             payload.razorpay_signature,
         )
-    except RazorpayNotConfigured as exc:
+    except RazorpayNotConfiguredError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     if not ok:
         raise HTTPException(

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- test(rebased onto main): verify-router assertions now read the
+  `ErrorResponse.message` envelope (the raw FastAPI `detail` shape shipped
+  before main's global HTTP exception handler) and pin the order test to an
+  INR clinic so the currency assertion is stable against main's EUR clinic
+  default.
+
 - feat(#263, PR #373): Razorpay online payments module, refactored out of
   the payments module (which gained the `payments.collect.actions` slot and
   `idempotency_key` support in #365). Per-clinic `key_id`/`key_secret`
