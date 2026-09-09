@@ -7,6 +7,10 @@
   before main's global HTTP exception handler) and pin the order test to an
   INR clinic so the currency assertion is stable against main's EUR clinic
   default.
+- fix: the checkout popup now receives the Razorpay payment `key` option
+  (the clinic's public key id) instead of `key_id`, matching the checkout.js
+  contract the SDK expects.
+
 - feat(#263): the create-payment modal's `upi` / `netbanking` / `card`
   chips now launch the Razorpay checkout for Indian clinics instead of a
   manual record, via the new host seam `useCollectGateway` (provider gated

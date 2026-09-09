@@ -77,7 +77,7 @@ export function useRazorpayCheckout() {
 
     return new Promise<RazorpayCheckoutOutcome>((resolve) => {
       const rzp = new RazorpayCtor({
-        key_id: order.key_id,
+        key: order.key_id,
         amount: order.amount,
         currency: order.currency,
         order_id: order.order_id,

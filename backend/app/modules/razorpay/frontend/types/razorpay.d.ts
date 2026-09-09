@@ -9,7 +9,7 @@ export interface RazorpayCheckoutResponse {
 }
 
 export interface RazorpayOptions {
-  key_id: string
+  key: string
   amount: number
   currency: string
   order_id: string
