@@ -109,6 +109,7 @@ gdpr = "app.modules.gdpr:GdprModule"
 inventory_reorder = "app.modules.inventory_reorder:InventoryReorderModule"
 supplier_ratings = "app.modules.supplier_ratings:SupplierRatingsModule"
 payroll = "app.modules.payroll:PayrollModule"
+sms_gateway = "app.modules.sms_gateway:SmsGatewayModule"
 
 [tool.setuptools.packages.find]
 where = ["."]

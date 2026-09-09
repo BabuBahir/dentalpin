@@ -264,3 +264,47 @@ async def test_settings_put_sms_daily_limit_round_trips(client, auth_headers, te
 
     response = await client.get("/api/v1/notifications/settings", headers=auth_headers)
     assert response.json()["data"]["sms_daily_limit"] == 50
+
+
+@pytest.mark.asyncio
+async def test_manual_send_sms_accepts_phone_only_patient(
+    client, auth_headers, test_clinic, db_session, sms_adapter
+):
+    """POST /notifications/send with channels=["sms"] must not 400 when the
+    patient has a phone but no email (issue #392 review)."""
+    from uuid import uuid4
+
+    from app.modules.notifications.models import NotificationTemplate
+    from app.modules.patients.models import Patient
+
+    patient = Patient(
+        id=uuid4(),
+        clinic_id=test_clinic.id,
+        first_name="Movil",
+        last_name="Solo",
+        email=None,
+        phone="+34600999888",
+    )
+    db_session.add(patient)
+    db_session.add(
+        NotificationTemplate(
+            clinic_id=None,
+            channel="sms",
+            template_key="welcome",
+            locale="es",
+            body_text="Bienvenido.",
+            is_system=True,
+        )
+    )
+    await db_session.commit()
+    response = await client.post(
+        "/api/v1/notifications/send",
+        json={
+            "notification_type": "welcome",
+            "patient_id": str(patient.id),
+            "channels": ["sms"],
+        },
+        headers=auth_headers,
+    )
+    assert response.status_code == 200, response.text
+    assert response.json()["data"]["success"] is True

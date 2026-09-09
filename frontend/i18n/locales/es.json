@@ -2933,11 +2933,22 @@
       "whatsappUnavailableHint": "WhatsApp no está disponible hasta conectar el número de la clínica.",
       "whatsappConnect": "Conectar WhatsApp (Kapso)",
       "noEmail": "El paciente no tiene email en su ficha",
-      "noPhone": "El paciente no tiene teléfono en su ficha"
+      "noPhone": "El paciente no tiene teléfono en su ficha",
+      "sms": "SMS",
+      "smsUnavailableHint": "SMS no está disponible hasta que se configure un proveedor de SMS.",
+      "smsConnect": "Configurar",
+      "smsDailyLimitLabel": "Límite diario de SMS",
+      "smsDailyLimitHelp": "Máximo de SMS salientes al día para la clínica."
     },
     "channelSent": {
       "email": "Email enviado correctamente",
-      "whatsapp": "Mensaje de WhatsApp enviado correctamente"
+      "whatsapp": "Mensaje de WhatsApp enviado correctamente",
+      "sms": "Mensaje SMS enviado correctamente"
+    },
+    "prefs": {
+      "title": "Preferencias de notificaciones",
+      "description": "Qué canales pueden contactar a este paciente. Darse de baja bloquea ese canal incluso en envíos forzosos.",
+      "saved": "Preferencias guardadas"
     }
   },
   "invoiceSeries": {

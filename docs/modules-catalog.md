@@ -47,6 +47,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `reports` | 0.2.0 | official | patients, agenda, catalog, budget, billing, payments | auto | no | 6 | 0 | 0 | yes |
 | `schedules` | 0.1.0 | official | agenda | auto | yes | 8 | 0 | 4 | yes |
 | `sdi_it` | 0.1.0 | official | billing | manual | yes | 4 | 0 | 0 | no |
+| `sms_gateway` | 0.1.0 | community | notifications | manual | yes | 2 | 0 | 0 | yes |
 | `staff_tasks` | 0.1.0 | community | — | manual | yes | 2 | 2 | 0 | yes |
 | `supplier_items` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 0 | 0 | no |
 | `supplier_ratings` | 0.1.0 | official | contacts, purchase_orders | manual | yes | 2 | 0 | 0 | no |
@@ -922,6 +923,23 @@ FatturaPA / SDI — fatturazione elettronica B2B per l'Italia.
 - **Events emitted:** —
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/sdi_it/CLAUDE.md`](../backend/app/modules/sdi_it/CLAUDE.md)
+
+### `sms_gateway` — v0.1.0
+
+SMS delivery for notifications via pluggable providers.
+
+- **Author:** lamanji
+- **License:** BSL-1.1
+- **Category:** community
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `notifications`
+- **Frontend layer:** `frontend`
+- **Permissions:**
+  - `sms_gateway.settings.read`
+  - `sms_gateway.settings.write`
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/sms_gateway/CLAUDE.md`](../backend/app/modules/sms_gateway/CLAUDE.md)
 
 ### `staff_tasks` — v0.1.0
 
