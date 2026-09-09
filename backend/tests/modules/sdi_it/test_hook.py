@@ -197,3 +197,16 @@ async def test_recipient_edit_is_allowed_only_after_a_scarto_and_requeues(db_ses
     assert [r.state for r in records] == ["rejected", "pending"]
     assert records[0].finished_at is not None
     assert "<IdCodice>01234567897</IdCodice>" in records[1].xml_payload
+
+
+@pytest.mark.asyncio
+async def test_progressivo_is_unique_across_builds(db_session):
+    clinic, invoice = await _setup(db_session)
+    hook = SdiItHook()
+    first = await hook.on_invoice_issued(invoice, db_session)
+    invoice.invoice_number = "E/2026/0002"
+    second = await hook.on_invoice_issued(invoice, db_session)
+    names = {first["IT"]["file_name"], second["IT"]["file_name"]}
+    assert names == {"IT01234567897_00001.xml", "IT01234567897_00002.xml"}
+    settings = (await db_session.execute(select(SdiItSettings))).scalar_one()
+    assert settings.progressivo_invio == 2

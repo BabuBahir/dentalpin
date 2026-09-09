@@ -68,7 +68,15 @@ async def build_record(
     cessionario = Party.from_recipient(
         tax_id=invoice.billing_tax_id, name=invoice.billing_name, address=invoice.billing_address
     )
-    settings.progressivo_invio = (settings.progressivo_invio or 0) + 1
+    # Two invoices issued at the same instant must not share a progressivo
+    # (and therefore a file name): take the row lock before bumping.
+    locked = (
+        await db.execute(
+            select(SdiItSettings).where(SdiItSettings.id == settings.id).with_for_update()
+        )
+    ).scalar_one()
+    locked.progressivo_invio = (locked.progressivo_invio or 0) + 1
+    settings.progressivo_invio = locked.progressivo_invio
     result = build_fattura(
         invoice,
         cedente=cedente,
