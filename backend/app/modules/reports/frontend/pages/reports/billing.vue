@@ -574,7 +574,7 @@ function goBack() {
           </p>
 
           <div
-            v-if="invoiceAging.length > 0"
+            v-if="invoiceAging.some(b => b.count > 0)"
             class="space-y-3"
           >
             <div

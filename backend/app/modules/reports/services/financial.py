@@ -1,15 +1,8 @@
-"""Financial family: invoice-axis aggregates (off-books rule).
+"""Financial family: invoice-axis aggregates.
 
 Every query here reads the INVOICE axis only (issue/due dates, status,
-totals). Nothing references the settlement side and nothing nets one
-axis against the other: the copilot off-books boundary is structural,
-not a review note (see ``test_reports_offbooks_guard.py``).
-
-Grandfathered exception (not ours to remove in this PR):
-``BillingReportService.get_overdue_invoices`` subtracts recorded
-amounts to show its per-row remainder. It predates the rule; a
-follow-up should either refit it to invoice totals or record an
-explicit exemption. New code must not copy the pattern.
+totals): nothing joins the payments side and nothing nets one axis
+against the other (pinned by ``test_reports_offbooks_guard.py``).
 """
 
 from __future__ import annotations
@@ -54,16 +47,16 @@ class FinancialReportService:
             await db.execute(
                 select(
                     Invoice.due_date,
+                    Invoice.patient_id,
                     func.sum(Invoice.total).label("total"),
                     func.count(Invoice.id).label("count"),
-                    func.count(func.distinct(Invoice.patient_id)).label("patients"),
                 )
                 .where(
                     Invoice.clinic_id == clinic_id,
                     Invoice.status.in_(OPEN_STATUSES),
                     Invoice.deleted_at.is_(None),
                 )
-                .group_by(Invoice.due_date)
+                .group_by(Invoice.due_date, Invoice.patient_id)
             )
         ).all()
 
@@ -71,7 +64,8 @@ class FinancialReportService:
             label: {"label": label, "total": Decimal("0"), "count": 0, "patient_count": 0}
             for label, _, _ in BUCKETS
         }
-        for due_date, total, count, patients in rows:
+        patients: dict[str, set[UUID]] = {label: set() for label, _, _ in BUCKETS}
+        for due_date, patient_id, total, count in rows:
             if due_date is None:
                 label = "0-30"
             else:
@@ -84,7 +78,9 @@ class FinancialReportService:
             slot = buckets[label]
             slot["total"] += total or Decimal("0")
             slot["count"] += count
-            slot["patient_count"] += patients
+            patients[label].add(patient_id)
+        for label, ids in patients.items():
+            buckets[label]["patient_count"] = len(ids)
         return [buckets[label] for label, _, _ in BUCKETS]
 
     @staticmethod

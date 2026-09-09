@@ -4,9 +4,6 @@ Structural rule (issue #230): financial reports read the INVOICE axis
 only. No endpoint may reference recorded/settled amounts or net one
 axis against the other. This test scans the family source so the rule
 survives refactors — a review note alone would not.
-
-Grandfathered (asserted elsewhere, not here):
-``BillingReportService.get_overdue_invoices`` predates the rule.
 """
 
 from __future__ import annotations

@@ -69,12 +69,7 @@ class ProfessionalBillingSummary(BaseModel):
 
 
 class OverdueInvoice(BaseModel):
-    """Overdue invoice item.
-
-    Grandfathered: ``balance_due`` nets recorded amounts against the
-    invoice total (invoice-minus-collected). The off-books rule now
-    forbids this pattern in new code — see ``services/financial.py``.
-    """
+    """Overdue invoice item."""
 
     id: UUID
     invoice_number: str

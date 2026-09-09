@@ -107,6 +107,8 @@ async def test_aging_buckets(db_session: AsyncSession, test_clinic: Clinic, test
     assert buckets["not_due"]["count"] == 1
     assert buckets["0-30"]["total"] == Decimal("125")
     assert buckets["0-30"]["count"] == 2
+    # Two invoices of the same patient in one bucket count that patient once.
+    assert buckets["0-30"]["patient_count"] == 1
     assert buckets["31-60"]["total"] == Decimal("200")
     assert buckets["31-60"]["count"] == 1
     assert buckets["61-90"]["total"] == Decimal("0")

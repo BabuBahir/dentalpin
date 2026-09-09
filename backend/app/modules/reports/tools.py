@@ -118,7 +118,7 @@ def get_tools() -> list[Tool]:
         Tool(
             name="financial_report",
             description=(
-                "Antigüedad de saldos por tramos e issued mensual de un periodo. "
+                "Antigüedad de facturas pendientes por tramos y emitido mensual de un periodo. "
                 "Solo eje factura (importes emitidos, nunca cobros ni diferencias)."
             ),
             parameters=PeriodArgs,
