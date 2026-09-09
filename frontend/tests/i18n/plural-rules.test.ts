@@ -1,6 +1,6 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
-import { arPluralRule } from '../../i18n/pluralRules'
+import { arPluralRule, plPluralRule } from '../../i18n/pluralRules'
 
 /**
  * Pins the Arabic plural rule (#389 tail). Every `ar.json` message today
@@ -26,7 +26,23 @@ describe('arPluralRule', () => {
   })
 
   it('clamps short variant lists instead of overrunning', () => {
-    expect(arPluralRule(100, 3)).toBeLessThanOrEqual(2)
+    // Three segments (zero | one | other): the six-way tail collapses
+    // onto the last available index instead of running past the list.
+    const threeWay: Array<[number, number]> = [[0, 0], [1, 1], [2, 2], [5, 2], [50, 2], [100, 2]]
+    for (const [n, idx] of threeWay) expect(arPluralRule(n, 3)).toBe(idx)
     expect(arPluralRule(2, 2)).toBe(1)
+  })
+})
+
+describe('plPluralRule', () => {
+  it('maps counts onto one / few / many', () => {
+    expect(plPluralRule(1, 3)).toBe(0)
+    for (const n of [2, 3, 4, 22]) expect(plPluralRule(n, 3)).toBe(1)
+    for (const n of [5, 12, 13, 14, 25]) expect(plPluralRule(n, 3)).toBe(2)
+  })
+
+  it('collapses two-segment messages onto one / other', () => {
+    expect(plPluralRule(1, 2)).toBe(0)
+    for (const n of [2, 5, 22]) expect(plPluralRule(n, 2)).toBe(1)
   })
 })
