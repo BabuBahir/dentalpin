@@ -362,9 +362,11 @@ access needed. Open **Settings → Modules** (`/settings/modules`).
   disk. The confirmation modal previews the transitive dependency
   chain that will be scheduled.
 - **Upgrade:** offered for installed modules whose on-disk manifest
-  version is newer than the installed version. The confirmation modal
-  schedules the upgrade; like installs, it needs an Apply + restart
-  (below) to run.
+  version differs from the installed version (shown as
+  "installed → on-disk"). The confirmation modal schedules the
+  upgrade; like installs, it needs an Apply + restart
+  (below) to run. Dependency reachability is enforced by Install,
+  not by this signal.
 - **Uninstall:** offered for installed, removable modules. The modal
   warns about the automatic `pg_dump` backup (§8). When reverse
   dependencies block the removal, the error renders inline with an

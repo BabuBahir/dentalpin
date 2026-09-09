@@ -375,9 +375,11 @@ administración — sin necesidad de acceso a la terminal. Abre
   presentes en disco. El modal de confirmación muestra la cadena
   transitiva de dependencias que se programará.
 - **Actualizar:** disponible para módulos instalados cuyo manifiesto en
-  disco es más nuevo que la versión instalada. El modal programa la
-  actualización; como las instalaciones, necesita Aplicar + reinicio
-  (abajo) para ejecutarse.
+  disco difiere de la versión instalada (se muestra como
+  "instalada → en disco"). El modal programa la actualización; como
+  las instalaciones, necesita Aplicar + reinicio (abajo) para
+  ejecutarse. La alcanzabilidad de dependencias la impone Instalar,
+  no esta señal.
 - **Desinstalar:** disponible para módulos instalados y removibles. El
   modal avisa de la copia de seguridad `pg_dump` automática (§8).
   Cuando dependencias inversas bloquean la eliminación, el error se

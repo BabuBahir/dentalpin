@@ -62,6 +62,10 @@ const categoryColor = computed<UiColor>(() =>
             {{ categoryLabel }}
           </UBadge>
           <span class="text-caption text-subtle">v{{ module.version }}</span>
+          <span
+            v-if="module.upgrade_available && module.installed_version"
+            class="text-caption text-subtle"
+          >({{ module.installed_version }} → {{ module.version }})</span>
         </div>
 
         <p

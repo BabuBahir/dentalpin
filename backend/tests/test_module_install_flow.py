@@ -152,7 +152,7 @@ async def test_upgrade_marks_to_upgrade_when_version_diverges(
         await db_session.execute(select(ModuleRecord).where(ModuleRecord.name == "billing"))
     ).scalar_one()
     assert refreshed.state == ModuleState.TO_UPGRADE.value
-    assert refreshed.version != "0.0.0"  # bumped to manifest version
+    assert refreshed.version == "0.0.0"  # version advances only on finalize
 
 
 @pytest.mark.asyncio
@@ -198,9 +198,12 @@ async def test_list_signals_upgrade_available_on_drift(
     assert info is not None
     assert info.upgrade_available is True
     assert info.installable is True
+    assert info.installed_version == "0.0.0"
+    assert info.version != "0.0.0"
     payload = info.to_dict()
     assert payload["upgrade_available"] is True
     assert payload["installable"] is True
+    assert payload["installed_version"] == "0.0.0"
 
 
 @pytest.mark.asyncio

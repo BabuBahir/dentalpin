@@ -40,6 +40,7 @@ class ModuleInfo:
 
     name: str
     version: str
+    installed_version: str | None
     state: ModuleState
     category: ModuleCategory
     removable: bool
@@ -60,6 +61,7 @@ class ModuleInfo:
         return {
             "name": self.name,
             "version": self.version,
+            "installed_version": self.installed_version,
             "state": self.state.value,
             "category": self.category.value,
             "removable": self.removable,
@@ -288,6 +290,7 @@ class ModuleService:
                 ModuleInfo(
                     name=name,
                     version=version,
+                    installed_version=record.version if record else None,
                     state=state,
                     category=category,
                     removable=record.removable if record else True,
@@ -564,8 +567,11 @@ class ModuleService:
         if record.version == manifest.version:
             return False
 
+        # NOTE: record.version intentionally keeps the last-APPLIED
+        # version here. Only the upgrade finalize advances it, so a
+        # failed upgrade still reports upgrade_available and
+        # post_upgrade receives the true previous version.
         record.state = ModuleState.TO_UPGRADE.value
-        record.version = manifest.version
         record.manifest_snapshot = manifest.to_snapshot()
         record.last_state_change = datetime.now(UTC)
         record.error_message = None
