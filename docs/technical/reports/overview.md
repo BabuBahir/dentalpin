@@ -27,8 +27,7 @@ published or consumed; no mutations.
  - **operational** (roadmap #230) — `GET /operational/productivity`
   (per-professional completed visits, cabinets, plan pipeline counts),
   under `reports.operational.read`, plus the `operational_report`
-  copilot tool. Reads billing/patients/agenda/treatment_plan; the
-  trend chart has no page section yet (follow-up).
+  copilot   tool. Reads billing/patients/agenda/treatment_plan.
 
 ## API surface
 
