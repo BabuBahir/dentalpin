@@ -15,13 +15,13 @@ Everything here is server-side; the key secret never leaves the backend.
 
 from __future__ import annotations
 
-import hmac
 import hashlib
+import hmac
 
 from app.config import settings
 
 
-class RazorpayNotConfigured(RuntimeError):
+class RazorpayNotConfiguredError(RuntimeError):
     """Raised when RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET are unset."""
 
 
@@ -35,13 +35,13 @@ def _client():
     key_id = settings.RAZORPAY_KEY_ID
     key_secret = settings.RAZORPAY_KEY_SECRET
     if not key_id or not key_secret:
-        raise RazorpayNotConfigured(
+        raise RazorpayNotConfiguredError(
             "Razorpay is not configured (set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET)."
         )
     try:
         import razorpay  # local import: optional at boot time
     except ImportError as exc:  # pragma: no cover - environment dependent
-        raise RazorpayNotConfigured("The 'razorpay' package is not installed.") from exc
+        raise RazorpayNotConfiguredError("The 'razorpay' package is not installed.") from exc
     return razorpay.Client(auth=(key_id, key_secret))
 
 
@@ -51,9 +51,7 @@ def create_order(amount: float, currency: str) -> dict:
     rounding."""
     client = _client()
     paise = int(round(amount * 100))
-    order = client.order.create(
-        {"amount": paise, "currency": currency, "payment_capture": 1}
-    )
+    order = client.order.create({"amount": paise, "currency": currency, "payment_capture": 1})
     return {
         "order_id": order["id"],
         "amount": order["amount"],
@@ -70,7 +68,7 @@ def verify_signature(
     ``order_id|payment_id`` signed with the key secret)."""
     key_secret = settings.RAZORPAY_KEY_SECRET
     if not key_secret:
-        raise RazorpayNotConfigured(
+        raise RazorpayNotConfiguredError(
             "Razorpay is not configured (set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET)."
         )
     msg = f"{razorpay_order_id}|{razorpay_payment_id}".encode()
