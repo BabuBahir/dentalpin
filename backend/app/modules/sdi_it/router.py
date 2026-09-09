@@ -172,6 +172,31 @@ async def list_records(
     )
 
 
+@router.get(
+    "/records/by-invoice/{invoice_id}", response_model=ApiResponse[SdiRecordResponse | None]
+)
+async def latest_record_for_invoice(
+    invoice_id: UUID,
+    ctx: Annotated[ClinicContext, Depends(get_clinic_context)],
+    _: Annotated[None, Depends(require_permission("sdi_it.records.read"))],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> ApiResponse[SdiRecordResponse | None]:
+    """The newest record of an invoice (the invoice page's SDI panel)."""
+    row = (
+        (
+            await db.execute(
+                select(SdiItRecord)
+                .where(SdiItRecord.clinic_id == ctx.clinic_id, SdiItRecord.invoice_id == invoice_id)
+                .order_by(SdiItRecord.created_at.desc())
+                .limit(1)
+            )
+        )
+        .scalars()
+        .first()
+    )
+    return ApiResponse(data=SdiRecordResponse.model_validate(row) if row else None)
+
+
 @router.get("/records/{record_id}/xml")
 async def download_record_xml(
     record_id: UUID,

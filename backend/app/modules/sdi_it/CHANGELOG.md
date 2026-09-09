@@ -1,5 +1,14 @@
 # Changelog — sdi_it
 
+## Unreleased — phase 3
+
+- Nuxt layer: Settings → Billing pages "Electronic invoicing (SDI)"
+  (regime, exemption reference, bollo, manual/PEC transport with mailbox
+  test) and "SDI files" (states, receipts, download / mark uploaded /
+  import receipt / regenerate / send now); SDI panel and chip on the
+  invoice page through the billing slots; ten locales.
+- `GET /records/by-invoice/{invoice_id}` for the invoice panel.
+
 ## Unreleased — phase 2
 
 - PEC transport: the clinic's PEC mailbox sends each FPR12 file to the SDI

@@ -229,3 +229,16 @@ async def test_process_now_runs_one_tick(
     assert (
         row["state"] == "exported" and row["transport"] == "pec" and row["message_id"] == "<m@pec>"
     )
+
+
+@pytest.mark.asyncio
+async def test_latest_record_for_invoice(
+    client: AsyncClient, auth_headers, test_clinic, test_patient, db_session
+):
+    rec = await _queued_record(db_session, test_clinic, test_patient)
+    res = await client.get(
+        f"/api/v1/sdi_it/records/by-invoice/{rec.invoice_id}", headers=auth_headers
+    )
+    assert res.status_code == 200 and res.json()["data"]["id"] == str(rec.id)
+    res = await client.get(f"/api/v1/sdi_it/records/by-invoice/{uuid4()}", headers=auth_headers)
+    assert res.status_code == 200 and res.json()["data"] is None
