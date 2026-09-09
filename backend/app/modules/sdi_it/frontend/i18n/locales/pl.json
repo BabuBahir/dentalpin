@@ -31,7 +31,7 @@
     "pec": {
       "address": "Adres PEC gabinetu",
       "sdiAddress": "Skrzynka SDI",
-      "sdiAddressHelp": "sdi01@pec.fatturapa.it dla pierwszego pliku; SDI odpowiada z dedykowanego adresu, zapisywanego tu automatycznie.",
+      "sdiAddressHelp": "sdi01{'@'}pec.fatturapa.it dla pierwszego pliku; SDI odpowiada z dedykowanego adresu, zapisywanego tu automatycznie.",
       "smtpHost": "Serwer SMTP",
       "imapHost": "Serwer IMAP",
       "port": "Port",

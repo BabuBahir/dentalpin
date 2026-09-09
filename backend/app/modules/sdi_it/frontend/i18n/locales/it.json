@@ -31,7 +31,7 @@
     "pec": {
       "address": "Indirizzo PEC dello studio",
       "sdiAddress": "Casella SDI",
-      "sdiAddressHelp": "sdi01@pec.fatturapa.it per il primo file; lo SDI risponde da un indirizzo dedicato, memorizzato qui automaticamente.",
+      "sdiAddressHelp": "sdi01{'@'}pec.fatturapa.it per il primo file; lo SDI risponde da un indirizzo dedicato, memorizzato qui automaticamente.",
       "smtpHost": "Server SMTP",
       "imapHost": "Server IMAP",
       "port": "Porta",

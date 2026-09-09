@@ -31,7 +31,7 @@
     "pec": {
       "address": "عنوان PEC للعيادة",
       "sdiAddress": "صندوق بريد SDI",
-      "sdiAddressHelp": "sdi01@pec.fatturapa.it للملف الأول؛ يردّ SDI من عنوان مخصص يُحفظ هنا تلقائياً.",
+      "sdiAddressHelp": "sdi01{'@'}pec.fatturapa.it للملف الأول؛ يردّ SDI من عنوان مخصص يُحفظ هنا تلقائياً.",
       "smtpHost": "خادم SMTP",
       "imapHost": "خادم IMAP",
       "port": "المنفذ",

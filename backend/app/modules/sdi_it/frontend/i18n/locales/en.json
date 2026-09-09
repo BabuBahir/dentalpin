@@ -18,7 +18,10 @@
     "bollo": "Virtual stamp duty (€2) above €77.47 exempt",
     "bolloHelp": "Declares DatiBollo on exempt invoices over the threshold; the amount is not added to the invoice total.",
     "progressivo": "Files generated so far: {n}",
-    "transport": "Transport to the SDI",
+    "transport": {
+      "manual": "manual upload",
+      "pec": "PEC"
+    },
     "transportOpt": {
       "manual": "Manual — download the file, upload it yourself, import the receipt",
       "manualHelp": "You download each XML from the records page, upload it in Fatture e Corrispettivi or send it from your PEC client, and import the receipt the SDI returns.",
@@ -28,7 +31,7 @@
     "pec": {
       "address": "Practice PEC address",
       "sdiAddress": "SDI mailbox",
-      "sdiAddressHelp": "sdi01@pec.fatturapa.it for the first file; the SDI answers from a dedicated address, which is stored here automatically.",
+      "sdiAddressHelp": "sdi01{'@'}pec.fatturapa.it for the first file; the SDI answers from a dedicated address, which is stored here automatically.",
       "smtpHost": "SMTP server",
       "imapHost": "IMAP server",
       "port": "Port",
@@ -80,10 +83,6 @@
       "actionFailed": "The action failed",
       "undeliverableHint": "The SDI could not deliver the file: it is in the recipient's reserved area. Tell the recipient by other means.",
       "rejectedHint": "Rejected by the SDI. Correct the invoice data, then regenerate: the new file keeps the same number and date."
-    },
-    "transport": {
-      "manual": "manual upload",
-      "pec": "PEC"
     },
     "badge": {
       "short": "SDI",

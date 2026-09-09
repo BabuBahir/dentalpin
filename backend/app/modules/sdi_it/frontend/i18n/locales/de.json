@@ -31,7 +31,7 @@
     "pec": {
       "address": "PEC-Adresse der Praxis",
       "sdiAddress": "SDI-Postfach",
-      "sdiAddressHelp": "sdi01@pec.fatturapa.it für die erste Datei; das SDI antwortet von einer eigenen Adresse, die hier automatisch gespeichert wird.",
+      "sdiAddressHelp": "sdi01{'@'}pec.fatturapa.it für die erste Datei; das SDI antwortet von einer eigenen Adresse, die hier automatisch gespeichert wird.",
       "smtpHost": "SMTP-Server",
       "imapHost": "IMAP-Server",
       "port": "Port",

@@ -31,7 +31,7 @@
     "pec": {
       "address": "Endereço PEC da clínica",
       "sdiAddress": "Caixa do SDI",
-      "sdiAddressHelp": "sdi01@pec.fatturapa.it para o primeiro ficheiro; o SDI responde de um endereço dedicado, guardado aqui automaticamente.",
+      "sdiAddressHelp": "sdi01{'@'}pec.fatturapa.it para o primeiro ficheiro; o SDI responde de um endereço dedicado, guardado aqui automaticamente.",
       "smtpHost": "Servidor SMTP",
       "imapHost": "Servidor IMAP",
       "port": "Porta",

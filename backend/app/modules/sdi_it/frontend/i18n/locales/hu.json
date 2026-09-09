@@ -31,7 +31,7 @@
     "pec": {
       "address": "A rendelő PEC-címe",
       "sdiAddress": "SDI-postafiók",
-      "sdiAddressHelp": "Az első fájlhoz sdi01@pec.fatturapa.it; az SDI dedikált címről válaszol, amit a rendszer ide automatikusan elment.",
+      "sdiAddressHelp": "Az első fájlhoz sdi01{'@'}pec.fatturapa.it; az SDI dedikált címről válaszol, amit a rendszer ide automatikusan elment.",
       "smtpHost": "SMTP-szerver",
       "imapHost": "IMAP-szerver",
       "port": "Port",
