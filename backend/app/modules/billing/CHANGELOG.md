@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- fix: invoice send options exclude SMS via the shared
+  `documentButtonsForPatient` composable (documents travel over
+  email/WhatsApp only); the predicate lives in notifications so every
+  document surface filters identically (issue #392).
+- fix: `regenerate_after_party_change` results are persisted — `compliance_data` is reassigned instead of updated in place (plain JSONB does not track mutation), so the regenerated record shows on the invoice after a billing-party edit.
+
 - fix: the discount-type select in the invoice item modals crashed on open — reka-ui rejects `''` as an item value; the 'no discount' option now uses `null`.
 
 - fix(#326): the invoice-series onboarding rule carries `permission: 'billing.read'` — it no longer renders or fires its load for a clinic where billing isn't active.
