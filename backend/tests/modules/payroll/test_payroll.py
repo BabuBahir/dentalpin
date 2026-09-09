@@ -282,3 +282,100 @@ async def test_http_masked_and_admin_only(
     assert (
         await client.get("/api/v1/payroll/reports/annual?year=2026", headers=headers)
     ).status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_delete_entry_draft_only(db_session: AsyncSession, test_clinic: Clinic):
+    # Bind ids upfront (M15): rollbacks below expire every instance.
+    clinic_id = test_clinic.id
+    user = await _make_user(db_session, clinic_id)
+    user_id = user.id
+    period = await _make_period(db_session, clinic_id)
+    period_id = period.id
+    entry = await _make_entry(db_session, clinic_id, period_id, user_id)
+    entry_id = entry.id
+    # Draft entry deletes cleanly and is gone afterwards.
+    await EntryService.delete_entry(db_session, entry)
+    assert await EntryService.get_entry(db_session, clinic_id, entry_id) is None
+    # Re-add, close the period: the delete now conflicts.
+    entry = await _make_entry(db_session, clinic_id, period_id, user_id)
+    entry_id = entry.id
+    period = await PeriodService.get_period(db_session, clinic_id, period_id)
+    assert period is not None
+    await PeriodService.transition(db_session, period, PeriodTransition(status="closed"))
+    entry = await EntryService.get_entry(db_session, clinic_id, entry_id)
+    assert entry is not None
+    with pytest.raises(HTTPException) as exc:
+        await EntryService.delete_entry(db_session, entry)
+    assert exc.value.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_delete_period_empty_draft_only(db_session: AsyncSession, test_clinic: Clinic):
+    clinic_id = test_clinic.id
+    user = await _make_user(db_session, clinic_id)
+    user_id = user.id
+    # Unknown ids are 404 (never leak existence across clinics).
+    with pytest.raises(HTTPException) as exc:
+        await PeriodService.delete_period(db_session, clinic_id, uuid4())
+    assert exc.value.status_code == 404
+    # A period with entries cannot go even while draft.
+    full = await _make_period(db_session, clinic_id, "2026-01")
+    full_id = full.id
+    await _make_entry(db_session, clinic_id, full_id, user_id)
+    with pytest.raises(HTTPException) as exc:
+        await PeriodService.delete_period(db_session, clinic_id, full_id)
+    assert exc.value.status_code == 409
+    # An empty draft period deletes; a closed one conflicts.
+    empty = await _make_period(db_session, clinic_id, "2026-02")
+    empty_id = empty.id
+    await PeriodService.delete_period(db_session, clinic_id, empty_id)
+    assert await PeriodService.get_period(db_session, clinic_id, empty_id) is None
+    doomed = await _make_period(db_session, clinic_id, "2026-03")
+    doomed_id = doomed.id
+    doomed = await PeriodService.transition(db_session, doomed, PeriodTransition(status="closed"))
+    with pytest.raises(HTTPException) as exc:
+        await PeriodService.delete_period(db_session, clinic_id, doomed_id)
+    assert exc.value.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_http_delete_draft_guards(
+    client: AsyncClient, auth_headers: dict, test_clinic: Clinic, db_session: AsyncSession
+):
+    clinic_id = test_clinic.id
+    user = await _make_user(db_session, clinic_id)
+    period = await _make_period(db_session, clinic_id)
+    entry = await _make_entry(db_session, clinic_id, period.id, user.id)
+    entry_id, period_id = entry.id, period.id
+    # Entry deletes with 204 while draft; unknown ids 404.
+    gone = await client.delete(f"/api/v1/payroll/entries/{entry_id}", headers=auth_headers)
+    assert gone.status_code == 204, gone.text
+    assert await EntryService.get_entry(db_session, clinic_id, entry_id) is None
+    assert (
+        await client.delete(f"/api/v1/payroll/entries/{uuid4()}", headers=auth_headers)
+    ).status_code == 404
+    # Empty draft period deletes with 204; unknown ids 404.
+    assert (
+        await client.delete(f"/api/v1/payroll/periods/{period_id}", headers=auth_headers)
+    ).status_code == 204
+    assert (
+        await client.delete(f"/api/v1/payroll/periods/{uuid4()}", headers=auth_headers)
+    ).status_code == 404
+    # Closed periods refuse with 409.
+    period = await _make_period(db_session, clinic_id, "2026-04")
+    period = await PeriodService.transition(db_session, period, PeriodTransition(status="closed"))
+    closed = await client.delete(f"/api/v1/payroll/periods/{period.id}", headers=auth_headers)
+    assert closed.status_code == 409, closed.text
+    # Entries of a closed period refuse with 409 at HTTP level too: create
+    # while draft, close, then delete.
+    late = await _make_period(db_session, clinic_id, "2026-05")
+    late_id = late.id
+    user2 = await _make_user(db_session, clinic_id)
+    stuck = await _make_entry(db_session, clinic_id, late_id, user2.id)
+    stuck_id = stuck.id
+    late = await PeriodService.get_period(db_session, clinic_id, late_id)
+    assert late is not None
+    await PeriodService.transition(db_session, late, PeriodTransition(status="closed"))
+    blocked = await client.delete(f"/api/v1/payroll/entries/{stuck_id}", headers=auth_headers)
+    assert blocked.status_code == 409, blocked.text

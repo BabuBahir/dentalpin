@@ -443,7 +443,7 @@ if (!isAdmin.value) {
           <table class="w-full">
             <thead>
               <tr class="border-b border-default">
-                <th class="text-left py-3 px-4 font-medium text-muted dark:text-subtle">
+                <th class="text-start py-3 px-4 font-medium text-muted dark:text-subtle">
                   {{ t('notifications.notificationType') }}
                 </th>
                 <th class="text-center py-3 px-4 font-medium text-muted dark:text-subtle w-24">
@@ -595,21 +595,21 @@ if (!isAdmin.value) {
           >
             <div>
               <span class="text-muted">{{ t('notifications.smtp.host') }}:</span>
-              <span class="ml-2 text-default">{{ smtpSettings.host }}:{{ smtpSettings.port }}</span>
+              <span class="ms-2 text-default">{{ smtpSettings.host }}:{{ smtpSettings.port }}</span>
             </div>
             <div>
               <span class="text-muted">{{ t('notifications.smtp.fromEmail') }}:</span>
-              <span class="ml-2 text-default">{{ smtpSettings.from_email || '-' }}</span>
+              <span class="ms-2 text-default">{{ smtpSettings.from_email || '-' }}</span>
             </div>
             <div>
               <span class="text-muted">{{ t('notifications.smtp.security') }}:</span>
-              <span class="ml-2 text-default">
+              <span class="ms-2 text-default">
                 {{ smtpSettings.use_ssl ? 'SSL' : smtpSettings.use_tls ? 'TLS' : 'None' }}
               </span>
             </div>
             <div>
               <span class="text-muted">{{ t('notifications.smtp.username') }}:</span>
-              <span class="ml-2 text-default">{{ smtpSettings.username || '-' }}</span>
+              <span class="ms-2 text-default">{{ smtpSettings.username || '-' }}</span>
             </div>
           </div>
 

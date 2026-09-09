@@ -63,7 +63,7 @@
       >
         <div class="flex items-center justify-between gap-4">
           <button
-            class="min-w-0 text-left"
+            class="min-w-0 text-start"
             @click="openDetail(order.id)"
           >
             <div class="flex items-center gap-2">
