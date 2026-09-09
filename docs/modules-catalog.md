@@ -42,6 +42,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `payroll` | 0.1.0 | official | — | manual | yes | 3 | 2 | 0 | yes |
 | `periodontogram` | 0.1.0 | official | patients, odontogram | manual | yes | 2 | 1 | 2 | yes |
 | `purchase_orders` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 3 | 0 | yes |
+| `razorpay` | 0.1.0 | official | payments | manual | yes | 3 | 0 | 0 | yes |
 | `recall_reminders` | 0.1.0 | community | recalls, notifications, patients | manual | yes | 0 | 0 | 1 | yes |
 | `recalls` | 0.1.0 | official | patients, agenda | auto | yes | 3 | 4 | 5 | yes |
 | `reports` | 0.1.0 | official | patients, agenda, catalog, budget, billing, payments | auto | no | 3 | 0 | 0 | yes |
@@ -812,6 +813,24 @@ Purchase orders with receiving, quality checks and PDF export.
   - `purchase_order.status_changed`
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/purchase_orders/CLAUDE.md`](../backend/app/modules/purchase_orders/CLAUDE.md)
+
+### `razorpay` — v0.1.0
+
+Razorpay online payments (India) via the payments collect slot.
+
+- **Author:** DentalPin Core Team
+- **License:** BSL-1.1
+- **Category:** official
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `payments`
+- **Frontend layer:** `frontend`
+- **Permissions:**
+  - `razorpay.collect`
+  - `razorpay.settings.read`
+  - `razorpay.settings.write`
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/razorpay/CLAUDE.md`](../backend/app/modules/razorpay/CLAUDE.md)
 
 ### `recall_reminders` — v0.1.0
 
