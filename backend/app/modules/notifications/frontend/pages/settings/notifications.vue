@@ -442,7 +442,7 @@ if (!isAdmin.value) {
             <p class="text-caption text-info">
               {{ t('notifications.channels.whatsappUnavailableHint') }}
               <NuxtLink
-                to="/settings/whatsapp-kapso"
+                to="/settings/integrations/whatsapp-kapso"
                 class="underline font-medium"
               >
                 {{ t('notifications.channels.whatsappConnect') }}
@@ -462,7 +462,7 @@ if (!isAdmin.value) {
             <p class="text-caption text-info">
               {{ t('notifications.channels.smsUnavailableHint') }}
               <NuxtLink
-                to="/settings/sms-gateway"
+                to="/settings/integrations/sms-gateway"
                 class="underline font-medium"
               >
                 {{ t('notifications.channels.smsConnect') }}

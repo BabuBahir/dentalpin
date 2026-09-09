@@ -1,7 +1,7 @@
 ---
 module: sms_gateway
 screen: settings
-route: /settings/sms-gateway
+route: /settings/integrations/sms-gateway
 last_verified_commit: 0b59a2a2
 related_endpoints:
   - GET /api/v1/sms_gateway/settings

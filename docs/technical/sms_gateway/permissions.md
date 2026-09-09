@@ -10,7 +10,7 @@ Returned by `SmsGatewayModule.get_permissions()`
 
 | Permission | Allows | Required by |
 |------------|--------|-------------|
-| `sms_gateway.settings.read` | View masked provider config | `GET /api/v1/sms_gateway/settings` |
+| `sms_gateway.settings.read` | View masked provider config, list registered providers | `GET /api/v1/sms_gateway/settings`, `GET /api/v1/sms_gateway/providers` |
 | `sms_gateway.settings.write` | Select provider, store credentials, dry-run | `PUT /api/v1/sms_gateway/settings`, `POST /api/v1/sms_gateway/test` |
 
 ## Role assignment

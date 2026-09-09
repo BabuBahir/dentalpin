@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- fix: the "connect WhatsApp" / "configure SMS" hints on the settings page
+  link to `/settings/integrations/<page>` (the registry route); the bare
+  `/settings/<page>` form 404s.
+
 - feat(#231 PR2): SMS in the UI. `sms` joins the `NotificationChannel`
   union, `CHANNEL_ORDER`, and the settings page (preferred select +
   manual checkbox + unconfigured hint, all gated by adapter

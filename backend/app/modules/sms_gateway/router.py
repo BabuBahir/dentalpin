@@ -38,7 +38,10 @@ async def get_settings(
 ) -> ApiResponse[SmsSettingsResponse]:
     row = await SmsGatewayService.get_settings(db, ctx.clinic_id)
     if row is None:
-        row = await SmsGatewayService.upsert_settings(db, ctx.clinic_id, {})
+        # Opening the page must not enable the channel: the admin flips
+        # the toggle explicitly (the log placeholder reports "sent"
+        # while sending nothing).
+        row = await SmsGatewayService.upsert_settings(db, ctx.clinic_id, {"is_active": False})
     return ApiResponse(data=mask_settings(row))
 
 

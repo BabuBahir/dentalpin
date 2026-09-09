@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `GET /settings` creates the per-clinic row inactive; the admin enables the channel explicitly from the settings page.
+
 ### Added
 
 - Settings surface (issue #392 review): `GET /providers` (registered
