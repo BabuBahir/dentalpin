@@ -3,6 +3,13 @@
 ## Unreleased
 
 - fix: rename `RazorpayNotConfigured` → `RazorpayNotConfiguredError` to satisfy the ruff `N818` exception-naming rule after rebasing onto current main.
+- feat(#263): gateway providers — the create-payment modal's `upi` /
+  netbanking / card chips delegate to a gateway module's checkout when one
+  claims the method through the new host seam `useCollectGateway`
+  (permission + country gated), otherwise they keep recording manually.
+  A verified gateway payment flows through the normal `created` event; a
+  cancelled popup or a failed checkout leaves the modal open, and an
+  unconfigured gateway falls back to a manual record with a warning toast.
 
 - fix(#365): the two post-merge follow-ups from #370 — two *concurrent* `record_payment` calls with one `idempotency_key` no longer 500 on the unique index (savepoint + `IntegrityError` → the loser adopts the winner's row), and the shared `CollectAmountModal` (budget / invoice collect flows) offers `upi` / `netbanking` behind the same IN gate; `useClinicCountry()` moved to the host so host and layer components share one gate.
 

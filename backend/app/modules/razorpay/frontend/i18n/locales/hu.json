@@ -30,6 +30,9 @@
       "loadError": "A Razorpay fizetési oldal nem tölthető be.",
       "error": "A fizetés indítása nem sikerült.",
       "verifyError": "A fizetés megerősítése nem sikerült."
+    },
+    "gateway": {
+      "notConfigured": "A Razorpay nincs beállítva — manuális fizetésként rögzítjük."
     }
   }
 }

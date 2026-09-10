@@ -7,7 +7,7 @@
  * /verify — the backend re-fetches the captured payment from Razorpay
  * and records it (amount/currency from the gateway, not from here).
  */
-import type { ApiResponse } from '~~/app/types'
+import type { ApiResponse, PaymentRecord } from '~~/app/types'
 
 export interface RazorpaySettings {
   key_id: string
@@ -64,12 +64,13 @@ export function useRazorpay() {
     razorpay_order_id: string
     razorpay_signature: string
     allocations: RazorpayAllocation[]
-  }) {
-    return (await api.post<ApiResponse<Record<string, unknown>>>(
+  }): Promise<PaymentRecord> {
+    const response = await api.post<ApiResponse<PaymentRecord>>(
       '/api/v1/razorpay/verify',
       payload,
       { errorToast: false }
-    )).data
+    )
+    return response.data
   }
 
   return { fetchSettings, saveSettings, createOrder, verifyAndRecord }
