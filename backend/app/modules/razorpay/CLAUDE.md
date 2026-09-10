@@ -8,7 +8,7 @@ webhook + settings. All lifecycle/ledger logic lives in
 `payment_gateways`/`payments`.
 
 Issue #263 (PR 1 of #365). ADR 0016 (channel adapters — the pattern
-this module's registration mirrors), ADR 0022 (payment gateway adapter
+this module's registration mirrors), ADR 0029 (payment gateway adapter
 architecture).
 
 ## Public API
@@ -168,8 +168,8 @@ returned by `GET`/`PUT /settings` — only `has_key_secret`/
   Razorpay" action).
 - **Pages**: `/settings/razorpay`. Permission-gated with
   `usePermissions().can()`.
-- **i18n**: en, es, ta (`frontend/i18n/locales/`) — not the host's
-  full 9-locale set; fr/pt/de/pl/it/hu are a follow-up.
+- **i18n**: all nine host locales (`frontend/i18n/locales/`): de, en, es,
+  fr, hu, it, pl, pt, ta.
 - **Checkout.js**: loaded dynamically (`<script src="https://checkout.razorpay.com/v1/checkout.js">`)
   only when the Razorpay rail is chosen — never eagerly on page load.
 - **Never treats the browser `handler` callback as confirmation** — it
@@ -191,7 +191,7 @@ returned by `GET`/`PUT /settings` — only `has_key_secret`/
 
 - `docs/adr/0016-channel-adapter-architecture.md`
 - `docs/adr/0020-install-state-gates-runtime.md`
-- `docs/adr/0022-payment-gateway-adapter-architecture.md`
+- `docs/adr/0029-payment-gateway-adapter-architecture.md`
 
 ## CHANGELOG
 

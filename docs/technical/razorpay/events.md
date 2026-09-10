@@ -11,7 +11,7 @@ its own**. It drives `payment_gateways`' services
 `expire`/`cancel`, `GatewayRefundService.complete`/`fail`) directly
 from its webhook handler, which in turn call `payments.workflow`
 directly — no event bus in this path (see
-`docs/adr/0022-payment-gateway-adapter-architecture.md`).
+`docs/adr/0029-payment-gateway-adapter-architecture.md`).
 
 ## Published (indirectly, via `payment_gateways` → `payments`)
 

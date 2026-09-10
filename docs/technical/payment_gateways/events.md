@@ -9,7 +9,7 @@ This module **does not register event handlers and publishes no
 events of its own**. A gateway confirmation calls
 `payments.workflow.record_payment`/`refund_payment` **directly** (in
 the same DB transaction), rather than going through the event bus —
-see ADR 0022 "Alternatives considered" for why (a webhook has exactly
+see ADR 0029 "Alternatives considered" for why (a webhook has exactly
 one authoritative consumer, unlike a genuinely fan-out send).
 
 ## Published (indirectly, via `payments`)

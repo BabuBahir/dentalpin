@@ -9,7 +9,7 @@ Provider-neutral payment gateway contract, registry, and the
 `PaymentRequest`/`GatewayRefundRequest` async lifecycle. Mirrors the
 channel-adapter architecture (ADR 0016) that `notifications` uses for
 email/WhatsApp. Official, installable/removable. Issue #263, PR 1 of
-#365. Full rationale: ADR 0022.
+#365. Full rationale: ADR 0029.
 
 ## What it is
 
@@ -57,7 +57,7 @@ render alongside existing content.
 
 Neither table duplicates anything on `payments.Payment`/`Refund` — no
 provider name, status, or fees live in the core ledger. See
-`docs/adr/0022-payment-gateway-adapter-architecture.md`.
+`docs/adr/0029-payment-gateway-adapter-architecture.md`.
 
 ## Module boundary
 

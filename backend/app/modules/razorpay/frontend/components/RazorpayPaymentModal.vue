@@ -58,7 +58,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const toast = useToast()
-const { create: createManualPayment } = usePayments()
+const { create: createManualPayment, get: getPayment } = usePayments()
 const {
   getSettings,
   createPaymentRequest,
@@ -332,8 +332,9 @@ function startPolling(id: string) {
 }
 
 async function onGatewaySucceeded(paymentId: string) {
-  const { get } = usePayments()
-  const payment = await get(paymentId)
+  // Runs from a poll timer, outside any Nuxt setup context — composables
+  // must already be resolved (see getPayment above), never called here.
+  const payment = await getPayment(paymentId)
   if (payment) {
     toast.add({ title: t('common.success'), description: t('razorpay.collect.success'), color: 'success' })
     emit('created', payment)

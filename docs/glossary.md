@@ -84,7 +84,7 @@ ADRs) for the full story.
 
 | EN (code) | ES (UI) | Definition |
 |---|---|---|
-| Payment gateway | Pasarela de pago | A provider (Razorpay first; PhonePe/Stripe planned) that collects money electronically on the clinic's behalf. See `payment_gateways`/`razorpay` modules, ADR 0022. |
+| Payment gateway | Pasarela de pago | A provider (Razorpay first; PhonePe/Stripe planned) that collects money electronically on the clinic's behalf. See `payment_gateways`/`razorpay` modules, ADR 0029. |
 | Payment request | Solicitud de pago | The pre-payment async lifecycle of one gateway collection attempt (`payment_gateways.PaymentRequest`) — never itself a source of financial truth; becomes one only once it links to a real `Payment` at confirmation. |
 | Gateway refund request | Solicitud de reembolso de pasarela | The async lifecycle of one gateway refund attempt (`payment_gateways.GatewayRefundRequest`) — a core `Refund` is created only once the provider reports completion. |
 | UPI | UPI | Unified Payments Interface — India's real-time bank-to-bank payment rail (the most common Indian consumer instant-payment method). |

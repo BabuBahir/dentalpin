@@ -3,11 +3,13 @@
 Creates ``payment_requests`` (the pre-payment async lifecycle of a
 gateway collection attempt) and ``gateway_refund_requests`` (the async
 lifecycle of a gateway refund attempt). Both FK into ``payments``
-(``payment_id`` / ``refund_id``), so this branch chains off the tip of
-the payments branch rather than the bare core anchor.
+(``payment_id`` / ``refund_id``), so this branch anchors on the core ``0001``
+like every other removable module and declares ``depends_on`` on the
+``payments`` head — never ``down_revision`` onto another module's chain,
+which would fork that branch (issue #56).
 
 Revision ID: pg_0001
-Revises: pay_0004
+Revises: 0001 (depends_on pay_0005)
 Create Date: 2026-09-03
 """
 
@@ -19,9 +21,9 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 revision: str = "pg_0001"
-down_revision: str | None = "pay_0004"
+down_revision: str | None = "0001"
 branch_labels: str | Sequence[str] | None = ("payment_gateways",)
-depends_on: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = ("pay_0005",)
 
 
 def upgrade() -> None:

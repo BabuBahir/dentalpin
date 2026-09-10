@@ -386,9 +386,8 @@ function formatDate(s: string | undefined): string {
                   class="truncate max-w-[160px]"
                   :title="p.reference"
                 >· {{ p.reference }}</span>
-                <!-- e.g. a "Razorpay · UPI" badge that opens the gateway
-                     transaction detail — renders nothing for a payment
-                     that wasn't gateway-collected. -->
+                <!-- Desktop row: gateway badge (the #card template below
+                     carries the same slot for the mobile layout). -->
                 <ModuleSlot
                   name="payments.list.row.meta"
                   :ctx="{ payment: p, clinic: currentClinic }"

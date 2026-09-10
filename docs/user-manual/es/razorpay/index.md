@@ -52,4 +52,4 @@ que este módulo añade a esa vista.
 - [Permisos](../../../technical/razorpay/permissions.md)
 - [Eventos](../../../technical/razorpay/events.md)
 - [Resumen de payment_gateways](../../../technical/payment_gateways/overview.md) — el módulo neutral al proveedor en el que se conecta este
-- [ADR 0022 — arquitectura de adaptadores de pasarela de pago](../../../adr/0022-payment-gateway-adapter-architecture.md)
+- [ADR 0029 — arquitectura de adaptadores de pasarela de pago](../../../adr/0029-payment-gateway-adapter-architecture.md)

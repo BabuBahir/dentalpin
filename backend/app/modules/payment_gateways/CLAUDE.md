@@ -7,7 +7,7 @@ owns the contract and the registry, never a provider implementation.
 `razorpay` is the first (and so far only) provider module; `phonepe`
 and `stripe` are expected to follow the exact same shape.
 
-Issue #263 (PR 1 of #365). See ADR 0022 (payment gateway adapter
+Issue #263 (PR 1 of #365). See ADR 0029 (payment gateway adapter
 architecture) for the full rationale — module boundary, state machine,
 atomic/idempotent confirmation, and why failed attempts are still
 committed before the error is raised.
@@ -56,7 +56,7 @@ unattended.
 
 None. Gateway confirmation calls `payments.workflow.record_payment`/
 `refund_payment` **directly**, in the same transaction, rather than
-through the event bus — see ADR 0022 "Alternatives considered" for why
+through the event bus — see ADR 0029 "Alternatives considered" for why
 (a webhook has exactly one authoritative consumer, unlike
 notifications' genuinely fan-out channel sends). `payments` itself
 still publishes its usual `payment.recorded`/`payment.allocated`/
@@ -79,8 +79,8 @@ None.
   for refunds) — removing the module must never orphan a checkout or
   refund a clinic is actively waiting on. Terminal rows never block
   uninstall; they're just history.
-- Own Alembic branch `payment_gateways` (`pg_0001`), chained off the
-  tip of the `payments` branch (`pay_0004`) since `payment_requests`/
+- Own Alembic branch `payment_gateways` (`pg_0001`), anchored on core
+  `0001` with `depends_on=("pay_0005",)` since `payment_requests`/
   `gateway_refund_requests` FK into `payments`/`refunds`.
 
 ## Gotchas / non-obvious invariants
@@ -96,7 +96,7 @@ None.
   `PaymentRequestService.confirm()` no-ops on an already-terminal
   request (not just `succeeded`) rather than raising, because a late
   "succeeded" webhook racing our own timeout sweep is a real scenario,
-  not a bug — see ADR 0022. Callers (webhook handlers) MUST hold a row
+  not a bug — see ADR 0029. Callers (webhook handlers) MUST hold a row
   lock (`get_locked_by_provider_reference`, `SELECT ... FOR UPDATE`)
   before calling `confirm()`/`apply_webhook_event()` — the lock is what
   makes concurrent duplicate deliveries serialize instead of racing on
@@ -112,14 +112,14 @@ None.
   both pass this pre-check — `payments.workflow.refund_payment`'s own
   row-locked cap check at `complete()` time is the real backstop (the
   loser gets converted to `failed`, never a silent over-refund). See
-  ADR 0022's accepted trade-offs.
+  ADR 0029's accepted trade-offs.
 - **A `GatewayError` raised from `create_and_initiate`/`request_refund`'s
   provider-failure branch is preceded by an explicit `db.commit()`.**
   FastAPI's `get_db()` rolls back the whole request session on any
   exception; without the early commit, a `failed` row created just
   before raising would vanish along with the reserved idempotency key,
   leaving nothing for the collection UI to show a "failed" state for.
-  See ADR 0022's "Why a failed attempt still gets committed" section
+  See ADR 0029's "Why a failed attempt still gets committed" section
   before removing what looks like a redundant commit.
 - **`allocation_input` and `context` are stored as JSONB — always pass
   Decimal/UUID values through `model.model_dump(mode="json")` before
@@ -138,7 +138,7 @@ None.
 - `docs/adr/0010-payments-as-primitive-module.md`
 - `docs/adr/0016-channel-adapter-architecture.md`
 - `docs/adr/0020-install-state-gates-runtime.md`
-- `docs/adr/0022-payment-gateway-adapter-architecture.md`
+- `docs/adr/0029-payment-gateway-adapter-architecture.md`
 
 ## CHANGELOG
 

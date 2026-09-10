@@ -37,7 +37,7 @@
   `RazorpayTransactionDetailModal` (via the `payments.list.row.meta`
   slot — audit trail, allocation, settlement, refund history, and a
   "refund via Razorpay" action), `/settings/razorpay` settings page +
-  `settings.sections` card. en/es/ta locales.
+  `settings.sections` card. All nine host locales.
 - Migrations: `rzp_0001` (own Alembic branch).
 - Tests: amount/method mapping (pure), webhook signature verification
   and payload parsing (pure, all event types), settings isolation/

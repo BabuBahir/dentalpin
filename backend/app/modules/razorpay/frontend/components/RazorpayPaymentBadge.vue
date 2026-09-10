@@ -24,6 +24,13 @@ const isLoading = ref(true)
 const showDetail = ref(false)
 
 onMounted(async () => {
+  // `reference` is "razorpay:<payment id>" for every gateway-collected
+  // payment (set by PaymentRequestService.confirm) — skip the round trip
+  // for the manual rows so a 20-row page costs 0 extra requests, not 20.
+  if (!props.ctx.payment.reference?.startsWith('razorpay:')) {
+    isLoading.value = false
+    return
+  }
   try {
     info.value = await getGatewayInfo(props.ctx.payment.id)
   } catch {

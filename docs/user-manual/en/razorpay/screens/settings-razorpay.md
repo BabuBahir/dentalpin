@@ -1,6 +1,6 @@
 ---
 module: razorpay
-screen: razorpay_settings
+screen: settings-razorpay
 route: /settings/razorpay
 related_endpoints:
   - GET /api/v1/razorpay/settings
@@ -10,7 +10,7 @@ related_permissions:
   - razorpay.settings.write
 related_paths:
   - backend/app/modules/razorpay/frontend/pages/settings/razorpay/index.vue
-last_verified_commit: 8b8e9375
+last_verified_commit: bd4b52b9
 ---
 
 # /settings/razorpay

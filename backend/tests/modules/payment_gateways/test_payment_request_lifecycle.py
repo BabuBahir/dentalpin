@@ -279,7 +279,7 @@ async def test_terminal_transitions_are_idempotent_no_ops(
     assert again.state == PaymentRequestState.CANCELLED
 
 
-def test_illegal_transition_from_pending_to_succeeded_is_rejected():
+def test_illegal_transition_from_succeeded_back_to_pending_is_rejected():
     from app.modules.payment_gateways.constants import validate_payment_request_transition
 
     with pytest.raises(PaymentRequestTransitionError):

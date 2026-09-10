@@ -48,4 +48,4 @@ to it.
 - [Permissions](../../../technical/razorpay/permissions.md)
 - [Events](../../../technical/razorpay/events.md)
 - [payment_gateways overview](../../../technical/payment_gateways/overview.md) — the provider-neutral module this one plugs into
-- [ADR 0022 — payment gateway adapter architecture](../../../adr/0022-payment-gateway-adapter-architecture.md)
+- [ADR 0029 — payment gateway adapter architecture](../../../adr/0029-payment-gateway-adapter-architecture.md)

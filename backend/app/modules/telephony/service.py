@@ -7,7 +7,6 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-import phonenumbers
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
@@ -46,10 +45,12 @@ def normalize_number(raw: str | None, default_country: str) -> str | None:
         return None
     raw = raw.strip()
     try:
+        import phonenumbers
+
         parsed = phonenumbers.parse(raw, default_country.upper())
         if phonenumbers.is_valid_number(parsed):
             return phonenumbers.format_number(parsed, phonenumbers.PhoneNumberFormat.E164)
-    except phonenumbers.NumberParseException:
+    except Exception:  # noqa: BLE001 — normalization must never kill ingest
         pass
     return raw
 
