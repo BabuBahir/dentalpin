@@ -10,8 +10,8 @@
 > endpoint (or Zenodo API for weights) on 2026-09-03. Re-verify before any
 > push — licenses can change.
 >
-> Rule (non-negotiable, proposed as ADR 0030 — staged until #415's
-> 0029 merges): no license file = all rights reserved = **no code
+> Rule (non-negotiable, candidate for an ADR — decision pending):
+> no license file = all rights reserved = **no code
 > copied, build-similar only**. MIT/Apache-2.0 = usable **with the copyright
 > notice preserved**. GPL/NC/custom-restricted = **no code**.
 

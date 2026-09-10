@@ -28,7 +28,7 @@
 > before any cloud call, and tools flagged `exposes_free_text` are
 > excluded from the cloud path entirely. Tool calls re-check the
 > caller's role permissions at the chokepoint; WRITE/DESTRUCTIVE tools
-> need inline user confirmation. The posture above (§4) governs
+> need inline user confirmation. The posture below (§4) governs
 > *planned imaging AI*; this paragraph governs the shipped copilot.
 
 ## 2. Tenancy and access control (the primary safeguard)
@@ -46,8 +46,7 @@
 
 ## 3. DICOM metadata and the RVG import path (planned modules)
 
-> Binding rules, proposed as ADR 0030 (staged — lands once #415's
-> 0029 merges; numbering must stay gapless per the layout gate).
+> Binding rules, candidate for an ADR (decision pending).
 > The `imaging_viewer` / `imaging_ai` branches are not merged yet. These
 > rules bind the day they land; nothing below describes shipped behavior.
 
@@ -66,11 +65,11 @@
 
 ## 4. AI processing boundaries (planned modules)
 
-> Binding rules, proposed as ADR 0030 (staged — lands once #415's
-> 0029 merges). Same status as §3: binding on the `imaging_ai`
-> rebuild, not shipped.
+> Binding rules, candidate for an ADR (decision pending). Same
+> status as §3: binding on the `imaging_ai` rebuild, not shipped.
 
-- AI runs as **operator-provided sidecars** (nnU-Net, pano, OCR, transcription
+- AI runs as **operator-provided sidecars** for imaging AI (nnU-Net,
+  pano, OCR, transcription
   runners) behind the `imaging_ai` `Runner` protocol — never as in-process
   cloud calls from the backend. No patient data leaves the clinic network
   unless the operator configures a cloud backend.
