@@ -20,6 +20,7 @@ import type {
   PaymentMethod,
   PaymentRecord
 } from '~~/app/types'
+import type { CollectGatewayProvider } from '~~/app/composables/useCollectGateway'
 
 const props = withDefaults(defineProps<{
   open: boolean
@@ -56,7 +57,13 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const { create } = usePayments()
+const toast = useToast()
 const { format: formatCurrency, symbol: currencySymbol } = useCurrency()
+// Gateway seam (#263): the chips for upi / netbanking / card launch a
+// gateway module's checkout (e.g. razorpay) instead of a manual record.
+// The host stays method-string-based; the provider's own permission and
+// country gates decide when that happens.
+const { resolve: resolveGateway } = useCollectGateway()
 
 const isBudgetContext = computed(() => Boolean(props.defaultBudgetId))
 const isPatientLocked = computed(() => Boolean(props.defaultPatientId))
@@ -128,6 +135,9 @@ const showAdvanced = ref(false)
 const showSecondaryMethods = ref(false)
 const splitManually = ref(false)
 const amountInputRef = ref<HTMLInputElement | null>(null)
+// True from the moment a gateway chip launches its checkout until the popup
+// settles — prevents a second order/popup while the first is still open.
+const gatewayBusy = ref(false)
 
 // Reset whenever the modal opens — keeps state from leaking between calls.
 watch(() => props.open, async (isOpen) => {
@@ -139,6 +149,7 @@ watch(() => props.open, async (isOpen) => {
     showAdvanced.value = false
     showSecondaryMethods.value = false
     splitManually.value = false
+    gatewayBusy.value = false
     await nextTick()
     amountInputRef.value?.focus()
     amountInputRef.value?.select()
@@ -210,7 +221,76 @@ function applySuggestion() {
 }
 
 function pickMethod(method: PaymentMethod) {
+  // A gateway module may claim this method: delegate the whole payment to
+  // its checkout flow (order → popup → server-verified record). When no
+  // provider passes its gates (user lacks razorpay.collect, clinic not in
+  // the gateway's country, module not installed) the chip behaves as a
+  // plain manual-record selection as before.
+  const gateway = resolveGateway(method)
+  if (gateway && !gatewayBusy.value) {
+    void runGateway(gateway, method)
+    return
+  }
   form.value.method = method
+}
+
+async function runGateway(gateway: CollectGatewayProvider, method: PaymentMethod) {
+  formError.value = null
+  // Same validation the manual submit runs — the gateway needs a real
+  // patient, a positive amount and allocations that sum to it.
+  if (!form.value.patient_id) {
+    formError.value = t('payments.new.errPatient')
+    form.value.method = method
+    return
+  }
+  if (!amountValid.value) {
+    formError.value = t('payments.new.errAmount')
+    form.value.method = method
+    return
+  }
+  if (!allocationsValid.value) {
+    formError.value = t('payments.new.errSum')
+    form.value.method = method
+    return
+  }
+
+  // While the checkout popup is up, further chip clicks / submits are no-ops
+  // until it settles (a second order + popup would double the payment).
+  const previous = form.value.method
+  form.value.method = method
+  gatewayBusy.value = true
+  try {
+    const result = await gateway.collect({
+      patient_id: form.value.patient_id,
+      amount: Number(form.value.amount),
+      payment_date: form.value.payment_date,
+      allocations: form.value.allocations.map(a => ({
+        target_type: a.target_type,
+        target_id: a.target_type === 'budget' ? a.target_id : undefined,
+        amount: Number(a.amount)
+      }))
+    })
+    if (result.ok) {
+      emit('created', result.payment)
+      emit('update:open', false)
+    } else if (result.reason === 'unconfigured') {
+      // Keep the gateway method selected so the counter can still hit
+      // Submit for a manual record; surface why the checkout didn't open.
+      toast.add({
+        title: t('razorpay.gateway.notConfigured'),
+        description: result.error,
+        color: 'warning'
+      })
+    } else if (result.reason === 'error') {
+      form.value.method = previous
+      formError.value = result.error ?? t('razorpay.collect.error')
+    } else {
+      // 'cancelled' — popup dismissed without paying; nothing recorded.
+      form.value.method = previous
+    }
+  } finally {
+    gatewayBusy.value = false
+  }
 }
 
 function addAllocation() {
@@ -575,6 +655,7 @@ function handleKeydown(e: KeyboardEvent) {
         >
           {{ t('payments.new.cancel') }}
         </UButton>
+
         <UButton
           color="primary"
           icon="i-lucide-check"
@@ -582,11 +663,7 @@ function handleKeydown(e: KeyboardEvent) {
           :disabled="!canSubmit"
           @click="submit"
         >
-          {{
-            amountValid
-              ? t('payments.new.submitWithAmount', { amount: formatCurrency(form.amount) })
-              : t('payments.new.submit')
-          }}
+          {{ amountValid ? t('payments.new.submitWithAmount', { amount: formatCurrency(form.amount) }) : t('payments.new.submit') }}
         </UButton>
       </div>
     </template>
