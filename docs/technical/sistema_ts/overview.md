@@ -51,6 +51,17 @@ clinic ten minutes); `tasks.py` schedules it every 120 s.
 - `sistema_ts_patient_opposition` — one row per patient, `revoked_at`.
 - `sistema_ts_item_types` — `tipoSpesa` (+ flag) per catalog item.
 
+## TLS to the test service
+
+`invioSS730pTest.sanita.finanze.it` presents a certificate issued by the
+private *Sogei Certification Authority Test* and sends no chain, so the
+default certifi bundle rejects it (`CERTIFICATE_VERIFY_FAILED`). Point
+`SISTEMA_TS_CA_BUNDLE` at a PEM bundle that includes that CA (download it
+from the Sistema TS portal; the kit's `CAAgenziadelleEntrateTest.pem` is the
+*signing* CA, not the TLS one). Production chains to a public CA and needs
+nothing. The worker surfaces the failure as a `TLS:` error on the document
+and the settings page.
+
 ## API surface
 
 - `GET /api/v1/sistema_ts/settings`, `PUT /api/v1/sistema_ts/settings`

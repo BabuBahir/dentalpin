@@ -77,3 +77,30 @@ async def test_send_uses_basic_auth_and_the_environment_endpoint(monkeypatch):
     _Client.status, _Client.body = 401, b""
     with pytest.raises(ts_client.TsClientError, match="credenziali"):
         await ts_client.send("<x/>", environment="test", username="u", password="p")
+
+
+@pytest.mark.asyncio
+async def test_send_passes_the_configured_ca_bundle(monkeypatch):
+    from app import config
+
+    monkeypatch.setattr(ts_client.httpx, "AsyncClient", _Client)
+    _Client.status, _Client.body = 200, OK.encode()
+    monkeypatch.setattr(config.settings, "SISTEMA_TS_CA_BUNDLE", "/etc/ssl/sogei-test.pem")
+    await ts_client.send("<x/>", environment="test", username="u", password="p")
+    assert _Client.last["init"]["verify"] == "/etc/ssl/sogei-test.pem"
+    monkeypatch.setattr(config.settings, "SISTEMA_TS_CA_BUNDLE", "")
+    await ts_client.send("<x/>", environment="test", username="u", password="p")
+    assert _Client.last["init"]["verify"] is True
+
+
+@pytest.mark.asyncio
+async def test_send_explains_an_untrusted_test_certificate(monkeypatch):
+    class _Boom(_Client):
+        async def post(self, url, content=None, headers=None):
+            raise ts_client.httpx.ConnectError(
+                "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed"
+            )
+
+    monkeypatch.setattr(ts_client.httpx, "AsyncClient", _Boom)
+    with pytest.raises(ts_client.TsClientError, match="SISTEMA_TS_CA_BUNDLE"):
+        await ts_client.send("<x/>", environment="test", username="u", password="p")
