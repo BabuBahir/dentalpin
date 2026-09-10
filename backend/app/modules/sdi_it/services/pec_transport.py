@@ -101,10 +101,39 @@ async def send_file(creds: PecCredentials, to_address: str, file_name: str, xml:
     return await loop.run_in_executor(None, partial(_send_sync, creds, to_address, file_name, xml))
 
 
+_SDI_ADDRESS = re.compile(r"[a-z0-9._-]+@" + re.escape(SDI_DOMAIN), re.I)
+
+
+def _sdi_sender(msg: email.message.Message) -> str:
+    """The SDI address a message came from, seen through the PEC envelope.
+
+    A PEC provider delivers the SDI's message inside a *busta di trasporto*:
+    ``From: "Per conto di: sdi07@pec.fatturapa.it" <posta-certificata@…>``
+    with the original message attached as ``postacert.eml``. So the address
+    is looked for in the outer From header (display name included) and in
+    the From of any embedded message; ``parseaddr`` alone would only see
+    the provider's mailbox.
+    """
+    candidates = [str(msg.get("From", ""))]
+    for part in msg.walk():
+        if part.get_content_type() == "message/rfc822":
+            for inner in part.get_payload():
+                candidates.append(str(inner.get("From", "")))
+    for header in candidates:
+        m = _SDI_ADDRESS.search(header)
+        if m:
+            return m.group(0).lower()
+    return parseaddr(msg.get("From", ""))[1].lower()
+
+
 def _extract_receipts(raw: bytes) -> tuple[list[tuple[str, str]], str]:
-    """(file_name, xml) pairs found in a message + the sender address."""
+    """(file_name, xml) pairs found in a message + the SDI sender address.
+
+    ``walk()`` descends into ``message/rfc822`` parts, so attachments of
+    the PEC-enveloped ``postacert.eml`` are found too.
+    """
     msg = email.message_from_bytes(raw)
-    sender = parseaddr(msg.get("From", ""))[1].lower()
+    sender = _sdi_sender(msg)
     out: list[tuple[str, str]] = []
     for part in msg.walk():
         name = part.get_filename() or ""
