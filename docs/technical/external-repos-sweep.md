@@ -1,11 +1,17 @@
 # External repos sweep — Groups C/D/E + AI weights (verified 2026-09-03)
 
-> Companion to `external-repos-reference.md` (§B1a/B1b, on the imaging
-> branches). Every row below was verified live via the GitHub API `license`
+> Labels: **Stream** = workstream (1 imaging, 3 booking); **T/B** =
+> tier intakes (§B of the imaging plan: T = code, B = weights/data,
+> numbered); **Group** = repo cluster by purpose (C orthodontic apps,
+> D PMS/booking, E marketing templates).
+>
+> Companion notes (§B1a/B1b) live on the imaging branches not yet
+> merged. Every row below was verified live via the GitHub API `license`
 > endpoint (or Zenodo API for weights) on 2026-09-03. Re-verify before any
 > push — licenses can change.
 >
-> Rule (non-negotiable): no license file = all rights reserved = **no code
+> Rule (non-negotiable, proposed as ADR 0030 — staged until #415's
+> 0029 merges): no license file = all rights reserved = **no code
 > copied, build-similar only**. MIT/Apache-2.0 = usable **with the copyright
 > notice preserved**. GPL/NC/custom-restricted = **no code**.
 
@@ -65,8 +71,8 @@ No license — no code: `AshisChetia/DentaPremium`, `alaeddineazri/Dentist-Proje
 | `AImageLab-zip/ToothFairy2-Benchmark` | none | — | Benchmark reference only. |
 | `coolleafly/VDING` | **GPL-3.0** ❌ (newly verified) | — | Excluded (ledger B4). |
 
-Full per-repo notes: `docs/technical/pano-backends.md` (ships with the
-`imaging_ai` rebuild, not yet on main).
+Full per-repo notes ship with the `imaging_ai` rebuild (not yet on
+main).
 
 ## Scoreboard
 

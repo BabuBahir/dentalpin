@@ -20,6 +20,16 @@
 | Consents, DSRs, erasure audit, breach register | `gdpr` module tables | The accountability layer (§5) |
 | AI job inputs/outputs (frames, overlays, transcripts) | planned `imaging_ai` job records + sidecar hosts (branch, not yet merged) | Never auto-finalized into records (§4) |
 | Auth + access traces | core auth, `activity_journal` | Who touched what, when |
+| Copilot prompts + tool results (today) | `copilot` module: redaction-gated cloud LLM path | See below — redaction gate, not a ban |
+
+> **Copilot today (shipped, not planned).** The assistant backend runs
+> through a redaction gate (`copilot/CLAUDE.md`, `copilot_settings.
+> redaction_enabled`, default on): PII fields tokenize deterministically
+> before any cloud call, and tools flagged `exposes_free_text` are
+> excluded from the cloud path entirely. Tool calls re-check the
+> caller's role permissions at the chokepoint; WRITE/DESTRUCTIVE tools
+> need inline user confirmation. The posture above (§4) governs
+> *planned imaging AI*; this paragraph governs the shipped copilot.
 
 ## 2. Tenancy and access control (the primary safeguard)
 
@@ -36,6 +46,8 @@
 
 ## 3. DICOM metadata and the RVG import path (planned modules)
 
+> Binding rules, proposed as ADR 0030 (staged — lands once #415's
+> 0029 merges; numbering must stay gapless per the layout gate).
 > The `imaging_viewer` / `imaging_ai` branches are not merged yet. These
 > rules bind the day they land; nothing below describes shipped behavior.
 
@@ -54,7 +66,9 @@
 
 ## 4. AI processing boundaries (planned modules)
 
-> Same status as §3: binding on the `imaging_ai` rebuild, not shipped.
+> Binding rules, proposed as ADR 0030 (staged — lands once #415's
+> 0029 merges). Same status as §3: binding on the `imaging_ai`
+> rebuild, not shipped.
 
 - AI runs as **operator-provided sidecars** (nnU-Net, pano, OCR, transcription
   runners) behind the `imaging_ai` `Runner` protocol — never as in-process

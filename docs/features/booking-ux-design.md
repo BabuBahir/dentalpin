@@ -1,7 +1,7 @@
 # Booking UX build-similar — design record (Stream 3, design-first)
 
 > Local-only design. No code copied from any Group D repo (most are
-> unlicensed; MIT ones usable only with notice — see `external-repos-sweep.md`).
+> unlicensed; MIT ones usable only with notice — see `../technical/external-repos-sweep.md`).
 > Everything below is reimplemented ideas mapped onto existing DentalPin
 > modules. Requires maintainer product decision before code.
 
@@ -16,10 +16,10 @@
 
 ## Mapping onto our modules (no new module)
 
-- Slot grid + hold tokens → `schedules` (new endpoints, own migration branch).
+- Slot grid + hold tokens → `agenda` (new endpoints, own migration branch).
 - Reminder cascade → `recall_reminders` + `notifications` events (no new tables).
-- Triage queue → `schedules` status extension (`pending_online`).
-- Permissions: `schedules.appointments.write` reuse; public grid is
+- Triage queue → `agenda` status extension (`pending_online`).
+- Permissions: `agenda.appointments.write` reuse; public grid is
   unauthenticated-by-design like the budget public link (signed token, TTL).
 
 ## Non-goals
@@ -29,7 +29,7 @@ datepicker components copied in.
 
 ## Ship shape (later)
 
-Tight `schedules`/`recalls` gap-close PR on its own branch, en/es screen
+Tight `agenda`/`recalls` gap-close PR on its own branch, en/es screen
 docs, e2e smoke on the hold→confirm flow.
 
 ## Code mining result (2026-09-03) — no code gap, S3 stays design-only
