@@ -61,6 +61,10 @@ services:
     environment:
       SERVICE_FQDN_FRONTEND_3000: ${FRONTEND_FQDN}
       NUXT_PUBLIC_API_BASE_URL: ${BACKEND_URL}
+      # SSR inside Docker reaches the backend by service name (see
+      # nuxt.config.ts apiBaseUrlServer default — localhost is host-dev
+      # only).
+      API_BASE_URL_SERVER: http://backend:8000
     depends_on:
       backend:
         condition: service_started
