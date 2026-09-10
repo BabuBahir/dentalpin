@@ -10,6 +10,9 @@
 
 ## 0.1.0 (2026-09-09) — phase 1
 
+- `SISTEMA_TS_CA_BUNDLE` for the test service's private Sogei CA; a clear
+  `TLS:` error instead of the raw SSL trace.
+
 - Per-clinic Sistema TS credentials (basic auth + RSA-encrypted pincode
   with the SanitelCF certificate), test/prod environments.
 - Worker: paid patient invoices → `inserimento`, credit notes →

@@ -87,14 +87,35 @@ def parse_response(raw: str | bytes) -> TsResponse:
     )
 
 
+def _verify() -> str | bool:
+    """CA bundle for the TLS handshake (see ``Settings.SISTEMA_TS_CA_BUNDLE``)."""
+    from app import config
+
+    return config.settings.SISTEMA_TS_CA_BUNDLE or True
+
+
 async def send(
     xml: str, *, environment: str, username: str, password: str, timeout: float = 30.0
 ) -> TsResponse:
     url = ENDPOINTS.get(environment, ENDPOINTS["test"])
     headers = {"Content-Type": "text/xml; charset=utf-8", "SOAPAction": '""'}
     try:
-        async with httpx.AsyncClient(timeout=timeout, auth=(username, password)) as client:
+        async with httpx.AsyncClient(
+            timeout=timeout, auth=(username, password), verify=_verify()
+        ) as client:
             resp = await client.post(url, content=xml.encode("utf-8"), headers=headers)
+    except httpx.ConnectError as exc:
+        if "CERTIFICATE_VERIFY_FAILED" in str(exc):
+            raise TsClientError(
+                "TLS: the Sistema TS certificate is not trusted"
+                + (
+                    " — the test service uses the private Sogei Test CA; "
+                    "set SISTEMA_TS_CA_BUNDLE to a PEM bundle that includes it"
+                    if environment == "test"
+                    else ""
+                )
+            ) from exc
+        raise TsClientError(f"HTTP: {exc}") from exc
     except httpx.HTTPError as exc:
         raise TsClientError(f"HTTP: {exc}") from exc
     if resp.status_code in (401, 403):
