@@ -1,0 +1,38 @@
+{
+  "razorpay": {
+    "settings": {
+      "title": "Razorpay",
+      "description": "Online fizetések (UPI, banki átutalás, kártya) a Razorpay-en keresztül indiai rendelőknek.",
+      "credentials": "Fizetési átjáró hitelesítő adatai",
+      "active": "Aktív",
+      "inactive": "Nincs konfigurálva",
+      "keyId": "Key ID",
+      "keyIdHelp": "Nyilvános azonosító a Razorpay irányítópultról (Settings → API Keys).",
+      "keySecret": "Key secret",
+      "keySecretHelp": "Titkosítva tároljuk a szerveren; a fizetés gomb megjelenik, amint elmenti a hitelesítő adatokat.",
+      "keySecretStored": "Már van elmentett kulcs. Hagyja üresen a mezőt a megtartáshoz, vagy írjon be újat a cseréhez.",
+      "activeLabel": "Online fizetések elfogadása",
+      "saved": "Razorpay beállítások mentve",
+      "saveError": "A Razorpay beállítások mentése nem sikerült",
+      "loadError": "A Razorpay beállítások betöltése nem sikerült",
+      "howTo": "Konfigurálás",
+      "howToHelp": "Hozzon létre Razorpay-fiókot, másolja ki az API-kulcsokat (Key ID + Key secret), és mentse őket ide. Az online fizetés gomb ezután megjelenik a fizetési képernyőn és a páciens-kimutatásban."
+    },
+    "collect": {
+      "button": "Fizetés Razorpay-jel",
+      "title": "Beszédzés online",
+      "description": "Rendelői fizetés",
+      "patient": "Páciens",
+      "budget": "Árajánlat",
+      "amount": "Összeg",
+      "invalidAmount": "Adjon meg 0-nál nagyobb érvényes összeget.",
+      "pay": "Fizetés",
+      "loadError": "A Razorpay fizetési oldal nem tölthető be.",
+      "error": "A fizetés indítása nem sikerült.",
+      "verifyError": "A fizetés megerősítése nem sikerült."
+    },
+    "gateway": {
+      "notConfigured": "A Razorpay nincs beállítva — manuális fizetésként rögzítjük."
+    }
+  }
+}

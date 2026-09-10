@@ -1,0 +1,38 @@
+{
+  "razorpay": {
+    "settings": {
+      "title": "Razorpay",
+      "description": "Płatności online (UPI, przelew, karty) przez Razorpay dla indyjskich klinik.",
+      "credentials": "Dane bramki płatniczej",
+      "active": "Aktywny",
+      "inactive": "Nieskonfigurowane",
+      "keyId": "Key ID",
+      "keyIdHelp": "Publiczny identyfikator z panelu Razorpay (Settings → API Keys).",
+      "keySecret": "Key secret",
+      "keySecretHelp": "Przechowywany zaszyfrowany po stronie serwera; przycisk płatności pojawia się po zapisaniu danych.",
+      "keySecretStored": "Klucz jest już zapisany. Pozostaw pole puste, aby go zachować, albo wpisz nowy, aby go wymienić.",
+      "activeLabel": "Akceptuj płatności online",
+      "saved": "Zapisano ustawienia Razorpay",
+      "saveError": "Nie udało się zapisać ustawień Razorpay",
+      "loadError": "Nie udało się wczytać ustawień Razorpay",
+      "howTo": "Jak skonfigurować",
+      "howToHelp": "Utwórz konto Razorpay, skopiuj klucze API (Key ID + Key secret) i zapisz je tutaj. Przycisk płatności online pojawi się na ekranie płatności i w rejestrze pacjenta."
+    },
+    "collect": {
+      "button": "Zapłać przez Razorpay",
+      "title": "Pobierz online",
+      "description": "Płatność kliniki",
+      "patient": "Pacjent",
+      "budget": "Kosztorys",
+      "amount": "Kwota",
+      "invalidAmount": "Podaj poprawną kwotę większą niż 0.",
+      "pay": "Zapłać",
+      "loadError": "Nie udało się wczytać kasy Razorpay.",
+      "error": "Nie udało się rozpocząć płatności.",
+      "verifyError": "Nie udało się potwierdzić płatności."
+    },
+    "gateway": {
+      "notConfigured": "Razorpay nie jest skonfigurowany — zostanie zarejestrowana jako płatność ręczna."
+    }
+  }
+}

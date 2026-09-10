@@ -1,0 +1,38 @@
+{
+  "razorpay": {
+    "settings": {
+      "title": "Razorpay",
+      "description": "Paiements en ligne (UPI, virement, cartes) via Razorpay pour les cliniques en Inde.",
+      "credentials": "Identifiants du fournisseur",
+      "active": "Actif",
+      "inactive": "Non configuré",
+      "keyId": "ID de clé",
+      "keyIdHelp": "Identifiant public du tableau de bord Razorpay (Settings → API Keys).",
+      "keySecret": "Clé secrète",
+      "keySecretHelp": "Stockée chiffrée côté serveur ; le bouton de paiement apparaît dès que les identifiants sont enregistrés.",
+      "keySecretStored": "Une clé est déjà enregistrée. Laissez le champ vide pour la conserver, ou saisissez-en une nouvelle pour la renouveler.",
+      "activeLabel": "Accepter les paiements en ligne",
+      "saved": "Paramètres Razorpay enregistrés",
+      "saveError": "Impossible d'enregistrer les paramètres Razorpay",
+      "loadError": "Impossible de charger les paramètres Razorpay",
+      "howTo": "Configuration",
+      "howToHelp": "Créez un compte Razorpay, copiez les clés API (Key ID et Key secret) et enregistrez-les ici. Le bouton de paiement en ligne apparaît alors dans l'écran des paiements et le relevé du patient."
+    },
+    "collect": {
+      "button": "Payer avec Razorpay",
+      "title": "Encaisser en ligne",
+      "description": "Paiement clinique",
+      "patient": "Patient",
+      "budget": "Devis",
+      "amount": "Montant",
+      "invalidAmount": "Saisissez un montant valide supérieur à 0.",
+      "pay": "Payer",
+      "loadError": "Impossible de charger le paiement Razorpay.",
+      "error": "Le paiement n'a pas pu être lancé.",
+      "verifyError": "Le paiement n'a pas pu être confirmé."
+    },
+    "gateway": {
+      "notConfigured": "Razorpay n'est pas configuré — paiement enregistré manuellement."
+    }
+  }
+}
