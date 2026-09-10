@@ -1,4 +1,4 @@
-# 0022 — Payment gateway adapter architecture (payment_gateways + razorpay)
+# 0023 — Payment gateway adapter architecture (payment_gateways + razorpay)
 
 - **Status:** accepted
 - **Date:** 2026-09-03
