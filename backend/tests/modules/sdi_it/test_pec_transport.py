@@ -160,3 +160,24 @@ def test_build_message_subject_is_the_file_stem():
     msg = pt.build_message(CREDS, "sdi01@pec.fatturapa.it", "IT01234567897_0000A.xml", "<x/>")
     assert msg["Subject"] == "IT01234567897_0000A"
     assert email.message_from_bytes(msg.as_bytes())["To"] == "sdi01@pec.fatturapa.it"
+
+
+def test_extract_receipts_sees_through_the_pec_busta_di_trasporto():
+    """PEC providers wrap the SDI message: outer From is the provider's
+    posta-certificata address with "Per conto di: sdiNN@…" as display name,
+    and the original message travels as a postacert.eml attachment."""
+    inner = email.message_from_bytes(
+        _sdi_message("sdi07@pec.fatturapa.it", [("IT01234567897_00001_RC_001.xml", _rc().encode())])
+    )
+    outer = EmailMessage()
+    outer["From"] = '"Per conto di: sdi07@pec.fatturapa.it" <posta-certificata@pec.aruba.it>'
+    outer["To"] = CREDS.address
+    outer["Subject"] = "POSTA CERTIFICATA: RICEZIONE"
+    outer.set_content("Messaggio di posta certificata")
+    outer.add_attachment(
+        b"<daticert/>", maintype="application", subtype="xml", filename="daticert.xml"
+    )
+    outer.add_attachment(inner, filename="postacert.eml")
+    receipts, sender = pt._extract_receipts(outer.as_bytes())
+    assert sender == "sdi07@pec.fatturapa.it"
+    assert [n for n, _ in receipts] == ["IT01234567897_00001_RC_001.xml"]
