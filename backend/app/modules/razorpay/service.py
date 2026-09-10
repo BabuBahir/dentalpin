@@ -141,9 +141,7 @@ class RazorpayService:
         }
 
     @staticmethod
-    def _verify_signature(
-        key_secret: str, payment_id: str, order_id: str, signature: str
-    ) -> bool:
+    def _verify_signature(key_secret: str, payment_id: str, order_id: str, signature: str) -> bool:
         msg = f"{order_id}|{payment_id}".encode()
         digest = hmac.new(key_secret.encode(), msg, hashlib.sha256).hexdigest()
         return hmac.compare_digest(digest, signature)

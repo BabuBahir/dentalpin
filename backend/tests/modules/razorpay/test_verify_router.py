@@ -98,24 +98,24 @@ def _verify_payload(patient_id, payment_id, amount=10) -> dict:
 
 
 @pytest.mark.asyncio
-async def test_order_requires_configured_gateway(
-    client: AsyncClient, auth_headers, test_clinic
-):
+async def test_order_requires_configured_gateway(client: AsyncClient, auth_headers, test_clinic):
     res = await client.post(
         ORDER,
         json={"patient_id": "00000000-0000-0000-0000-000000000000", "amount": 10},
         headers=auth_headers,
     )
     assert res.status_code == 400
-    assert "not configured" in res.json()["detail"].lower()
+    assert "not configured" in res.json()["message"].lower()
 
 
 @pytest.mark.asyncio
 async def test_order_creates_order_server_side(
-    client: AsyncClient, auth_headers, test_clinic, test_patient, monkeypatch
+    client: AsyncClient, auth_headers, test_clinic, test_patient, monkeypatch, db_session
 ):
     await _configure_gateway(client, auth_headers)
     _patch_client(monkeypatch)
+    test_clinic.currency = "INR"
+    await db_session.flush()
 
     res = await client.post(
         ORDER,
@@ -126,7 +126,7 @@ async def test_order_creates_order_server_side(
     data = res.json()["data"]
     assert data["order_id"] == ORDER_ID
     assert data["amount"] == 1000  # paise
-    assert data["currency"] == "INR"
+    assert data["currency"] == test_clinic.currency
     assert data["key_id"] == KEY_ID
 
 
@@ -153,7 +153,7 @@ async def test_verify_rejects_bad_signature(
     payload["razorpay_signature"] = "deadbeef"
     res = await client.post(VERIFY, json=payload, headers=auth_headers)
     assert res.status_code == 400
-    assert "signature" in res.json()["detail"].lower()
+    assert "signature" in res.json()["message"].lower()
 
 
 @pytest.mark.asyncio
@@ -177,7 +177,7 @@ async def test_verify_rejects_unfinished_capture(
         VERIFY, json=_verify_payload(test_patient.id, "pay_RP_002"), headers=auth_headers
     )
     assert res.status_code == 400
-    assert "not captured" in res.json()["detail"].lower()
+    assert "not captured" in res.json()["message"].lower()
 
 
 @pytest.mark.asyncio
@@ -202,7 +202,7 @@ async def test_verify_rejects_order_mismatch(
         VERIFY, json=_verify_payload(test_patient.id, "pay_RP_003"), headers=auth_headers
     )
     assert res.status_code == 400
-    assert "different order" in res.json()["detail"].lower()
+    assert "different order" in res.json()["message"].lower()
 
 
 @pytest.mark.asyncio
@@ -219,7 +219,7 @@ async def test_verify_rejects_allocation_sum_mismatch(
         headers=auth_headers,
     )
     assert res.status_code == 400
-    assert "does not match" in res.json()["detail"].lower()
+    assert "does not match" in res.json()["message"].lower()
 
 
 @pytest.mark.asyncio
