@@ -24,12 +24,6 @@ export default defineNuxtPlugin((nuxtApp) => {
   let lastStatusCheck = 0
   let timer: ReturnType<typeof setInterval> | undefined
 
-  const t = (nuxtApp.$i18n as { t: (k: string) => string }).t
-  const { user } = useAuth()
-  const { can } = usePermissions()
-  const api = useApi(t)
-  const toast = useToast()
-
   function remember(id: string) {
     seen.add(id)
     if (seen.size > SEEN_CAP) {
@@ -39,7 +33,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   async function tick() {
+    const { user } = useAuth()
+    const { can } = usePermissions()
     if (!user.value || !can(PERMISSIONS.telephony.callsRead)) return
+
+    const api = useApi()
     const now = Date.now()
     if (gatewayActive === null || now - lastStatusCheck > STATUS_RECHECK_MS) {
       lastStatusCheck = now
@@ -57,6 +55,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     if (!gatewayActive) return
 
+    const toast = useToast()
+    const t = (nuxtApp.$i18n as { t: (k: string) => string }).t
     try {
       const res = await api.get<{ data: Array<{
         id: string
@@ -77,9 +77,9 @@ export default defineNuxtPlugin((nuxtApp) => {
           actions: [{
             label: call.patient_id ? t('telephony.calls.openRecord') : t('telephony.calls.searchPatient'),
             onClick: () => {
-              nuxtApp.runWithContext(() => navigateTo(call.patient_id
+              navigateTo(call.patient_id
                 ? `/patients/${call.patient_id}`
-                : `/patients?phone=${encodeURIComponent(call.from_number)}`))
+                : `/patients?phone=${encodeURIComponent(call.from_number)}`)
             }
           }]
         })

@@ -42,7 +42,6 @@ dist/
 # IDE
 .idea/
 .vscode/
-.vs/
 *.swp
 *.swo
 *~
@@ -67,4 +66,3 @@ proyecto_open_source_dental.docx
 *.dpm
 *.dpmf
 test-results/
-/.vs

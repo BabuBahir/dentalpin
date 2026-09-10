@@ -102,7 +102,7 @@
       "bank_transfer": "Transferencia",
       "direct_debit": "Domiciliación",
       "insurance": "Seguro",
-"other": "Otro",
+      "other": "Otro",
       "upi": "UPI",
       "netbanking": "Banca online"
     },

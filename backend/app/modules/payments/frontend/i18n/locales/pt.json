@@ -102,7 +102,7 @@
       "bank_transfer": "Transferência",
       "direct_debit": "Débito direto",
       "insurance": "Seguro",
-"other": "Outro",
+      "other": "Outro",
       "upi": "UPI",
       "netbanking": "Net banking"
     },
