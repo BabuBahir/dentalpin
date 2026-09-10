@@ -25,6 +25,7 @@ from app.modules.billing.hooks import BillingComplianceHook
 from app.modules.billing.models import Invoice
 
 from .models import SdiItRecord, SdiItSettings
+from .services.invoice_state import compliance_block
 from .services.tax_ids import PartitaIva, is_business_recipient
 from .services.xml_builder import Party, SdiBuildError, build_fattura, progressivo_invio
 
@@ -149,15 +150,7 @@ async def original_invoice(db: AsyncSession, invoice: Invoice) -> Invoice | None
 
 
 def _queued(record: SdiItRecord) -> dict[str, Any]:
-    return {
-        "IT": {
-            "sdi": "queued",
-            "record_id": str(record.id),
-            "tipo_documento": record.tipo_documento,
-            "file_name": record.file_name,
-            "state": record.state,
-        }
-    }
+    return {"IT": compliance_block(record)}
 
 
 class SdiItHook(BillingComplianceHook):

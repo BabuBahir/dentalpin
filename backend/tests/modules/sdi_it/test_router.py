@@ -229,3 +229,45 @@ async def test_process_now_runs_one_tick(
     assert (
         row["state"] == "exported" and row["transport"] == "pec" and row["message_id"] == "<m@pec>"
     )
+
+
+@pytest.mark.asyncio
+async def test_latest_record_for_invoice(
+    client: AsyncClient, auth_headers, test_clinic, test_patient, db_session
+):
+    rec = await _queued_record(db_session, test_clinic, test_patient)
+    res = await client.get(
+        f"/api/v1/sdi_it/records/by-invoice/{rec.invoice_id}", headers=auth_headers
+    )
+    assert res.status_code == 200 and res.json()["data"]["id"] == str(rec.id)
+    res = await client.get(f"/api/v1/sdi_it/records/by-invoice/{uuid4()}", headers=auth_headers)
+    assert res.status_code == 200 and res.json()["data"] is None
+
+
+@pytest.mark.asyncio
+async def test_invoice_compliance_block_follows_the_record_state(
+    client: AsyncClient, auth_headers, test_clinic, test_patient, db_session
+):
+    """The list chip reads ``invoice.compliance_data["IT"]``: it must move
+    with the record (exported → delivered), not stay on ``pending``."""
+    rec = await _queued_record(db_session, test_clinic, test_patient)
+
+    async def block() -> dict:
+        return (
+            await db_session.execute(
+                select(Invoice.compliance_data).where(Invoice.id == rec.invoice_id)
+            )
+        ).scalar_one()["IT"]
+
+    res = await client.post(f"/api/v1/sdi_it/records/{rec.id}/exported", headers=auth_headers)
+    assert res.status_code == 200, res.text
+    assert (await block())["state"] == "exported"
+    rc = (
+        '<ns3:RicevutaConsegna xmlns:ns3="http://ivaservizi.agenziaentrate.gov.it/docs/xsd/'
+        'fatture/messaggi/v1.0"><IdentificativoSdI>5</IdentificativoSdI>'
+        f"<NomeFile>{rec.file_name}</NomeFile></ns3:RicevutaConsegna>"
+    )
+    res = await client.post("/api/v1/sdi_it/receipts", json={"xml": rc}, headers=auth_headers)
+    assert res.status_code == 200, res.text
+    b = await block()
+    assert b["state"] == "delivered" and b["record_id"] == str(rec.id)

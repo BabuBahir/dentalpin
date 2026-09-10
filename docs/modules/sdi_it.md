@@ -1,6 +1,6 @@
 # sdi_it — FatturaPA / SDI e-invoicing (Italy)
 
-**Status:** phase 2 (manual + PEC transport). Issue #133, ADR 0025.
+**Status:** phase 3 (manual + PEC transport, Nuxt layer). Issue #133, ADR 0025.
 
 ## What it does
 
@@ -43,6 +43,17 @@ to both servers without sending; `POST /queue/process-now` runs one tick.
 Every Italian professional already has a PEC mailbox (obligatory for the
 albo), so nothing needs accrediting.
 
+## Screens
+
+Settings → Billing and taxes → **Electronic invoicing (SDI)** (regime,
+exemption reference, bollo, transport with PEC mailbox and test) and **SDI
+files** (list with states and receipts; download, mark uploaded, import
+receipt, regenerate after a scarto, send now). The invoice page gets an
+SDI panel (`invoice.detail.compliance` slot) and an `SDI` chip in the list
+and header (`invoice.list.row.meta`, `invoice.detail.header.meta`); patient
+invoices show the art. 10-bis note instead. User manual:
+`docs/user-manual/{en,es}/sdi_it/index.md`.
+
 ## Configuration (`/api/v1/sdi_it/settings`)
 
 - `enabled`, `transport` (`manual`), `regime_fiscale` (`RF01` ordinario,
@@ -66,9 +77,9 @@ albo), so nothing needs accrediting.
 
 `GET/PUT /settings`, `GET /records`, `GET /records/{id}/xml`,
 `POST /records/{id}/exported`, `POST /records/{id}/requeue`,
-`POST /receipts` (`{xml, file_name?}`), `POST /pec/test`, `POST /queue/process-now`.
+`POST /receipts` (`{xml, file_name?}`), `POST /pec/test`, `POST /queue/process-now`,
+`GET /records/by-invoice/{invoice_id}`.
 
 ## Not yet
 
-SdICoop, digital signature, `Allegati` (PDF copy inside the XML), the Nuxt
-layer (settings and records pages, receipt upload).
+SdICoop, digital signature, `Allegati` (PDF copy inside the XML).

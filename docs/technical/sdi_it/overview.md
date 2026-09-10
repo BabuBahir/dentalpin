@@ -48,6 +48,17 @@ row, clinic paused ten minutes on mailbox errors) and applies receipts via
 `services/receipts.apply_receipt`, shared with the API import.
 `tasks.py` schedules it every 120 s.
 
+## Frontend layer (phase 3)
+
+`frontend/plugins/settings.client.ts` registers two Settings → Billing
+pages (`SdiItSettingsPage.vue`, `SdiItRecordsPage.vue`);
+`frontend/plugins/slots.client.ts` mounts `InvoiceSdiSlot.vue` in
+`invoice.detail.compliance` and `SdiBadge.vue` in `invoice.list.row.meta`
+/ `invoice.detail.header.meta`, gated on the clinic country `IT` or an
+`IT` block in `compliance_data`. `composables/useSdiIt.ts` wraps the API;
+the XML download uses `useApi().raw` (blob). Permissions in
+`frontend/app/config/permissions.ts` → `sdiIt`.
+
 ## API surface
 
 - `GET /api/v1/sdi_it/settings`, `PUT /api/v1/sdi_it/settings`
@@ -56,6 +67,7 @@ row, clinic paused ten minutes on mailbox errors) and applies receipts via
 - `POST /api/v1/sdi_it/records/{record_id}/exported`
 - `POST /api/v1/sdi_it/records/{record_id}/requeue`
 - `POST /api/v1/sdi_it/receipts`
+- `GET /api/v1/sdi_it/records/by-invoice/{invoice_id}`
 - `POST /api/v1/sdi_it/pec/test`
 - `POST /api/v1/sdi_it/queue/process-now`
 
@@ -67,7 +79,7 @@ credit notes, router lifecycle, Alembic round-trip uninstall.
 
 ## Not yet
 
-SdICoop, digital signature, `Allegati`, Nuxt layer.
+SdICoop, digital signature, `Allegati`.
 
 ## See also
 

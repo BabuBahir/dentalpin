@@ -49,6 +49,7 @@ class SdiItModule(BaseModule):
             "assistant": [],
             "receptionist": ["records.read", "records.manage"],
         },
+        "frontend": {"layer_path": "frontend", "navigation": []},
     }
 
     def get_models(self) -> list:
