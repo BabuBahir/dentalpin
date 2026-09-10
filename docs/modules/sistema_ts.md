@@ -1,6 +1,6 @@
 # sistema_ts — Sistema Tessera Sanitaria (Italy)
 
-**Status:** phase 1 (backend, worker, API). Issue #134, ADR 0026.
+**Status:** phase 2 (backend, worker, API, Nuxt layer). Issue #134, ADR 0026.
 
 ## What it does
 
@@ -40,6 +40,17 @@ opposition; documents are still sent, anonymised, and accepted documents
 of the patient are re-sent as `variazione`. The patient record shows the
 flag (phase 2 UI).
 
+## Screens
+
+Settings → Billing and taxes → **Sistema Tessera Sanitaria** (access
+credentials with write-only password/pincode, certificate upload, sender
+identity, year overview: deadline, not-yet-sent / accepted / rejected
+counts, and the expense type per catalog item) and **Sistema TS
+submissions** (per year, states, protocollo, retry, send now). The
+patient summary gets an **opposition card** (record / revoke, with a
+note); the invoice page a panel listing the invoice's submissions.
+User manual: `docs/user-manual/{en,es}/sistema_ts/index.md`.
+
 ## Endpoints
 
 `GET/PUT /settings` (credentials, identity, year overview with the
@@ -48,8 +59,7 @@ flag (phase 2 UI).
 `GET/PUT /opposition/{patient_id}`, `GET /item-types`,
 `PUT /item-types/{catalog_item_id}`.
 
-## Not in phase 1
+## Not yet
 
-Nuxt layer (settings, documents, patient opposition card), the
-asynchronous zip service, receipt PDFs (`Ricevute730`), the AdE
+The asynchronous zip service, receipt PDFs (`Ricevute730`), the AdE
 notification services.

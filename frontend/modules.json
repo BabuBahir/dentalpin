@@ -34,6 +34,7 @@
     "/module_layers/reports/frontend",
     "/module_layers/schedules/frontend",
     "/module_layers/sdi_it/frontend",
+    "/module_layers/sistema_ts/frontend",
     "/module_layers/sms_gateway/frontend",
     "/module_layers/staff_tasks/frontend",
     "/module_layers/telephony/frontend",
@@ -275,6 +276,11 @@
     {
       "name": "sdi_it",
       "path": "/module_layers/sdi_it/frontend",
+      "routes": []
+    },
+    {
+      "name": "sistema_ts",
+      "path": "/module_layers/sistema_ts/frontend",
       "routes": []
     },
     {

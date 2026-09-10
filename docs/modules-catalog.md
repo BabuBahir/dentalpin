@@ -47,7 +47,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `reports` | 0.2.0 | official | patients, agenda, catalog, budget, billing, payments, treatment_plan | auto | no | 6 | 0 | 0 | yes |
 | `schedules` | 0.1.0 | official | agenda | auto | yes | 8 | 0 | 4 | yes |
 | `sdi_it` | 0.1.0 | official | billing | manual | yes | 4 | 0 | 0 | yes |
-| `sistema_ts` | 0.1.0 | official | billing, patients, catalog, payments | manual | yes | 6 | 0 | 0 | no |
+| `sistema_ts` | 0.1.0 | official | billing, patients, catalog, payments | manual | yes | 6 | 0 | 0 | yes |
 | `sms_gateway` | 0.1.0 | community | notifications | manual | yes | 2 | 0 | 0 | yes |
 | `staff_tasks` | 0.1.0 | community | — | manual | yes | 2 | 2 | 0 | yes |
 | `supplier_items` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 0 | 0 | no |
@@ -934,7 +934,7 @@ Sistema Tessera Sanitaria — invio delle spese sanitarie dei pazienti (IT).
 - **Category:** official
 - **Install policy:** installable=True · auto_install=False · removable=True
 - **Depends:** `billing`, `patients`, `catalog`, `payments`
-- **Frontend layer:** —
+- **Frontend layer:** `frontend`
 - **Permissions:**
   - `sistema_ts.documents.manage`
   - `sistema_ts.documents.read`

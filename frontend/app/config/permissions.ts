@@ -152,6 +152,14 @@ export const PERMISSIONS = {
     recordsRead: 'sdi_it.records.read',
     recordsManage: 'sdi_it.records.manage'
   },
+  sistemaTs: {
+    settingsRead: 'sistema_ts.settings.read',
+    settingsConfigure: 'sistema_ts.settings.configure',
+    documentsRead: 'sistema_ts.documents.read',
+    documentsManage: 'sistema_ts.documents.manage',
+    oppositionRead: 'sistema_ts.opposition.read',
+    oppositionWrite: 'sistema_ts.opposition.write'
+  },
   telephony: {
     settingsRead: 'telephony.settings.read',
     settingsWrite: 'telephony.settings.write',
