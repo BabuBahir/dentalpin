@@ -4,6 +4,10 @@
 
 - fix: `GET /invoices/{id}/pdf` (and `/pdf/preview`) accept every UI locale instead of `es|en|ta` only — a pt/pl/it/de/hu/fr/ar UI got a 422 on "Download PDF". Labels fall back to English until translated (#422); amounts and dates use the locale's separators.
 
+- fix: invoice send options exclude SMS via the shared
+  `documentButtonsForPatient` composable (documents travel over
+  email/WhatsApp only); the predicate lives in notifications so every
+  document surface filters identically (issue #392).
 - fix: `regenerate_after_party_change` results are persisted — `compliance_data` is reassigned instead of updated in place (plain JSONB does not track mutation), so the regenerated record shows on the invoice after a billing-party edit.
 
 - fix: the discount-type select in the invoice item modals crashed on open — reka-ui rejects `''` as an item value; the 'no discount' option now uses `null`.

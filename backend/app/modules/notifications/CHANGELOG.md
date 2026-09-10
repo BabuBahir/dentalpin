@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- fix: the "connect WhatsApp" / "configure SMS" hints on the settings page
+  link to `/settings/integrations/<page>` (the registry route); the bare
+  `/settings/<page>` form 404s.
+
+- feat(#231 PR2): SMS in the UI. `sms` joins the `NotificationChannel`
+  union, `CHANNEL_ORDER`, and the settings page (preferred select +
+  manual checkbox + unconfigured hint, all gated by adapter
+  availability); new `PatientNotificationPrefs` card on the patient
+  summary (email/WhatsApp/SMS opt-out toggles over the preferences
+  API). Host locale keys added in all 9 languages.
+
 - feat(#231 PR1): SMS channel core support. `Channel.SMS` enum;
   `_resolve_channel` SMS branch (destination = patient E.164 phone,
   `sms_enabled` opt-out honoured even on force_send, text-only so both
