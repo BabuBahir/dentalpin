@@ -36,6 +36,7 @@ class PatientStatsService:
         Area reads ``address->>'city'`` with an ``unknown`` fallback —
         the address JSON has no contracted shape, so anything
         unparseable groups under ``unknown`` rather than being guessed.
+        Archived patients are left out, as everywhere else in the app.
         """
         today = date.today()
         rows = (
@@ -44,7 +45,7 @@ class PatientStatsService:
                     Patient.date_of_birth,
                     Patient.gender,
                     Patient.address.op("->>")("city").label("city"),
-                ).where(Patient.clinic_id == clinic_id)
+                ).where(Patient.clinic_id == clinic_id, Patient.status != "archived")
             )
         ).all()
 

@@ -24,10 +24,10 @@ published or consumed; no mutations.
   (age bands, sex split) + `GET /patients/visits` (first vs
   returning), under `reports.patient_stats.read`, plus the
   `patient_stats_report` copilot tool.
- - **operational** (roadmap #230) — `GET /operational/productivity`
+- **operational** (roadmap #230) — `GET /operational/productivity`
   (per-professional completed visits, cabinets, plan pipeline counts),
   under `reports.operational.read`, plus the `operational_report`
-  copilot   tool. Reads billing/patients/agenda/treatment_plan.
+  copilot tool. Reads agenda + treatment_plan.
 
 ## API surface
 

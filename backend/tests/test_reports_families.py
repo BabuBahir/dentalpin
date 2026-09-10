@@ -70,9 +70,12 @@ async def test_demographics(db_session: AsyncSession, test_clinic: Clinic):
         db_session, clinic_id, dob=date(today.year - 70, 1, 1), gender="male", city="Madrid"
     )
     await _patient(db_session, clinic_id, dob=None, gender=None, city=None)
+    archived = await _patient(db_session, clinic_id, gender="male", city="Madrid")
+    archived.status = "archived"
+    await db_session.commit()
 
     demo = await PatientStatsService.demographics(db_session, clinic_id)
-    assert demo["total_patients"] == 3
+    assert demo["total_patients"] == 3  # archived patients are not counted
     bands = {b["band"]: b["count"] for b in demo["age_bands"]}
     assert bands["18-34"] == 1
     assert bands["55-74"] == 1

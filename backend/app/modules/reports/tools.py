@@ -97,9 +97,8 @@ async def _operational_report(ctx: AgentContext, params: PeriodArgs) -> dict:
     }
 
 
-async def _financial_report(
-    ctx: AgentContext, params: PeriodArgs
-) -> dict:  # Invoice axis only — aging buckets + issued trend carry issued
+async def _financial_report(ctx: AgentContext, params: PeriodArgs) -> dict:
+    # Invoice axis only — aging buckets + issued trend carry issued
     # totals on their own axis, nothing else.
     buckets = await FinancialReportService.aging_buckets(ctx.db, ctx.clinic_id)
     trend = await FinancialReportService.issued_trend(
