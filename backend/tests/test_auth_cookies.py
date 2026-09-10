@@ -104,8 +104,11 @@ async def test_bearer_header_path_is_unchanged_and_csrf_exempt(
 
 @pytest.mark.asyncio
 async def test_refresh_rotates_and_reuse_burns_the_family(
-    client: AsyncClient, db_session: AsyncSession
+    client: AsyncClient, db_session: AsyncSession, monkeypatch
 ) -> None:
+    from app.config import settings
+
+    monkeypatch.setattr(settings, "REFRESH_REUSE_GRACE_SECONDS", 0)
     await _bootstrap(client)
     first = (await _login(client)).json()
     old_refresh = first["refresh_token"]
@@ -227,3 +230,68 @@ async def test_cookie_domain_setting_widens_cookies_for_split_hosts(
     assert out.status_code == 204
     # Clearing must target the same domain or the browser keeps the cookies.
     assert all("Domain=.example.com" in h for h in out.headers.get_list("set-cookie"))
+
+
+@pytest.mark.asyncio
+async def test_refresh_rate_key_reads_cookie_when_body_is_empty() -> None:
+    """The browser refresh has no body; the limiter must still key by user."""
+    from uuid import uuid4
+
+    from starlette.requests import Request
+
+    from app.core.auth.router import _refresh_rate_key
+    from app.core.auth.service import create_refresh_token
+
+    user_id = uuid4()
+    token = create_refresh_token(user_id, token_version=0)
+    scope = {
+        "type": "http",
+        "method": "POST",
+        "path": REFRESH,
+        "headers": [(b"cookie", f"dp_refresh={token}".encode())],
+        "client": ("10.0.0.1", 1234),
+    }
+
+    async def receive():
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    assert await _refresh_rate_key(Request(scope, receive)) == f"refresh:{user_id}"
+
+
+@pytest.mark.asyncio
+async def test_logout_after_access_cookie_expired_still_revokes_family(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    """Once the browser has dropped the expired ``dp_access`` (max-age),
+    logout must still find the family through ``dp_refresh``."""
+    await _bootstrap(client)
+    login = (await _login(client)).json()
+    client.cookies.delete("dp_access")
+    resp = await client.post(LOGOUT)
+    assert resp.status_code == 204
+    rows = await _family_rows(db_session, login["refresh_token"])
+    assert rows and all(r.revoked_at is not None for r in rows)
+
+
+@pytest.mark.asyncio
+async def test_reuse_inside_grace_window_returns_live_successor(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    """Two tabs refreshing with the same token (#421): the second one gets
+    the successor instead of burning the family; the family stays alive."""
+    await _bootstrap(client)
+    old_refresh = (await _login(client)).json()["refresh_token"]
+    client.cookies.clear()
+    first = await client.post(REFRESH, json={"refresh_token": old_refresh})
+    assert first.status_code == 200
+    client.cookies.clear()
+    second = await client.post(REFRESH, json={"refresh_token": old_refresh})
+    assert second.status_code == 200, second.text
+    live = second.json()["refresh_token"]
+    assert decode_token(live)["jti"] == decode_token(first.json()["refresh_token"])["jti"]
+    # The successor still rotates normally afterwards.
+    client.cookies.clear()
+    third = await client.post(REFRESH, json={"refresh_token": live})
+    assert third.status_code == 200, third.text
+    rows = await _family_rows(db_session, old_refresh)
+    assert any(r.revoked_at is None for r in rows)

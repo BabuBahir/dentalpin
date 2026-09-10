@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     # parent domain, e.g. ".example.com", so the browser sends the cookies
     # to both hosts and the app can read ``dp_csrf``.
     COOKIE_DOMAIN: str = ""
+    # Presenting a refresh token revoked less than this many seconds ago
+    # (two tabs refreshing at once, a Nuxt error re-render) answers with the
+    # live successor instead of burning the family (#421). 0 disables.
+    REFRESH_REUSE_GRACE_SECONDS: int = 30
     ALGORITHM: str = "HS256"
     # Independent secret used to sign the public-budget verification
     # cookies (ADR 0006). Falls back to ``SECRET_KEY`` for local/dev

@@ -58,8 +58,7 @@ def create_access_token(
     """Create a JWT access token.
 
     ``family_id`` (ADR 0023) names the refresh chain the session belongs
-    to, so ``/auth/logout`` can revoke it from the access token alone —
-    the refresh cookie is path-scoped and never reaches ``/logout``.
+    to, so ``/auth/logout`` can revoke it from the access token alone.
     """
     expire = datetime.now(UTC) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
@@ -197,6 +196,24 @@ async def rotate_refresh_token(
     if row is None or row.user_id != user.id:
         raise RefreshTokenError("Unknown refresh token")
     if row.revoked_at is not None:
+        # Grace window (#421): a duplicate presentation right after rotation
+        # (second tab, SSR error re-render) is not theft — hand back the
+        # live successor. Older reuse, or reuse of a token whose successor
+        # was itself replaced, burns the family.
+        grace = timedelta(seconds=settings.REFRESH_REUSE_GRACE_SECONDS)
+        successor = (
+            await db.get(RefreshToken, row.replaced_by)
+            if row.replaced_by is not None and now - row.revoked_at <= grace
+            else None
+        )
+        if successor is not None and successor.revoked_at is None:
+            token = create_refresh_token(
+                user.id,
+                token_version=user.token_version,
+                jti=successor.id,
+                family_id=successor.family_id,
+            )
+            return user, token, successor.family_id
         await revoke_family(db, row.family_id)
         raise RefreshTokenError("Refresh token reuse detected; session revoked")
     if row.expires_at <= now:

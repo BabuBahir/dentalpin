@@ -107,10 +107,14 @@ async def _refresh_rate_key(request: Request) -> str:
     here gives a per-user bucket; we fall back to the proxy-aware client
     IP if the body is missing or unreadable.
     """
+    # The browser's cookie-only refresh sends no body: read the cookie
+    # first, or ``request.json()`` raises and the cookie branch is skipped
+    # (IP-keyed bucket shared by the whole tenant behind the proxy).
+    token: str | None = request.cookies.get(REFRESH_COOKIE)
     try:
-        body = await request.json()
-        token = body.get("refresh_token") if isinstance(body, dict) else None
-        token = token or request.cookies.get(REFRESH_COOKIE)
+        if not token:
+            body = await request.json()
+            token = body.get("refresh_token") if isinstance(body, dict) else None
         if token:
             payload = decode_token(token)
             sub = payload.get("sub")
@@ -331,8 +335,11 @@ async def logout(
     auth_header = request.headers.get("authorization", "")
     if auth_header.lower().startswith("bearer "):
         candidates.append(auth_header[7:])
-    if request.cookies.get(ACCESS_COOKIE):
-        candidates.append(request.cookies[ACCESS_COOKIE])
+    # Both session cookies carry ``fam``; the refresh one still does once
+    # the browser has dropped the expired access cookie (max-age).
+    for name in (ACCESS_COOKIE, REFRESH_COOKIE):
+        if request.cookies.get(name):
+            candidates.append(request.cookies[name])
     try:
         body = await request.json()
         if isinstance(body, dict) and body.get("refresh_token"):
