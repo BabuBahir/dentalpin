@@ -182,4 +182,7 @@ async def apply_receipt(
     ).scalar_one_or_none()
     if settings is not None:
         settings.last_receipt_at = now
+    from .invoice_state import sync_invoice_state
+
+    await sync_invoice_state(db, row)
     return row, receipt

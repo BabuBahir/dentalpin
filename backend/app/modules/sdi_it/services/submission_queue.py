@@ -25,6 +25,7 @@ from app.core.email.encryption import decrypt_password
 
 from ..models import SdiItRecord, SdiItSettings
 from . import pec_transport
+from .invoice_state import sync_invoice_state
 from .receipts import ReceiptError, apply_receipt
 
 logger = logging.getLogger(__name__)
@@ -105,6 +106,7 @@ async def process_clinic(db: AsyncSession, clinic_id: UUID) -> dict[str, int]:
             else:
                 row.next_attempt_at = datetime.now(UTC) + _backoff(row.attempts)
             counters["failed"] += 1
+            await sync_invoice_state(db, row)
             # A mailbox-level failure hits every row the same way: pause the clinic.
             settings.last_error = f"PEC: {exc}"[:500]
             settings.next_send_after = datetime.now(UTC) + timedelta(minutes=10)
@@ -117,6 +119,7 @@ async def process_clinic(db: AsyncSession, clinic_id: UUID) -> dict[str, int]:
         row.next_attempt_at = None
         settings.last_error = None
         counters["sent"] += 1
+        await sync_invoice_state(db, row)
         await db.commit()
 
     # Receipts: poll the mailbox (network, no locks held), then apply each.

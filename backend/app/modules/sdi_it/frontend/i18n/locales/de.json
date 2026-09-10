@@ -18,6 +18,7 @@
     "bollo": "Virtuelle Stempelsteuer (2 €) über 77,47 € befreit",
     "bolloHelp": "Meldet DatiBollo auf befreiten Rechnungen über der Schwelle; der Betrag wird nicht zum Total addiert.",
     "progressivo": "Bisher erzeugte Dateien: {n}",
+    "transportLabel": "Übermittlung an das SDI",
     "transport": {
       "manual": "manueller Upload",
       "pec": "PEC"

@@ -18,6 +18,7 @@
     "bollo": "Timbre virtuel (2 €) au-delà de 77,47 € exonérés",
     "bolloHelp": "Déclare DatiBollo sur les factures exonérées au-dessus du seuil ; le montant n'est pas ajouté au total.",
     "progressivo": "Fichiers générés à ce jour : {n}",
+    "transportLabel": "Transmission au SDI",
     "transport": {
       "manual": "dépôt manuel",
       "pec": "PEC"

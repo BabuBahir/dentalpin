@@ -4,7 +4,7 @@
 // SDI document at all (art. 10-bis DL 119/2018) — with the manual-
 // transport actions: download the FPR12, mark it exported, import the
 // receipt, requeue after a scarto.
-import { useSdiIt, type SdiRecord } from '../../composables/useSdiIt'
+import { useSdiIt, fmtWhen, type SdiRecord } from '../../composables/useSdiIt'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
 
@@ -138,12 +138,12 @@ function onImportReceipt() {
         <dt class="text-subtle">
           {{ t('sdi_it.panel.transport') }}
         </dt>
-        <dd>{{ record.transport ? t(`sdi_it.transport.${record.transport}`) : '—' }}<span v-if="record.sent_at"> · {{ record.sent_at }}</span></dd>
+        <dd>{{ record.transport ? t(`sdi_it.transport.${record.transport}`) : '—' }}<span v-if="record.sent_at"> · {{ fmtWhen(record.sent_at) }}</span></dd>
         <template v-if="record.receipt_type">
           <dt class="text-subtle">
             {{ t('sdi_it.panel.receipt') }}
           </dt>
-          <dd>{{ record.receipt_type }} · {{ record.receipt_at }}<span v-if="record.sdi_identifier"> · IdSdI {{ record.sdi_identifier }}</span></dd>
+          <dd>{{ record.receipt_type }} · {{ fmtWhen(record.receipt_at) }}<span v-if="record.sdi_identifier"> · IdSdI {{ record.sdi_identifier }}</span></dd>
         </template>
       </dl>
       <p

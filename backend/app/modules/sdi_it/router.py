@@ -35,6 +35,7 @@ from .schemas import (
     SdiSettingsUpdate,
 )
 from .services import submission_queue
+from .services.invoice_state import sync_invoice_state
 from .services.pec_transport import test_connection
 from .services.receipts import (
     ReceiptAlreadyAppliedError,
@@ -226,6 +227,7 @@ async def mark_exported(
     row.state = "exported"
     row.attempts += 1
     row.sent_at = datetime.now(UTC)
+    await sync_invoice_state(db, row)
     await db.commit()
     await db.refresh(row)
     return ApiResponse(data=SdiRecordResponse.model_validate(row))
@@ -267,6 +269,7 @@ async def requeue_record(
         )
     except SdiBuildError as exc:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, str(exc)) from exc
+    await sync_invoice_state(db, new)
     await db.commit()
     await db.refresh(new)
     return ApiResponse(data=SdiRecordResponse.model_validate(new))

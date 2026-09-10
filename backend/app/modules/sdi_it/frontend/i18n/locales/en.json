@@ -18,6 +18,7 @@
     "bollo": "Virtual stamp duty (€2) above €77.47 exempt",
     "bolloHelp": "Declares DatiBollo on exempt invoices over the threshold; the amount is not added to the invoice total.",
     "progressivo": "Files generated so far: {n}",
+    "transportLabel": "Transport",
     "transport": {
       "manual": "manual upload",
       "pec": "PEC"

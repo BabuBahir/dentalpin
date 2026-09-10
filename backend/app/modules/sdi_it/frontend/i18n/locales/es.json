@@ -18,6 +18,7 @@
     "bollo": "Timbre virtual (2 €) a partir de 77,47 € exentos",
     "bolloHelp": "Declara DatiBollo en las facturas exentas por encima del umbral; el importe no se suma al total.",
     "progressivo": "Ficheros generados hasta ahora: {n}",
+    "transportLabel": "Envío al SDI",
     "transport": {
       "manual": "subida manual",
       "pec": "PEC"

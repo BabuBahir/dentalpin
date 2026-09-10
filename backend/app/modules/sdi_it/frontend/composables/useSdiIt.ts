@@ -58,9 +58,13 @@ export interface ReceiptImportResult {
 
 export const SDI_STATES = ['pending', 'exported', 'delivered', 'undeliverable', 'rejected', 'failed'] as const
 
+/** ISO timestamp → the viewer's locale, short; raw ISO with microseconds reads badly in a panel. */
+export function fmtWhen(iso: string | null | undefined): string {
+  return iso ? new Date(iso).toLocaleString() : ''
+}
+
 export function useSdiIt() {
   const api = useApi()
-  const config = useRuntimeConfig()
 
   async function fetchSettings(): Promise<SdiSettings> {
     return (await api.get<ApiResponse<SdiSettings>>('/api/v1/sdi_it/settings')).data
@@ -87,15 +91,9 @@ export function useSdiIt() {
   }
 
   /** Blob download of the FPR12 file; the browser saves it under its SDI name.
-   *  Raw fetch (no JSON): works with the bearer token while it exists and
-   *  with the session cookies once ADR 0023 lands (credentials: include). */
+   *  ``useApi().raw`` attaches the session cookies (ADR 0023). */
   async function downloadXml(record: SdiRecord): Promise<void> {
-    const auth = useAuth() as unknown as { accessToken?: { value: string | null } }
-    const token = auth.accessToken?.value
-    const res = await fetch(`${config.public.apiBaseUrl}/api/v1/sdi_it/records/${record.id}/xml`, {
-      credentials: 'include',
-      headers: token ? { Authorization: `Bearer ${token}` } : {}
-    })
+    const res = await api.raw(`/api/v1/sdi_it/records/${record.id}/xml`)
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     const blob = await res.blob()
     const url = window.URL.createObjectURL(blob)

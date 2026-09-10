@@ -18,6 +18,7 @@
     "bollo": "Wirtualna opłata skarbowa (2 €) powyżej 77,47 € zwolnionych",
     "bolloHelp": "Deklaruje DatiBollo na fakturach zwolnionych powyżej progu; kwota nie jest dodawana do sumy.",
     "progressivo": "Dotychczas wygenerowane pliki: {n}",
+    "transportLabel": "Przesyłanie do SDI",
     "transport": {
       "manual": "ręczne wgranie",
       "pec": "PEC"

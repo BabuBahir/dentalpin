@@ -18,6 +18,7 @@
     "bollo": "Virtuális illetékbélyeg (2 €) 77,47 € adómentes fölött",
     "bolloHelp": "A küszöb feletti adómentes számlákon DatiBollo-t jelöl; az összeg nem adódik a végösszeghez.",
     "progressivo": "Eddig előállított fájlok: {n}",
+    "transportLabel": "Továbbítás az SDI felé",
     "transport": {
       "manual": "kézi feltöltés",
       "pec": "PEC"

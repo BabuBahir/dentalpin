@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSdiIt, type SdiSettings } from '../composables/useSdiIt'
+import { useSdiIt, fmtWhen, type SdiSettings } from '../composables/useSdiIt'
 import { errorDetail } from '~~/app/utils/error'
 
 const { t } = useI18n()
@@ -182,10 +182,10 @@ async function onTest() {
 
       <UCard>
         <template #header>
-          <span class="font-medium">{{ t('sdi_it.transport') }}</span>
+          <span class="font-medium">{{ t('sdi_it.transportLabel') }}</span>
         </template>
         <div class="space-y-3">
-          <UFormField :label="t('sdi_it.transport')">
+          <UFormField :label="t('sdi_it.transportLabel')">
             <USelect
               v-model="form.transport"
               :items="transportOptions"
@@ -273,7 +273,7 @@ async function onTest() {
               v-if="settings?.last_pec_poll_at"
               class="text-xs text-subtle"
             >
-              {{ t('sdi_it.pec.lastPoll', { at: settings.last_pec_poll_at }) }}
+              {{ t('sdi_it.pec.lastPoll', { at: fmtWhen(settings.last_pec_poll_at) }) }}
             </p>
           </template>
 

@@ -18,6 +18,7 @@
     "bollo": "Bollo virtuale (€2) sopra €77,47 esenti",
     "bolloHelp": "Dichiara DatiBollo sulle fatture esenti oltre soglia; l'importo non si somma al totale.",
     "progressivo": "File generati finora: {n}",
+    "transportLabel": "Trasmissione allo SDI",
     "transport": {
       "manual": "caricamento manuale",
       "pec": "PEC"

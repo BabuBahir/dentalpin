@@ -18,6 +18,7 @@
     "bollo": "Selo virtual (2 €) acima de 77,47 € isentos",
     "bolloHelp": "Declara DatiBollo nas faturas isentas acima do limite; o valor não é somado ao total.",
     "progressivo": "Ficheiros gerados até agora: {n}",
+    "transportLabel": "Envio ao SDI",
     "transport": {
       "manual": "carregamento manual",
       "pec": "PEC"

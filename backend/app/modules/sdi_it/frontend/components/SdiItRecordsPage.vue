@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSdiIt, SDI_STATES, type SdiRecord } from '../composables/useSdiIt'
+import { useSdiIt, SDI_STATES, fmtWhen, type SdiRecord } from '../composables/useSdiIt'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
 
@@ -239,7 +239,7 @@ async function onProcessNow() {
                 <template v-if="r.receipt_type">
                   {{ r.receipt_type }}<span v-if="r.sdi_identifier"> · {{ r.sdi_identifier }}</span>
                   <div class="text-gray-500">
-                    {{ r.receipt_at }}
+                    {{ fmtWhen(r.receipt_at) }}
                   </div>
                 </template>
                 <span v-else>—</span>
