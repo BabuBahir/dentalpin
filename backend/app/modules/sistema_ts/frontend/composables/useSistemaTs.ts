@@ -72,6 +72,11 @@ export function fmtWhen(iso: string | null | undefined): string {
   return iso ? new Date(iso).toLocaleString() : ''
 }
 
+/** ISO date (YYYY-MM-DD) → the viewer's locale. */
+export function fmtDate(iso: string | null | undefined): string {
+  return iso ? new Date(`${iso}T00:00:00`).toLocaleDateString() : ''
+}
+
 export function useSistemaTs() {
   const api = useApi()
 

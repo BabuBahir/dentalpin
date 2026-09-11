@@ -2,7 +2,7 @@
 // Patient summary card: the patient's opposition to the Sistema TS
 // (spec table 5 — documents still go, anonymised). Renders only for
 // Italian clinics; toggling needs `sistema_ts.opposition.write`.
-import { useSistemaTs, type Opposition } from '../../composables/useSistemaTs'
+import { useSistemaTs, fmtDate, type Opposition } from '../../composables/useSistemaTs'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
 
@@ -14,13 +14,10 @@ const props = defineProps<{ ctx: Ctx }>()
 const { t } = useI18n()
 const toast = useToast()
 const { can } = usePermissions()
-const { currentClinic } = useClinic()
+const country = useClinicCountry()
 const { fetchOpposition, setOpposition } = useSistemaTs()
 
-const isIT = computed(() => {
-  const c = currentClinic.value as { country?: string | null, settings?: { country?: string | null } | null } | null
-  return (c?.country ?? c?.settings?.country ?? null) === 'IT'
-})
+const isIT = computed(() => country.value === 'IT')
 const state = ref<Opposition | null>(null)
 const busy = ref(false)
 const note = ref('')
@@ -71,7 +68,7 @@ async function toggle(opposed: boolean) {
         v-if="state.opposed && state.opposed_since"
         class="text-xs text-subtle"
       >
-        {{ t('sistema_ts.opposition.since', { date: state.opposed_since }) }}
+        {{ t('sistema_ts.opposition.since', { date: fmtDate(state.opposed_since) }) }}
       </p>
       <template v-if="can(PERMISSIONS.sistemaTs.oppositionWrite)">
         <UInput

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSistemaTs, fmtWhen, TS_STATES, type TsDocument } from '../composables/useSistemaTs'
+import { useSistemaTs, fmtWhen, fmtDate, TS_STATES, type TsDocument } from '../composables/useSistemaTs'
 import { PERMISSIONS } from '~~/app/config/permissions'
 import { errorMessage } from '~~/app/utils/error'
 
@@ -45,7 +45,11 @@ async function load() {
   }
 }
 onMounted(load)
-watch([page, stateFilter, year], load)
+watch(page, load)
+watch([stateFilter, year], () => {
+  if (page.value !== 1) page.value = 1
+  else load()
+})
 
 async function onRetry(d: TsDocument) {
   try {
@@ -149,7 +153,7 @@ async function onProcessNow() {
                   {{ d.num_documento }}
                 </div>
                 <div class="text-xs text-gray-500">
-                  {{ d.data_emissione }} · {{ d.total_amount }} EUR · {{ d.pagamento_tracciato === 'SI' ? t('sistema_ts.documents.traceable') : t('sistema_ts.documents.cash') }}
+                  {{ fmtDate(d.data_emissione) }} · {{ d.total_amount }} EUR · {{ d.pagamento_tracciato === 'SI' ? t('sistema_ts.documents.traceable') : t('sistema_ts.documents.cash') }}
                   <span
                     v-if="d.flag_opposizione"
                     class="text-amber-600"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useSistemaTs, fmtWhen, TIPI_SPESA, type TsSettings, type ItemType } from '../composables/useSistemaTs'
+import { useSistemaTs, fmtWhen, fmtDate, TIPI_SPESA, type TsSettings, type ItemType } from '../composables/useSistemaTs'
 import { errorDetail } from '~~/app/utils/error'
 
 const { t } = useI18n()
@@ -180,7 +180,7 @@ async function onClearCertificate() {
               {{ t('sistema_ts.year.deadline') }}
             </div>
             <div class="font-medium">
-              {{ settings?.deadline }}
+              {{ fmtDate(settings?.deadline) }}
             </div>
           </div>
           <div>
