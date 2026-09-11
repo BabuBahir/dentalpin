@@ -27,17 +27,13 @@ export default defineNuxtPlugin(() => {
     searchKeywords: ['razorpay', 'upi', 'gateway', 'payment', 'qr', 'india']
   })
 
-  // Full replacement for PaymentCreateModal — same "New payment"/
-  // "Cobrar" button, same trigger, same open/created contract; only
-  // the modal content behind it changes for India clinics. See
-  // components/RazorpayPaymentModal.vue's own docstring. Resolved via
-  // `resolveSlot('payments.create.modal', ...)` at each call site
-  // (payments/index.vue, PatientPaymentsPanel.vue) — never rendered
-  // through the generic <ModuleSlot> (which only forwards `ctx`, not
-  // v-model/props/events this component needs).
-  registerSlot('payments.create.modal', {
-    id: 'razorpay.payments.create.modal',
-    component: defineAsyncComponent(() => import('../components/RazorpayPaymentModal.vue')),
+  // Gateway rails inside the core "Record payment" modal's method row
+  // (#263 review, point 3): the modal stays a plain form; on submit it
+  // hands the validated form to RazorpayCollectPanel, which owns the
+  // QR / Checkout.js / link wait, polling and expiry.
+  registerSlot('payments.create.methods', {
+    id: 'razorpay.payments.create.methods',
+    component: defineAsyncComponent(() => import('../components/RazorpayMethodChips.vue')),
     order: 10,
     condition: isIndiaClinicCtx
   })

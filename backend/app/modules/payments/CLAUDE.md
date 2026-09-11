@@ -100,7 +100,7 @@ nothing. Country gating is the gateway's `condition` (same as
 | Slot | Where | `ctx` |
 |---|---|---|
 | `payments.collect.actions` | next to "New payment" (payments page), "Cobrar" (`PatientPaymentsPanel`, both buttons), "Collect" (`BudgetPaymentsCard`) | `{ patient?, budget?, prefer_invoice_id? }` — each host passes what it has |
-| `payments.create.modal` | full replacement for the built-in `PaymentCreateModal` behind "New payment" / "Cobrar" — resolved directly via `resolveSlot()` (never `<ModuleSlot>`: it carries `v-model:open`/props/events the generic slot can't forward); first matching entry wins, else the built-in modal renders unchanged | `{ clinic }` — for the provider's country `condition` |
+| `payments.create.methods` | inside `PaymentCreateModal`'s method chip row, after the four primary chips — the module component renders its own `.method-chip` buttons (the style is unscoped for that) and calls `ctx.select({ id, label, panel, panelProps? })`; on submit the modal validates patient/amount/allocations as usual and swaps its body for `panel` (props `form = { patient_id, patient_name, amount, allocations }` + `panelProps`), which emits `created(payment)` or `back`. Waiting/expiry/retries belong to the panel, never to the modal | `{ clinic, selectedId, select }` |
 | `payments.list.row.meta` | payments list row, under the date · method line | `{ payment, clinic }` |
 | `payments.ledger.row.meta` | patient ledger row, under the meta line | `{ entry }` |
 | `payments.detail.sections` | payments list row, above the refund action (there is no dedicated detail view yet — this is its stand-in) | `{ payment }` |

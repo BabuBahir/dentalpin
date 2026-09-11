@@ -60,17 +60,10 @@
         "qr": "QR",
         "card": "Kártya",
         "payment_link": "Fizetési link"
-      }
-    },
-    "paymentModal": {
-      "railUpiManual": "UPI",
+      },
       "railUpiQr": "UPI QR",
-      "railRazorpay": "Razorpay",
-      "pending": "Függőben {amount}",
-      "received": "Beérkezett",
-      "allocated": "Hozzárendelve",
-      "unallocated": "Nincs hozzárendelve",
-      "continueWith": "Folytatás ezzel: {provider}"
+      "railCheckout": "Razorpay",
+      "railPaymentLink": "Fizetési link"
     },
     "detail": {
       "title": "Razorpay tranzakció",

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { PaymentMethod, PaymentRecord, PaginatedResponse } from '~~/app/types'
 import { PERMISSIONS } from '~~/app/config/permissions'
-import { resolveSlot } from '~~/app/composables/useModuleSlots'
-import PaymentCreateModal from '../../components/PaymentCreateModal.vue'
 
 /**
  * /payments — list page.
@@ -20,22 +18,9 @@ definePageMeta({ middleware: 'auth' })
 const { t, locale } = useI18n()
 const api = useApi()
 const { can } = usePermissions()
-// Passed verbatim as `ctx.clinic` to the `payments.create.modal` /
-// `payments.list.row.meta` slots — the same shape india_gst's/verifactu's
-// country-gated slots already expect (`ctx.clinic.country`).
+// Passed as `ctx.clinic` to `payments.list.row.meta` — the shape the
+// country-gated slots (india_gst / verifactu / razorpay) already expect.
 const { currentClinic } = useClinic()
-
-// The "New payment" button and its label never change (issue #365
-// PR1 feedback: renaming it churns muscle memory for no benefit) —
-// only what it opens does. A provider module (razorpay) may register
-// a full replacement for PaymentCreateModal into `payments.create.modal`
-// (India-clinic-gated); when none matches, the built-in modal renders
-// exactly as before. This page never imports razorpay — it only
-// resolves the slot by name.
-const createModalOverride = computed(() => {
-  const entries = resolveSlot('payments.create.modal', { clinic: currentClinic.value }, { can })
-  return entries[0]?.component ?? PaymentCreateModal
-})
 
 interface PatientBrief {
   id: string
@@ -498,8 +483,7 @@ function formatDate(s: string | undefined): string {
       </template>
     </DataListLayout>
 
-    <component
-      :is="createModalOverride"
+    <PaymentCreateModal
       v-model:open="showCreate"
       @created="handleCreated"
     />

@@ -150,22 +150,19 @@ returned by `GET`/`PUT /settings` — only `has_key_secret`/
 
 - **Composable**: `useRazorpay` (settings + payment_gateways client).
 - **Components**: `RazorpaySettingsCardsSlot` (settings hub card),
-  `RazorpayPaymentModal` (`payments.create.modal` slot — a **full
-  replacement** for `payments`' own `PaymentCreateModal`, India-clinic-
-  gated. Same "New payment"/"Cobrar" trigger, same `open`/`created`
-  contract, but the panel behind it adds UPI/UPI QR/Razorpay rails
-  alongside the four existing manual methods, an allocation table
-  instead of a single "Apply to" target, and a received/allocated/
-  unallocated footer. Manual rails record instantly; gateway rails
-  hand off to `PaymentRequest` polling and only call `created` once
-  the request reaches `succeeded`. Resolved directly via
-  `resolveSlot('payments.create.modal', ...)` at each `payments`-module
-  call site — never through `<ModuleSlot>`, which only forwards `ctx`
-  and can't carry this component's `v-model`/props/events), the
+  `RazorpayMethodChips` (`payments.create.methods` slot — three chips,
+  UPI QR / Razorpay checkout / payment link, inside the core
+  `PaymentCreateModal`'s method row, India-clinic-gated, disabled with
+  a hint until settings are active), `RazorpayCollectPanel` (the
+  hand-off panel the core modal renders on submit: opens the
+  `PaymentRequest`, shows QR / Checkout.js / link, polls, `created`
+  only once `succeeded`, `back` on cancel/try again),
   `RazorpayPaymentBadge` (`payments.list.row.meta` slot — renders
-  nothing for a non-gateway payment), `RazorpayTransactionDetailModal`
+  nothing for a non-gateway payment; only calls `gateway-info` when
+  `reference` starts with `razorpay:`), `RazorpayTransactionDetailModal`
   (audit trail, allocation, settlement, refund history + "refund via
-  Razorpay" action).
+  Razorpay" action). The core modal is never forked: manual methods,
+  date, reference/notes and the allocation editor stay its own.
 - **Pages**: `/settings/razorpay`. Permission-gated with
   `usePermissions().can()`.
 - **i18n**: all nine host locales (`frontend/i18n/locales/`): de, en, es,

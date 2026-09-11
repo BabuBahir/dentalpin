@@ -60,17 +60,10 @@
         "qr": "QR",
         "card": "கார்டு",
         "payment_link": "பணம் செலுத்தும் இணைப்பு"
-      }
-    },
-    "paymentModal": {
-      "railUpiManual": "UPI",
+      },
       "railUpiQr": "UPI QR",
-      "railRazorpay": "Razorpay",
-      "pending": "நிலுவையில் {amount}",
-      "received": "பெறப்பட்டது",
-      "allocated": "ஒதுக்கப்பட்டது",
-      "unallocated": "ஒதுக்கப்படாதது",
-      "continueWith": "{provider} உடன் தொடரவும்"
+      "railCheckout": "Razorpay",
+      "railPaymentLink": "கட்டண இணைப்பு"
     },
     "detail": {
       "title": "Razorpay பரிவர்த்தனை",

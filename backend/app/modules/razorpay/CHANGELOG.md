@@ -23,21 +23,13 @@
   a data-problem `GatewayError` is logged to webhook health and still
   answers 200; a transport/programmer error answers 500 so Razorpay
   retries.
-- Frontend: `RazorpayPaymentModal` — a full replacement for `payments`'
-  own `PaymentCreateModal`, mounted via the new `payments.create.modal`
-  slot (India-clinic-gated; resolved directly, not through
-  `<ModuleSlot>`, since it needs `v-model`/props/events the generic
-  slot can't carry). Same "New payment"/"Cobrar" trigger; the panel
-  adds UPI/UPI QR/Razorpay rails next to the four existing manual
-  methods, an allocation table (several invoices + on-account as a
-  row) in place of the single "Apply to" target, and a received/
-  allocated/unallocated footer. Manual rails record instantly; gateway
-  rails hand off to `PaymentRequest` polling. PhonePe has no adapter in
-  this PR and is not rendered. Also `RazorpayPaymentBadge` +
-  `RazorpayTransactionDetailModal` (via the `payments.list.row.meta`
-  slot — audit trail, allocation, settlement, refund history, and a
-  "refund via Razorpay" action), `/settings/razorpay` settings page +
-  `settings.sections` card. All nine host locales.
+- Frontend: `RazorpayMethodChips` registers three rails (UPI QR, Razorpay
+  checkout, payment link) into the core modal's `payments.create.methods`
+  slot (India-clinic-gated); on submit the modal hands its validated form
+  to `RazorpayCollectPanel`, which opens the `PaymentRequest`, shows the
+  QR / Checkout.js / link, polls, and emits `created` only once
+  `payment_gateways` reports `succeeded`. Manual methods (incl. the
+  IN-gated UPI/netbanking chips from #370) stay the core modal's own.
 - Migrations: `rzp_0001` (own Alembic branch).
 - Tests: amount/method mapping (pure), webhook signature verification
   and payload parsing (pure, all event types), settings isolation/
@@ -52,9 +44,9 @@
 - `payments.PAYMENT_METHODS`/`PaymentMethod` gained `upi`/`netbanking`
   (see `payments/CHANGELOG.md`).
 - `payments` gained one new slot consumed by this module:
-  `payments.create.modal` (a full override of the modal opened by "New
-  payment"/"Cobrar" on `/payments` and the patient Pagos tab; resolved
-  directly via `resolveSlot`, not `<ModuleSlot>`). The badge rides the
+  `payments.create.methods` (gateway chips inside the modal opened by
+  "New payment"/"Cobrar" on `/payments` and the patient Pagos tab, with a
+  hand-off panel contract for the wait). The badge rides the
   `payments.list.row.meta` slot that PR #370 already added (small badge
   on gateway-collected payment rows). Neither slot renders anything
   when no provider module is installed, or for a non-India clinic. `BudgetPaymentsCard`'s own

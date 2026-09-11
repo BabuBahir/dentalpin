@@ -60,17 +60,10 @@
         "qr": "QR",
         "card": "Carta",
         "payment_link": "Link di pagamento"
-      }
-    },
-    "paymentModal": {
-      "railUpiManual": "UPI",
-      "railUpiQr": "UPI QR",
-      "railRazorpay": "Razorpay",
-      "pending": "In sospeso {amount}",
-      "received": "Ricevuto",
-      "allocated": "Assegnato",
-      "unallocated": "Non assegnato",
-      "continueWith": "Continua con {provider}"
+      },
+      "railUpiQr": "QR UPI",
+      "railCheckout": "Razorpay",
+      "railPaymentLink": "Link di pagamento"
     },
     "detail": {
       "title": "Transazione Razorpay",
