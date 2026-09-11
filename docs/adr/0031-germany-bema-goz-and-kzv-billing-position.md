@@ -1,4 +1,4 @@
-# 0029 — Germany: KZBV suitability finding decides the billing position for DE clinics (BEMA / GOZ / KZV)
+# 0031 — Germany: KZBV suitability finding decides the billing position for DE clinics (BEMA / GOZ / KZV)
 
 - **Status:** proposed
 - **Date:** 2026-09-10
@@ -114,7 +114,7 @@ not edit either catalog.
   the practice uploads the resulting KCH/KFO/ZE/PAR/KB files on its
   KZV's portal (KZVB: quarterly files in early January/April/July/
   October, monthly files on the 16th). The VSDM Prüfungsnachweis
-  travels inside the same submission as eGKO positions (ADR 0030).
+  travels inside the same submission as eGKO positions (ADR 0032).
 - The file format and the module interface are handed to
   manufacturers, not published on the pages read; whether the modules
   are source, a specification or platform binaries, and under what
@@ -237,7 +237,7 @@ e-invoicing duty.
 7. **Until then DentalPin's position in Germany is "clinical record,
    schedule and private (GOZ) invoicing; statutory billing with your
    KZBV-listed PVS"**, stated on the German pages and in the readiness
-   matrix. Together with ADR 0030 this means DentalPin is not the sole
+   matrix. Together with ADR 0032 this means DentalPin is not the sole
    system of a Kassenpraxis today.
 
 ## Consequences
@@ -305,12 +305,12 @@ e-invoicing duty.
 
 ## Readiness matrix row
 
-| Germany | ✅ `de` | ❌ | ❌ GOZ private invoicing: `de_goz` module pending (no approval needed); statutory BEMA/KZV billing not possible for a self-hosted, modifiable program — KZBV Eignungsfeststellung is per system and version and the submission files come from KZBV modules (Anlage 1 BMV-Z; ADR 0029) — bill the KZV with a KZBV-listed PVS | ❌ TI: DentalPin talks to the practice's gematik-approved Konnektor/TI-Gateway, never is one; `de_ti` (VSDM first, KIM transport second) pending; EBZ/E-Rezept/ePA stay with the approved PVS (ADR 0030) | #135, #136 (answered) |
+| Germany | ✅ `de` | ❌ | ❌ GOZ private invoicing: `de_goz` module pending (no approval needed); statutory BEMA/KZV billing not possible for a self-hosted, modifiable program — KZBV Eignungsfeststellung is per system and version and the submission files come from KZBV modules (Anlage 1 BMV-Z; ADR 0031) — bill the KZV with a KZBV-listed PVS | ❌ TI: DentalPin talks to the practice's gematik-approved Konnektor/TI-Gateway, never is one; `de_ti` (VSDM first, KIM transport second) pending; EBZ/E-Rezept/ePA stay with the approved PVS (ADR 0032) | #135, #136 (answered) |
 
 ## References
 
 - Issue #135; `backend/app/modules/billing/`; ADR 0027 (Portugal),
-  ADR 0028 (France), ADR 0030 (TI)
+  ADR 0028 (France), ADR 0032 (TI)
 - BMV-Z Gesamtausgabe 01.07.2025 (§ 23, § 25, Anlage 1 Nr. 1–2.4,
   Anlage 10 § 5): <https://www.kzbv.de/wp-content/uploads/bmv-z-2025-07-01-gesamtausgabe.pdf>
 - BMV-Z Anlage 8a (DTA-Vertrag): <https://www.gkv-spitzenverband.de/media/dokumente/krankenversicherung_1/zahnaerztliche_versorgung/zae_bmv_z/bmv-z-2022-01-01-anlage-8a.pdf>

@@ -1,4 +1,4 @@
-# 0030 — Germany: Telematikinfrastruktur — DentalPin talks to an approved Konnektor, never is one
+# 0032 — Germany: Telematikinfrastruktur — DentalPin talks to an approved Konnektor, never is one
 
 - **Status:** proposed
 - **Date:** 2026-09-10
@@ -135,7 +135,7 @@ Clientmodul itself.
 3. **Second: KIM as transport** through an approved Clientmodul
    (SMTP/POP3), for receiving and sending signed attachments. The
    payloads that make KIM mandatory — EBZ and eAU datasets — are the
-   KZBV PVS modules' business (ADR 0029) and stay with the approved
+   KZBV PVS modules' business (ADR 0031) and stay with the approved
    PVS until that ADR's open questions are answered.
 4. **E-Rezept and ePA are out of scope for now**: they need QES with
    the eHBA via SignatureService, the E-Rezept conformity confirmation
@@ -143,7 +143,7 @@ Clientmodul itself.
    mandatory status is open. They remain with the approved PVS.
 5. **Position until then: "DentalPin reads the eGK through your
    existing Konnektor (once `de_ti` ships); EBZ, E-Rezept and ePA stay
-   in your KZBV-listed PVS."** With ADR 0029 this means a German
+   in your KZBV-listed PVS."** With ADR 0031 this means a German
    Kassenpraxis runs DentalPin beside its PVS, and a purely private
    practice can run DentalPin alone (no TI duty without GKV billing).
 6. **The website states the costs**: the TI-Pauschale table, the
@@ -165,7 +165,7 @@ Clientmodul itself.
 ### Bad / accepted trade-offs
 
 - Without EBZ/E-Rezept/ePA DentalPin cannot be the only system of a
-  Kassenpraxis; those depend on ADR 0029 and on the KOB question.
+  Kassenpraxis; those depend on ADR 0031 and on the KOB question.
 - Testing needs a real Konnektor or TI-Gateway test account; the KoPS
   simulator is gone. Someone owns that lab.
 - gematik specs move (VSDM 2.0 in Q4 2026, RSA switch-off from
@@ -179,7 +179,7 @@ Clientmodul itself.
 - **Skip TI and position for private practices only.** — Leaves every
   Kassenpraxis out; VSDM alone is cheap enough to do.
 - **Start with KIM/EBZ because it is "the billing one".** — EBZ needs
-  the KZBV PVS modules (ADR 0029); transport without payload is not
+  the KZBV PVS modules (ADR 0031); transport without payload is not
   useful.
 - **File the gematik confirmation before shipping.** — Voluntary and
   1 800 € per application; listing is marketing, not a licence to
@@ -202,7 +202,7 @@ Clientmodul itself.
    not specify or approve Primärsysteme; the Bestätigung is voluntary
    (1 800 € per application, audit since 01.07.2025); the interface
    guide and test suites are public. Caveats: ePA's KOB status is open
-   and the KZV billing side is governed by ADR 0029.
+   and the KZV billing side is governed by ADR 0031.
 2. **Minimally useful:** VSDM (eGK read + Prüfungsnachweis), then KIM
    transport. Mandatory dates/sanctions in Context §2.
 3. **Boundary:** talk to the existing Konnektor/TI-Gateway over its
@@ -222,14 +222,14 @@ Clientmodul itself.
 
 ## Readiness matrix row
 
-See ADR 0029 — one Germany row covers both ADRs; the interop cell reads:
+See ADR 0031 — one Germany row covers both ADRs; the interop cell reads:
 "❌ TI: DentalPin talks to the practice's gematik-approved
 Konnektor/TI-Gateway, never is one; `de_ti` (VSDM first, KIM transport
-second) pending; EBZ/E-Rezept/ePA stay with the approved PVS (ADR 0030)".
+second) pending; EBZ/E-Rezept/ePA stay with the approved PVS (ADR 0032)".
 
 ## References
 
-- Issue #136; ADR 0029; `backend/app/modules/verifactu/` (module shape)
+- Issue #136; ADR 0031; `backend/app/modules/verifactu/` (module shape)
 - gematik Fachportal, Primärsysteme: <https://fachportal.gematik.de/hersteller-anbieter/primaersysteme>
 - gematik, Bestätigung Konnektorschnittstelle: <https://fachportal.gematik.de/hersteller-anbieter/primaersysteme/best-konf-ps-konnektor>
 - gemILF_PS V2.29.0: <https://gemspec.gematik.de/docs/gemILF/gemILF_PS/latest/index.html>;
@@ -254,7 +254,7 @@ second) pending; EBZ/E-Rezept/ePA stay with the approved PVS (ADR 0030)".
   E-Rezept: <https://www.kzbv.de/zahnaerzte/digitales/digitale-anwendungen/elektronisches-rezept/>;
   ePA für alle: <https://www.kzbv.de/zahnaerzte/digitales/elektronische-patientenakte-epa/epa-fuer-alle/>;
   SMC-B: <https://www.kzbv.de/elektronischer-praxisausweis.1119.de.html>
-- BMV-Z Anlage 10 § 5 (eGK), Anlage 15 (EBZ): see ADR 0029 references
+- BMV-Z Anlage 10 § 5 (eGK), Anlage 15 (EBZ): see ADR 0031 references
 - LZK BW eHBA Anbieter und Kosten (02/2021): <https://lzk-bw.de/fileadmin/user_upload/1.Zahn%C3%A4rzte/20.Mitgliedschaft_in_der_Kammer/21.eHBA/Anbieter_und_Kosten_eHBA_Stand_LZK_BW_26.02.2021.pdf>;
   BLZK eHBA: <https://www.blzk.de/blzk/site.nsf/id/pa_ehba.html>;
   KZV BW SMC-B: <https://www.kzvbw.de/zahnaerzte/praxis/telematik/praxisausweis-smc-b/>
