@@ -1,5 +1,16 @@
 # Changelog — sistema_ts
 
+## Unreleased — phase 2
+
+- Nuxt layer: Settings → Billing pages "Sistema Tessera Sanitaria"
+  (credentials, certificate upload, identity, year overview with the
+  31 January deadline, `tipoSpesa` per catalog item) and "Sistema TS
+  submissions" (states, protocollo, retry, send now); opposition card in
+  the patient summary; submission panel on the invoice page; ten locales.
+- Layer polish: dates through `fmtDate` (deadline, issue date, opposed
+  since), opposition card gated by `useClinicCountry`, filter change
+  resets the submissions list to page 1.
+
 ## 0.1.0 (2026-09-09) — phase 1
 
 - Opposition and item-type endpoints answer 404 for a patient or catalog

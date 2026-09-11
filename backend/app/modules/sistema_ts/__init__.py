@@ -65,6 +65,7 @@ class SistemaTsModule(BaseModule):
                 "opposition.write",
             ],
         },
+        "frontend": {"layer_path": "frontend", "navigation": []},
     }
 
     def get_models(self) -> list:

@@ -51,6 +51,15 @@ clinic ten minutes); `tasks.py` schedules it every 120 s.
 - `sistema_ts_patient_opposition` — one row per patient, `revoked_at`.
 - `sistema_ts_item_types` — `tipoSpesa` (+ flag) per catalog item.
 
+## Frontend layer (phase 2)
+
+`frontend/plugins/settings.client.ts` registers two Settings → Billing
+pages (`SistemaTsSettingsPage.vue`, `SistemaTsDocumentsPage.vue`);
+`frontend/plugins/slots.client.ts` mounts `PatientOppositionCard.vue` in
+`patient.summary.cards` (renders only for `IT` clinics) and
+`InvoiceTsSlot.vue` in `invoice.detail.compliance` (IT clinics, patient
+invoices only). `composables/useSistemaTs.ts` wraps the API. Permissions
+in `frontend/app/config/permissions.ts` → `sistemaTs`.
 ## TLS to the test service
 
 `invioSS730pTest.sanita.finanze.it` presents a certificate issued by the
@@ -83,9 +92,4 @@ backoff, credential pause, disabled); router; Alembic round-trip.
 
 ## Not yet
 
-Nuxt layer (settings, documents, patient opposition card), async zip
-service, receipt PDFs, the AdE notification services.
-
-## See also
-
-- `docs/modules/sistema_ts.md`, ADR 0026, ADR 0025 (SDI), `CLAUDE.md`
+Async zip service, receipt PDFs, the AdE notification services.
