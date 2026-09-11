@@ -1,4 +1,4 @@
-# 0029 — RBAC step 4: role_id writes and flag-aware permission callers
+# 0030 — RBAC step 4: role_id writes and flag-aware permission callers
 
 - **Status:** proposed
 - **Date:** 2026-09-07
