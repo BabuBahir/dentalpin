@@ -66,6 +66,12 @@ export interface PaymentRequest {
   created_at: string
 }
 
+export interface RazorpayCheckoutResponse {
+  razorpay_payment_id: string
+  razorpay_order_id: string
+  razorpay_signature: string
+}
+
 export interface GatewayRefundRequest {
   id: string
   payment_id: string

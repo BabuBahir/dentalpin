@@ -10,7 +10,7 @@
 
 import type { PaymentAllocationCreate, PaymentRecord } from '~~/app/types'
 import { errorMessage } from '~~/app/utils/error'
-import type { GatewayMethod, PaymentRequest } from '../composables/useRazorpay'
+import type { GatewayMethod, PaymentRequest, RazorpayCheckoutResponse } from '../composables/useRazorpay'
 
 const props = defineProps<{
   form: {
@@ -94,8 +94,14 @@ async function openCheckout(req: PaymentRequest) {
   const Ctor = (window as unknown as { Razorpay: RazorpayCtor }).Razorpay
   new Ctor({
     ...req.checkout.checkout_payload,
-    handler: () => startPolling(req.id) // browser callback — cue to poll, never authoritative
-  }).open()
+    handler: async (response: RazorpayCheckoutResponse) => {  
+      try {
+        await settle(await getPaymentRequest(response.razorpay_payment_id)) 
+      } catch {
+        // transient failure — next poll tick will retry
+      }
+    }
+ }).open()
 }
 
 onMounted(async () => {
