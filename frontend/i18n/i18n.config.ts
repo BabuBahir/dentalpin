@@ -10,5 +10,20 @@ export default defineI18nConfig(() => ({
   fallbackLocale: 'en',
   missingWarn: false,
   fallbackWarn: false,
-  pluralRules: { pl: plPluralRule, ar: arPluralRule }
+  pluralRules: { pl: plPluralRule, ar: arPluralRule },
+  // Named date format used by the module detail modal (`d(value, 'short')`).
+  // Registered for every shipped locale so no locale falls back with a
+  // console warning (L18 parity applies to config-level formats too).
+  datetimeFormats: {
+    es: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    en: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    de: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    fr: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    hu: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    it: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    pl: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    pt: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    ta: { short: { dateStyle: 'short', timeStyle: 'short' } },
+    ar: { short: { dateStyle: 'short', timeStyle: 'short' } }
+  }
 }))

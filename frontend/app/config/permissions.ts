@@ -136,6 +136,10 @@ export const PERMISSIONS = {
     settingsRead: 'whatsapp_kapso.settings.read',
     settingsWrite: 'whatsapp_kapso.settings.write'
   },
+  razorpay: {
+    settingsRead: 'razorpay.settings.read',
+    settingsWrite: 'razorpay.settings.write'
+  },
   whatsappWebhook: {
     settingsRead: 'whatsapp_webhook.settings.read',
     settingsWrite: 'whatsapp_webhook.settings.write'
