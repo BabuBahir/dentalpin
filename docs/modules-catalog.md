@@ -49,6 +49,7 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `reports` | 0.2.0 | official | patients, agenda, catalog, budget, billing, payments, treatment_plan | auto | no | 6 | 0 | 0 | yes |
 | `schedules` | 0.1.0 | official | agenda | auto | yes | 8 | 0 | 4 | yes |
 | `sdi_it` | 0.1.0 | official | billing | manual | yes | 4 | 0 | 0 | yes |
+| `sistema_ts` | 0.1.0 | official | billing, patients, catalog, payments | manual | yes | 6 | 0 | 0 | no |
 | `sms_gateway` | 0.1.0 | community | notifications | manual | yes | 2 | 0 | 0 | yes |
 | `staff_tasks` | 0.1.0 | community | — | manual | yes | 2 | 2 | 0 | yes |
 | `supplier_items` | 0.1.0 | official | contacts, inventory, suppliers | manual | yes | 2 | 0 | 0 | no |
@@ -957,6 +958,27 @@ FatturaPA / SDI — fatturazione elettronica B2B per l'Italia.
 - **Events emitted:** —
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/sdi_it/CLAUDE.md`](../backend/app/modules/sdi_it/CLAUDE.md)
+
+### `sistema_ts` — v0.1.0
+
+Sistema Tessera Sanitaria — invio delle spese sanitarie dei pazienti (IT).
+
+- **Author:** DentalPin Core Team
+- **License:** BSL-1.1
+- **Category:** official
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `billing`, `patients`, `catalog`, `payments`
+- **Frontend layer:** —
+- **Permissions:**
+  - `sistema_ts.documents.manage`
+  - `sistema_ts.documents.read`
+  - `sistema_ts.opposition.read`
+  - `sistema_ts.opposition.write`
+  - `sistema_ts.settings.configure`
+  - `sistema_ts.settings.read`
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/sistema_ts/CLAUDE.md`](../backend/app/modules/sistema_ts/CLAUDE.md)
 
 ### `sms_gateway` — v0.1.0
 
