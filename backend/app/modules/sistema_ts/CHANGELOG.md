@@ -2,6 +2,8 @@
 
 ## 0.1.0 (2026-09-09) — phase 1
 
+- Opposition and item-type endpoints answer 404 for a patient or catalog
+  item of another clinic (ownership check before the write).
 - `SISTEMA_TS_CA_BUNDLE` for the test service's private Sogei CA; a clear
   `TLS:` error instead of the raw SSL trace.
 

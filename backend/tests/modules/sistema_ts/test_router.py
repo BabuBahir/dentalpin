@@ -68,6 +68,26 @@ async def test_opposition_roundtrip(client: AsyncClient, auth_headers, test_clin
 
 
 @pytest.mark.asyncio
+async def test_opposition_and_item_type_reject_foreign_ids(
+    client: AsyncClient, auth_headers, test_clinic, db_session
+):
+    """A patient or catalog item of another clinic is a 404, never an oracle."""
+    from ._fixtures import make_clinic, make_patient
+
+    other_clinic, _user, _settings = await make_clinic(db_session)
+    other_patient = await make_patient(db_session, other_clinic)
+    await db_session.commit()
+
+    url = f"/api/v1/sistema_ts/opposition/{other_patient.id}"
+    assert (await client.get(url, headers=auth_headers)).status_code == 404
+    assert (await client.put(url, json={"opposed": True}, headers=auth_headers)).status_code == 404
+    res = await client.put(
+        f"/api/v1/sistema_ts/item-types/{uuid4()}", json={"tipo_spesa": "IC"}, headers=auth_headers
+    )
+    assert res.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_item_types_and_documents(
     client: AsyncClient, auth_headers, test_clinic, test_patient, db_session
 ):

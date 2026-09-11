@@ -15,6 +15,8 @@ from app.core.auth.dependencies import ClinicContext, get_clinic_context, requir
 from app.core.email.encryption import encrypt_password
 from app.core.schemas import ApiResponse, PaginatedApiResponse
 from app.database import get_db
+from app.modules.catalog.models import TreatmentCatalogItem
+from app.modules.patients.models import Patient
 
 from .models import (
     SistemaTsDocument,
@@ -49,6 +51,15 @@ async def get_settings(db: AsyncSession, clinic_id: UUID) -> SistemaTsSettings |
     return (
         await db.execute(select(SistemaTsSettings).where(SistemaTsSettings.clinic_id == clinic_id))
     ).scalar_one_or_none()
+
+
+async def _assert_in_clinic(db: AsyncSession, model, row_id: UUID, clinic_id: UUID) -> None:
+    """Cross-clinic ids resolve to 404, never an oracle."""
+    exists = (
+        await db.execute(select(model.id).where(model.id == row_id, model.clinic_id == clinic_id))
+    ).scalar_one_or_none()
+    if exists is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Non trovato")
 
 
 async def _year_counts(db: AsyncSession, clinic_id: UUID, year: int) -> tuple[int, int, int]:
@@ -296,6 +307,7 @@ async def get_opposition(
     _: Annotated[None, Depends(require_permission("sistema_ts.opposition.read"))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[OppositionResponse]:
+    await _assert_in_clinic(db, Patient, patient_id, ctx.clinic_id)
     row = (
         await db.execute(
             select(SistemaTsPatientOpposition).where(
@@ -325,6 +337,7 @@ async def set_opposition(
 ) -> ApiResponse[OppositionResponse]:
     """Record (or revoke) the patient's opposizione; accepted documents of
     the patient are re-sent as ``variazione`` with the new flag."""
+    await _assert_in_clinic(db, Patient, patient_id, ctx.clinic_id)
     row = (
         await db.execute(
             select(SistemaTsPatientOpposition).where(
@@ -404,6 +417,7 @@ async def set_item_type(
     _: Annotated[None, Depends(require_permission("sistema_ts.settings.configure"))],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> ApiResponse[ItemTypeResponse]:
+    await _assert_in_clinic(db, TreatmentCatalogItem, catalog_item_id, ctx.clinic_id)
     row = (
         await db.execute(
             select(SistemaTsItemType).where(
