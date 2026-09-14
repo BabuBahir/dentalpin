@@ -53,3 +53,7 @@
   "fetch failed" troubleshooting note (Inspector cannot reach the
   configured target URL — network level, distinct from
   `auth_challenge`/401).
+- `.claude/skills/mint-dp-token/SKILL.md` — Claude Code skill that mints,
+  verifies, and revokes `dp_` tokens via the integrations API (login →
+  `POST /integrations/tokens`). `.claude/` is now ignored only for
+  local files (`settings.local.json`); skills ship with the repo.
