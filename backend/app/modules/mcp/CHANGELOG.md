@@ -57,3 +57,9 @@
   verifies, and revokes `dp_` tokens via the integrations API (login →
   `POST /integrations/tokens`). `.claude/` is now ignored only for
   local files (`settings.local.json`); skills ship with the repo.
+- `.kilo/kilo.jsonc` — project Kilo Code MCP config for `dentalpin`
+  (remote streamable-HTTP + `Authorization: Bearer dp_...` header, token
+  placeholder). Kilo reuses the single `mint-dp-token` skill from
+  `.claude/skills/` via `skills.paths` (no `.kilo/skills/` duplicate, no
+  undocumented compatibility toggle). Overview doc gains a Kilo section
+  (§6, audit trail → §7).

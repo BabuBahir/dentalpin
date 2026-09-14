@@ -251,7 +251,46 @@ Daniel Garcia, then fetch the details of the first result."* You should
 see exactly the two curated tools: `search_patients` (`{query, limit}`)
 and `get_patient` (`{patient_id}`).
 
-### 6. Verify the audit trail
+### 6. Kilo Code
+
+Kilo Code reads MCP servers from the top-level `mcp` key of `kilo.jsonc`
+(project: `./kilo.jsonc` or `.kilo/kilo.jsonc`; global:
+`~/.config/kilo/kilo.jsonc`). The repo ships `.kilo/kilo.jsonc`; mint a
+token (skill `mint-dp-token` in `.kilo/skills/` or `.claude/skills/`,
+or §1) and paste it in:
+
+```jsonc
+{
+  "mcp": {
+    "dentalpin": {
+      "type": "remote",
+      "url": "http://localhost:8000/api/v1/mcp/",
+      "headers": { "Authorization": "Bearer dp_..." },
+      "enabled": true,
+      "timeout": 15000
+    }
+  }
+}
+```
+
+Then reload the VS Code window (Kilo discovers MCP config on load) or, on
+the CLI, check `kilo mcp list`. Test in Kilo chat: *"use the dentalpin
+MCP server: search for patient Daniel Garcia."*
+
+Skills: Kilo implements the open Agent Skills format and reads the same
+`mint-dp-token` skill from `.claude/skills/`, wired via `skills.paths`
+in the shipped `.kilo/kilo.jsonc` (no undocumented "Claude Code
+Compatibility" toggle needed):
+
+```jsonc
+{
+  "skills": { "paths": [".claude/skills"] }
+}
+```
+
+Trigger it with *"use your mint-dp-token skill to mint a dp_ token"*.
+
+### 7. Verify the audit trail
 
 Every `tools/call` creates deterministic per-token
 `agents`/`agent_sessions` rows (`type = 'external_mcp'`) and an
