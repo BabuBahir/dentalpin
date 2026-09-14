@@ -96,4 +96,4 @@ Both clients just need an `Authorization: Bearer dp_...` header:
   `"type": "http"`, `"url": "http://localhost:8000/api/v1/mcp/"`,
   `"headers": { "Authorization": "Bearer dp_..." }`.
 
-Full walkthrough: `docs/technical/mcp/overview.md` (§1 mint, §5 Claude).
+Full walkthrough: `docs/technical/mcp/overview.md` (§1 mint, §4 Claude, §5 Kilo).

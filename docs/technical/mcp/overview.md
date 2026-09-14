@@ -87,37 +87,23 @@ Bearer`):
   {"error":"insufficient_scope","error_description":"Required scope:
   patients:read"}`.
 
-### 2. MCP Inspector (GUI, quickest)
+**Token lifecycle:** `dp_` tokens never expire — the `ApiToken` row has a
+`revoked_at` but no TTL, and `authenticate_token` only rejects revoked or
+unknown hashes. They stay valid until manually revoked (like a Stripe or
+GitHub machine key), so revoke any you stop using. `last_used_at` is
+stamped on every authenticated call, which makes stale tokens easy to
+spot. Revocation is staff-authenticated (JWT +
+`integrations.tokens.write`):
 
 ```bash
-npx @modelcontextprotocol/inspector    # needs Node ^22.7.5
+curl -s -X POST http://localhost:8000/api/v1/integrations/tokens/<token_id>/revoke \
+  -H "Authorization: Bearer <jwt>"
+# → 409 Conflict if the token was already revoked
 ```
 
-Open the URL it prints (it embeds an API token for the inspector UI,
-e.g. `http://127.0.0.1:6274?MCP_INSPECTOR_API_TOKEN=...`), then in the
-settings (gear icon):
+The `mint-dp-token` skill (`.claude/skills/`) wraps both mint and revoke.
 
-- **Transport**: Streamable HTTP
-- **URL**: `http://localhost:8000/api/v1/mcp/`
-- **Authentication**: header name `Authorization`, bearer token
-  `dp_...`
-
-Connect, list tools (exactly `search_patients` and `get_patient`), and
-run each — e.g. `search_patients` with `{"query": "Daniel Garcia"}`.
-
-> **`{"ok":false,"kind":"transport_error","error":"fetch failed"}`**
-> means the Inspector's Node process could not reach the configured URL
-> at the network level — not an auth, CORS, or protocol problem. Verify
-> the URL is exactly `http://localhost:8000/api/v1/mcp/` (a missing
-> Authorization header instead surfaces as `auth_challenge`, and a bad
-> token as the server's `invalid_token` 401). A bare-path `.../mcp`
-> without the trailing slash is fine (307 redirect), but any unreachable
-> host/port/scheme (the Inspector's built-in example URL, the frontend
-> port `3000`, `https://`, ...) reproduces exactly this error. If the
-> Inspector runs on a different machine than the backend, replace
-> `localhost` with the backend host's LAN IP.
-
-### 3. Raw JSON-RPC smoke test (no GUI)
+### 2. Raw JSON-RPC smoke test (no GUI)
 
 Streamable HTTP is a sessioned handshake: every request carries
 `Authorization`, and the `initialize` response returns a
@@ -152,7 +138,7 @@ Responses are `application/json` (see `json_response=True` above) with
 PowerShell, inline `-d` bodies get their quotes mangled — write each body
 to a temp file and pass `--data "@body.json"` instead.
 
-### 4. Postman
+### 3. Postman
 
 Same handshake, five POSTs. Create a Postman collection with these
 requests (all to `http://localhost:8000/api/v1/mcp/` — keep the trailing
@@ -190,7 +176,7 @@ Common settings per request:
 
 If a request fails a session must be re-established: re-run step 1 (new `Mcp-Session-Id`).
 
-### 5. Claude (Desktop & Code)
+### 4. Claude (Desktop & Code)
 
 The endpoint is standard streamable-HTTP MCP, so both Claude apps can
 dial it directly. Both need the token sent as an `Authorization: Bearer`
@@ -251,7 +237,7 @@ Daniel Garcia, then fetch the details of the first result."* You should
 see exactly the two curated tools: `search_patients` (`{query, limit}`)
 and `get_patient` (`{patient_id}`).
 
-### 6. Kilo Code
+### 5. Kilo Code
 
 Kilo Code reads MCP servers from the top-level `mcp` key of `kilo.jsonc`
 (project: `./kilo.jsonc` or `.kilo/kilo.jsonc`; global:
@@ -290,7 +276,7 @@ Compatibility" toggle needed):
 
 Trigger it with *"use your mint-dp-token skill to mint a dp_ token"*.
 
-### 7. Verify the audit trail
+### 6. Verify the audit trail
 
 Every `tools/call` creates deterministic per-token
 `agents`/`agent_sessions` rows (`type = 'external_mcp'`) and an

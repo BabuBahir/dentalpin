@@ -45,14 +45,14 @@
   `get_patient`, revoked-token rejection (single process-wide session).
 - Module CLAUDE.md + CHANGELOG, `docs/technical/mcp/` overview/events/
   permissions, ADR 0033, glossary entry, catalogs regenerated.
-- `docs/technical/mcp/overview.md` "Trying it out": token-minting steps,
-  MCP Inspector setup, a raw JSON-RPC smoke sequence, a Postman
-  walkthrough (session-id capture via Tests script — validated live
-  against the demo backend), and Claude Desktop/Claude Code connection
-  config (`.mcp.json`, `claude mcp add` with header auth). Includes a
-  "fetch failed" troubleshooting note (Inspector cannot reach the
-  configured target URL — network level, distinct from
-  `auth_challenge`/401).
+- `docs/technical/mcp/overview.md` "Trying it out": token-minting steps
+  + `dp_` token lifecycle (no expiry — revoke via
+  `POST /tokens/{id}/revoke`, `last_used_at` tracking), a raw JSON-RPC
+  smoke sequence, a Postman walkthrough (session-id capture via Tests
+  script — validated live against the demo backend), and Claude,
+  Desktop/Claude Code + Kilo Code connection config (`.mcp.json`,
+  `claude mcp add`, `kilo.jsonc` `skills.paths` reuse of
+  `.claude/skills/`).
 - `.claude/skills/mint-dp-token/SKILL.md` — Claude Code skill that mints,
   verifies, and revokes `dp_` tokens via the integrations API (login →
   `POST /integrations/tokens`). `.claude/` is now ignored only for
@@ -62,4 +62,4 @@
   placeholder). Kilo reuses the single `mint-dp-token` skill from
   `.claude/skills/` via `skills.paths` (no `.kilo/skills/` duplicate, no
   undocumented compatibility toggle). Overview doc gains a Kilo section
-  (§6, audit trail → §7).
+  (§5, audit trail → §6).
