@@ -66,3 +66,5 @@ proyecto_open_source_dental.docx
 *.dpm
 *.dpmf
 test-results/
+/.kilo/plans
+/.vs
