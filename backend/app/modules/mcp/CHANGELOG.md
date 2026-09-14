@@ -46,8 +46,10 @@
 - Module CLAUDE.md + CHANGELOG, `docs/technical/mcp/` overview/events/
   permissions, ADR 0033, glossary entry, catalogs regenerated.
 - `docs/technical/mcp/overview.md` "Trying it out": token-minting steps,
-  MCP Inspector setup, a raw JSON-RPC smoke sequence, and a Postman
+  MCP Inspector setup, a raw JSON-RPC smoke sequence, a Postman
   walkthrough (session-id capture via Tests script — validated live
-  against the demo backend). Includes a "fetch failed" troubleshooting
-  note (Inspector cannot reach the configured target URL — network
-  level, distinct from `auth_challenge`/401).
+  against the demo backend), and Claude Desktop/Claude Code connection
+  config (`.mcp.json`, `claude mcp add` with header auth). Includes a
+  "fetch failed" troubleshooting note (Inspector cannot reach the
+  configured target URL — network level, distinct from
+  `auth_challenge`/401).

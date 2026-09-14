@@ -190,7 +190,68 @@ Common settings per request:
 
 If a request fails a session must be re-established: re-run step 1 (new `Mcp-Session-Id`).
 
-### 5. Verify the audit trail
+### 5. Claude (Desktop & Code)
+
+The endpoint is standard streamable-HTTP MCP, so both Claude apps can
+dial it directly. Both need the token sent as an `Authorization: Bearer`
+header — use the one minted in §1.
+
+#### Claude Desktop (GUI)
+
+Add a remote server to `%APPDATA%\Claude\claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "dentalpin": {
+      "type": "http",
+      "url": "http://localhost:8000/api/v1/mcp/",
+      "headers": {
+        "Authorization": "Bearer dp_..."
+      }
+    }
+  }
+}
+```
+
+Fully quit and restart Claude Desktop (headers are read at launch, a
+reload in Settings → Developers does not pick them up). Then in a chat:
+*"list the MCP tools available to you"* to confirm the connection, and
+*"search patients for Daniel Garcia"* to run one. If tools keep failing
+with 401 auth, the Desktop build is dropping the custom header — fall
+back to Claude Code.
+
+#### Claude Code (CLI)
+
+Register the server (default scope `local`; add `--scope project` to
+share it with the team via the repo's `.mcp.json`):
+
+```bash
+claude mcp add dentalpin --transport http http://localhost:8000/api/v1/mcp/ \
+  --header "Authorization: Bearer dp_..." [--scope local]
+claude mcp list    # should show dentalpin as connected/OK
+```
+
+Project-scope alternative — commit `.mcp.json` at the repo root:
+
+```json
+{
+  "mcpServers": {
+    "dentalpin": {
+      "type": "http",
+      "url": "http://localhost:8000/api/v1/mcp/",
+      "headers": { "Authorization": "Bearer dp_..." }
+    }
+  }
+}
+```
+
+Then prompt e.g. *"use the dentalpin MCP server: search for patient
+Daniel Garcia, then fetch the details of the first result."* You should
+see exactly the two curated tools: `search_patients` (`{query, limit}`)
+and `get_patient` (`{patient_id}`).
+
+### 6. Verify the audit trail
 
 Every `tools/call` creates deterministic per-token
 `agents`/`agent_sessions` rows (`type = 'external_mcp'`) and an
