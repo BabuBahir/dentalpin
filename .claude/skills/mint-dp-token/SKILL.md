@@ -36,11 +36,17 @@ Grab the JWT from `access_token`. It is a staff credential — pass it in the
 
 ### 2. Mint the token
 
+For MCP use, pick the scope set from what the user needs:
+
+- `["patients:read"]` — read tools only (`search_patients`, `get_patient`).
+- `["patients:write"]` — write only (`create_patient`).
+- `["patients:read","patients:write"]` — the full curated surface.
+
 ```bash
 curl -s -X POST "$BASE/api/v1/integrations/tokens" \
   -H "Authorization: Bearer $JWT" \
   -H "Content-Type: application/json" \
-  -d '{"name":"mcp-claude","scopes":["patients:read"]}'
+  -d '{"name":"mcp-claude","scopes":["patients:read","patients:write"]}'
 # → {"data":{"token":"dp_...", ...}}   ← plaintext, shown once
 ```
 
@@ -50,10 +56,12 @@ it is displayed once. Stow it where they ask (Claude Desktop
 password manager). **Never write the token into any file that gets committed,
 never paste it into docs, commits, or chat-visible artifacts.**
 
-The MCP surface requires the `patients:read` scope on the token
-(`backend/app/modules/mcp/auth.py`). Token API: `GET /tokens` lists,
-`POST /tokens` mints, `POST /tokens/{id}/revoke` revokes — all under
-`integrations.tokens.*` permissions (see `backend/app/modules/integrations/router.py`).
+The MCP surface requires the token to carry at least one MCP-supported scope
+(`backend/app/modules/mcp/auth.py`, `MCP_SCOPES`: `patients:read` /
+`patients:write`); tools are listed filtered by those scopes. Token API:
+`GET /tokens` lists, `POST /tokens` mints, `POST /tokens/{id}/revoke`
+revokes — all under `integrations.tokens.*` permissions (see
+`backend/app/modules/integrations/router.py`).
 
 ### 3. (Optional) Verify against MCP
 
@@ -81,7 +89,7 @@ curl -s -X POST "$BASE/api/v1/integrations/tokens/$TOKEN_ID/revoke" \
 | `401` from `/auth/login` | wrong staff credentials | correct username/password |
 | `403` on token create | role lacks `integrations.tokens.write` | use an admin account |
 | `401 invalid_token` from `/api/v1/mcp/` | missing / invalid / revoked `dp_` token | mint a fresh one |
-| `403 insufficient_scope` from `/api/v1/mcp/` | token lacks `patients:read` | mint again with the scope |
+| `403 insufficient_scope` from `/api/v1/mcp/` | token carries none of the MCP scopes (`patients:read`, `patients:write`) | mint again with a supported scope |
 
 Windows/PowerShell: inline `-d` bodies get quotes mangled — write the body to a
 temp file and pass `--data "@body.json"`.

@@ -27,14 +27,16 @@ handlers (`tools/list`, `tools/call`) are thin wrappers over the
 existing `tool_registry`. Tool implementations stay where they are —
 the module never duplicates business logic. Access is gated by ASGI
 middleware on the integrations **API tokens** (`Bearer dp_...`,
-`patients:read` scope), and since this module has no staff RBAC, no
-`get_permissions()` entries, no new bus events, and no tables, it adds
-no namespaced surface of its own.
+`patients:read`/`patients:write` scopes), and since this module has no
+staff RBAC, no `get_permissions()` entries, no new bus events, and no
+tables, it adds no namespaced surface of its own.
 
-The curated surface is a closed, read-only allowlist
+The curated surface is a closed, scope-admitted allowlist
 (`server.CURATED_TOOLS`): `patients.search_patients`,
-`patients.get_patient`. Write tools stay out until a `patients:write`
-token scope exists in `integrations.triggers.SUPPORTED_TOKEN_SCOPES`.
+`patients.get_patient` (via `patients:read`) and
+`patients.create_patient` (via `patients:write`). Each new scope must
+exist in `integrations.triggers.SUPPORTED_TOKEN_SCOPES` before the
+corresponding tool can be curated in.
 
 Because the token (not a JWT session) is the identity, the audit trail
 is keyed on deterministic `uuid5` ids derived from the token, with the
@@ -73,8 +75,10 @@ groups under one stable agent/session and the registry's audit writes
 - `json_response=True` diverges from SSE default — fine while the
   surface is pure RPC, needs revisiting if server→client notifications
   (e.g. progress) are added.
-- Read-only while only `patients:read` exists; write exposure is
-  deliberately deferred on a scope.
+- Scope are permitted tools by construction: `patients:read` tokens see
+  only the read tools, `patients:write` only `create_patient`, both
+  scopes the full surface. `update_patient` stays out until a safe
+  machine-facing write shape exists.
 
 ## Alternatives considered
 
@@ -95,7 +99,8 @@ groups under one stable agent/session and the registry's audit writes
 ## How to verify the rule still holds
 
 - `tests/modules/mcp/test_server.py` — 401 gate, initialize /
-  tools/list (asserts the exact curated allowlist) / `seed` tool calls /
+  tools/list (asserts the scope-filtered curated allowlist) / read +
+  write tool calls / permission-denied on a read-only token /
   revoked-token rejection.
 - `tests/test_entry_point_parity.py` — the module has a pyproject entry
   point (production discovery relies on it).

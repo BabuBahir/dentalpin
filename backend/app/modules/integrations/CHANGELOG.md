@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### `patients:write` token scope
+
+- `SUPPORTED_TOKEN_SCOPES` now also admits `patients:write`
+  (`triggers.py`). First consumer is the MCP module
+  (`mcp` `create_patient`); the public REST API stays read-only.
+  This line supersedes the original "patients:read only" note below.
+
 ### Shared token lookup helper
 
 - `IntegrationsService.authenticate_token(db, plaintext)` — resolves a

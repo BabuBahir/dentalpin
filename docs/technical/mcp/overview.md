@@ -5,7 +5,7 @@ last_verified_commit: d9d8ad97
 
 # mcp — overview
 
-Model Context Protocol bridge. Exposes a curated, read-only slice of
+Model Context Protocol bridge. Exposes a curated, scope-gated slice of
 DentalPin's agent tools to external AI clients (Claude Desktop, Cursor,
 any MCP-compatible host) over the standard streamable-HTTP transport at
 `/api/v1/mcp/`.
@@ -17,12 +17,15 @@ Alembic branch). It mounts the MCP Server SDK's
 `StreamableHTTPSessionManager` behind ASGI auth middleware and two
 handlers:
 
-- `tools/list` — the curated allowlist (`server.CURATED_TOOLS`):
-  `patients.search_patients`, `patients.get_patient`.
+- `tools/list` — the curated allowlist (`server.CURATED_TOOLS`),
+  filtered to the tools the token's scopes admit: `patients:read`
+  surfaces `search_patients` and `get_patient`; `patients:write` adds
+  `create_patient`.
 - `tools/call` — every call is delegated to
   `tool_registry.call(ctx, "patients.<name>", args)`, the **same single
-  chokepoint** internal agents use: guardrails, RBAC permission check,
-  Pydantic validation, and the audit log all still run.
+  chokepoint** internal agents use: guardrails, RBAC permission check
+  (the token's scopes are translated to the RBAC strings the tools
+  declare), Pydantic validation, and the audit log all still run.
 
 Tools are *not* reimplemented. The MCP layer is pure plumbing — a new
 transport over existing tool handlers.
@@ -32,9 +35,10 @@ transport over existing tool handlers.
 No JWT, no staff session. `DentalPinAuthMiddleware` (`auth.py`) requires
 `Authorization: Bearer dp_...` — the API tokens the integrations module
 issues (`integrations.tokens.*`, `ApiToken` rows, SHA-256 hashed). It
-enforces the token's `patients:read` scope (403 otherwise) and stashes
-the resolved identity (clinic id, token id, scopes) on the request scope
-for the tool handler to read per message.
+requires the token to carry at least one MCP-supported scope (`MCP_SCOPES`
+in `auth.py`: `patients:read`, `patients:write`; 403 otherwise) and
+stashes the resolved identity (clinic id, token id, scopes) on the request
+scope for the tool handler to read per message.
 
 Unauthenticated / revoked-token traffic is rejected with 401 *before*
 the session manager task ever starts.
@@ -61,8 +65,9 @@ steps below were validated against a live demo install.
 ### 1. Mint an API token
 
 MCP does **not** use the staff JWT — it needs a `dp_` API token from the
-integrations module, scoped `patients:read`. Log in once as an admin to
-issue it (the token prints **once**; store it):
+integrations module. A token with `patients:read` gets the two read tools;
+adding `patients:write` also exposes `create_patient`. Log in once as an
+admin to issue it (the token prints **once**; store it):
 
 ```bash
 # Admin login → access token (OAuth2 form, not JSON)
@@ -83,9 +88,9 @@ Error surface on the MCP endpoint (both return JSON, `www-authenticate:
 Bearer`):
 
 - missing / invalid / revoked token → `401 {"error":"invalid_token",...}`;
-- token without the `patients:read` scope → `403
-  {"error":"insufficient_scope","error_description":"Required scope:
-  patients:read"}`.
+- token without any supported scope → `403
+  {"error":"insufficient_scope","error_description":"Required scopes:
+  patients:read, patients:write"}`.
 
 **Token lifecycle:** `dp_` tokens never expire — the `ApiToken` row has a
 `revoked_at` but no TTL, and `authenticate_token` only rejects revoked or
@@ -150,7 +155,7 @@ Common settings per request:
 |---------|-------|
 | Method | `POST` |
 | URL | `http://localhost:8000/api/v1/mcp/` |
-| Authorization | `Bearer dp_...` (unknown/revoked → 401; missing `patients:read` scope → 403) |
+| Authorization | `Bearer dp_...` (unknown/revoked → 401; missing an MCP-supported scope → 403) |
 | Headers | `Content-Type: application/json`, `Accept: application/json, text/event-stream`, and (steps 2–5) `Mcp-Session-Id: {{SID}}` |
 | Body | `raw` → `JSON` |
 
@@ -168,7 +173,7 @@ Common settings per request:
 
 2. **notifications/initialized** — `{"jsonrpc":"2.0","method":"notifications/initialized"}`.
 
-3. **tools/list** — `{"jsonrpc":"2.0","id":2,"method":"tools/list"}` → returns exactly `search_patients` + `get_patient` with their input schemas.
+3. **tools/list** — `{"jsonrpc":"2.0","id":2,"method":"tools/list"}` → with a `patients:read` token returns `search_patients` + `get_patient` with their input schemas.
 
 4. **tools/call → search_patients** — `{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"search_patients","arguments":{"query":"Daniel Garcia","limit":5}}}` → a patient list in `result.structuredContent`.
 
@@ -234,8 +239,9 @@ Project-scope alternative — commit `.mcp.json` at the repo root:
 
 Then prompt e.g. *"use the dentalpin MCP server: search for patient
 Daniel Garcia, then fetch the details of the first result."* You should
-see exactly the two curated tools: `search_patients` (`{query, limit}`)
-and `get_patient` (`{patient_id}`).
+see the read tools `search_patients` (`{query, limit}`) and
+`get_patient` (`{patient_id}`); if the token also carries `patients:read`
++ `patients:write`, `create_patient` appears too.
 
 ### 5. Kilo Code
 
@@ -324,8 +330,10 @@ rows are clinic-scoped too.
   issuance/verification). No other cross-module imports.
 - No staff RBAC permissions (`get_permissions()` → `[]`): this boundary
   is scope-based, not role-based.
-- The curated set is deliberately closed and read-only; expanding it
-  requires a matching token scope (`patients:write`, ...) to exist in
+- The curated set is deliberately closed; each tool is admitted by a
+  specific token scope (`patients:read` → `search_patients` /
+  `get_patient`, `patients:write` → `create_patient`). Expanding the
+  surface requires the matching scope to exist in
   `integrations/triggers.py` `SUPPORTED_TOKEN_SCOPES`.
 
 See [`./permissions.md`](./permissions.md) and

@@ -1,6 +1,6 @@
 # MCP module
 
-Model Context Protocol bridge: exposes a curated, read-only slice of
+Model Context Protocol bridge: exposes a curated, scope-gated slice of
 DentalPin's agent tools to external AI clients (Claude Desktop, Cursor,
 any MCP-compatible host) over the streamable-HTTP transport.
 
@@ -11,9 +11,9 @@ Endpoint at `/api/v1/mcp/` ([SDK](https://www.npmjs.com/package/@modelcontextpro
 
 Auth is `Authorization: Bearer dp_...` — the **same API tokens the
 integrations module issues** (`integrations.tokens.*`). No JWT, no
-browser session. Access is gated on the token's `patients:read` scope
-(`auth.py`, `REQUIRED_SCOPE`) — as integrations grows scopes, the
-curated tool set expands alongside.
+browser session. Access is gated on the token carrying at least one
+MCP scope (`auth.py`, `MCP_SCOPES`): `patients:read` grants the read
+tools, `patients:write` adds `create_patient`.
 
 ## Dependencies
 
@@ -36,12 +36,15 @@ qualified key:
 |---|---|---|
 | `search_patients` | `patients.search_patients` | READ |
 | `get_patient` | `patients.get_patient` | READ |
+| `create_patient` | `patients.create_patient` | WRITE |
 
 Every `tools/call` flows through `tool_registry.call` — guardrails,
-RBAC (`permissions=["patients.read"]`), input validation and the audit
-log (keyed on deterministic per-token agent/session ids) all still run
-at the single chokepoint. Writers (`create_patient`/`update_patient`)
-stay out until a `patients:write` token scope exists.
+RBAC (enforced against the RBAC grants the token's scopes translate to:
+`patients:read` → `patients.read`, `patients:write` → `patients.write`),
+input validation and the audit log (keyed on deterministic per-token
+agent/session ids) all still run at the single chokepoint. A session
+only *lists* tools its scopes could call. `update_patient` stays out —
+there's no shape for safely patching via autonomous machine clients yet.
 
 ## Events emitted
 

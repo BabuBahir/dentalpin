@@ -1,4 +1,4 @@
-"""MCP module contract: token auth gate, tool advert, real tool execution.
+"""MCP module contract: token auth gate, scope-filtered tool advert, real tool execution.
 
 One test function on purpose: the StreamableHTTPSessionManager behind
 ``/api/v1/mcp/`` is process-single-use (`run()` can only be entered once),
@@ -8,6 +8,7 @@ exactly one manager start per process.
 """
 
 import json
+from contextlib import asynccontextmanager
 
 import httpx2
 import pytest
@@ -30,6 +31,34 @@ async def test_mcp_contract(
     from mcp import ClientSession
     from mcp.client.streamable_http import streamable_http_client
 
+    @asynccontextmanager
+    async def mcp_session(token: str):
+        """One streamable-HTTP MCP session authenticated by ``token``."""
+        hx = httpx2.AsyncClient(
+            transport=httpx2.ASGITransport(app=app),
+            base_url="http://test",
+            headers={"authorization": f"Bearer {token}"},
+            timeout=60,
+        )
+        try:
+            async with streamable_http_client(MCP_BASE, http_client=hx) as (
+                read_stream,
+                write_stream,
+            ):
+                async with ClientSession(read_stream, write_stream) as session:
+                    yield session
+        finally:
+            await hx.aclose()
+
+    async def mint_token(name: str, scopes: list[str]) -> str:
+        made = await client.post(
+            TOKENS_BASE,
+            json={"name": name, "scopes": scopes},
+            headers=auth_headers,
+        )
+        assert made.status_code == 201, made.text
+        return made.json()["data"]["token"]
+
     # --- Auth gate: no token is rejected before any MCP handling. --------
     anon = await client.post(
         MCP_BASE,
@@ -47,39 +76,66 @@ async def test_mcp_contract(
     dp_token = created.json()["data"]["token"]
     token_id = created.json()["data"]["id"]
 
-    # --- Full streamable-HTTP session: initialize → list → call. ---------
-    hx = httpx2.AsyncClient(
-        transport=httpx2.ASGITransport(app=app),
-        base_url="http://test",
-        headers={"authorization": f"Bearer {dp_token}"},
-        timeout=60,
-    )
-    try:
-        async with streamable_http_client(MCP_BASE, http_client=hx) as (read_stream, write_stream):
-            async with ClientSession(read_stream, write_stream) as session:
-                init = await session.initialize()
-                assert init.server_info.name == "dentalpin-mcp"
+    # --- Read-scoped token: read tools only, writes invisible + denied. --
+    async with mcp_session(dp_token) as session:
+        init = await session.initialize()
+        assert init.server_info.name == "dentalpin-mcp"
 
-                listed = await session.list_tools()
-                # Curated allowlist: the two read tools, nothing else.
-                assert sorted(t.name for t in listed.tools) == [
-                    "get_patient",
-                    "search_patients",
-                ]
+        listed = await session.list_tools()
+        # Curated allowlist filtered by scope: the two read tools, nothing else.
+        assert sorted(t.name for t in listed.tools) == [
+            "get_patient",
+            "search_patients",
+        ]
 
-                found = await session.call_tool("search_patients", {"query": "Test Patient"})
-                assert found.is_error is False
-                payload = json.loads(found.content[0].text)
-                assert payload["total"] >= 1
-                names = {p["full_name"] for p in payload["patients"]}
-                assert "Test Patient" in names
+        found = await session.call_tool("search_patients", {"query": "Test Patient"})
+        assert found.is_error is False
+        payload = json.loads(found.content[0].text)
+        assert payload["total"] >= 1
+        names = {p["full_name"] for p in payload["patients"]}
+        assert "Test Patient" in names
 
-                one = await session.call_tool("get_patient", {"patient_id": str(test_patient.id)})
-                assert one.is_error is False
-                detail = json.loads(one.content[0].text)
-                assert detail["full_name"] == "Test Patient"
-    finally:
-        await hx.aclose()
+        one = await session.call_tool("get_patient", {"patient_id": str(test_patient.id)})
+        assert one.is_error is False
+        detail = json.loads(one.content[0].text)
+        assert detail["full_name"] == "Test Patient"
+
+        # A read-only token is refused the write even if it guesses the name.
+        denied = await session.call_tool(
+            "create_patient", {"first_name": "Jane", "last_name": "Doe"}
+        )
+        assert denied.is_error is True
+        assert "permission denied" in denied.content[0].text
+
+    # --- Write-scoped token: create_patient visible and executable. ------
+    dp_write = await mint_token("test-mcp-write", ["patients:write"])
+    async with mcp_session(dp_write) as session:
+        await session.initialize()
+        listed = await session.list_tools()
+        assert [t.name for t in listed.tools] == ["create_patient"]
+
+        made = await session.call_tool(
+            "create_patient",
+            {"first_name": "Ada", "last_name": "Lovelace", "email": "ada@example.org"},
+        )
+        assert made.is_error is False
+        created_id = json.loads(made.content[0].text)["id"]
+        assert created_id
+
+    # --- Both scopes: the full curated surface, incl. reading the new row.
+    dp_both = await mint_token("test-mcp-both", ["patients:read", "patients:write"])
+    async with mcp_session(dp_both) as session:
+        await session.initialize()
+        listed = await session.list_tools()
+        assert sorted(t.name for t in listed.tools) == [
+            "create_patient",
+            "get_patient",
+            "search_patients",
+        ]
+
+        detail = await session.call_tool("get_patient", {"patient_id": created_id})
+        assert detail.is_error is False
+        assert json.loads(detail.content[0].text)["full_name"] == "Ada Lovelace"
 
     # --- Revoked token can no longer open a session. ----------------------
     revoked = await client.post(

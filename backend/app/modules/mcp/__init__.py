@@ -1,11 +1,12 @@
 """MCP module - Model Context Protocol server for external AI clients.
 
-Exposes a curated, read-only slice of DentalPin's agent tools over the MCP
+Exposes a curated, scope-gated slice of DentalPin's agent tools over the MCP
 streamable-HTTP transport at ``/api/v1/mcp``. Clients authenticate with the
 ``dp_`` API tokens issued by the integrations module (no JWT, no browser
-session). Every tool call flows through the shared ``tool_registry``
-chokepoint, so RBAC, guardrails, input validation and the audit log behave
-exactly as they do for internal agents.
+session); ``patients:read`` tokens get the read tools, ``patients:write``
+tokens add ``create_patient``. Every tool call flows through the shared
+``tool_registry`` chokepoint, so RBAC, guardrails, input validation and the
+audit log behave exactly as they do for internal agents.
 
 Transport-only module: no models, no DB tables, no RBAC permissions,
 no agent-facing tools of its own. Carries a single no-op Alembic
@@ -22,7 +23,7 @@ from .router import build_mcp_router
 
 
 class MCPModule(BaseModule):
-    """MCP server bridge — read-only patient tools for external AI agents."""
+    """MCP server bridge — scope-gated patient tools for external AI agents."""
 
     manifest = {
         "name": "mcp",

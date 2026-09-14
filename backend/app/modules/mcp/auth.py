@@ -6,7 +6,8 @@ API tokens the integrations module already owns (issue #65). This ASGI
 middleware wraps the streamable-HTTP app and enforces:
 
 - a `dp_` prefix and a live (unrevoked) `ApiToken` row — else 401;
-- the ``patients:read`` scope on the token — else 403.
+- at least one MCP-supported scope (`patients:read` / `patients:write`) on
+  the token — else 403.
 
 On success it stores the resolved identity on ``scope["state"]["dentalpin"]``
 (clinic id, token id, scopes) so the lowlevel ``tools/call`` handler can read
@@ -29,10 +30,11 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from app.database import async_session_maker
 from app.modules.integrations.service import IntegrationsService
 
-# Scope the token must carry to reach the MCP tools (mirrors the public
-# data-read API). When integrations grows a write scope (``patients:write``)
-# the curated tool set can expand alongside it.
-REQUIRED_SCOPE = "patients:read"
+# Scopes that authorize access to the MCP surface (subset of the integration
+# token catalog). The token must carry at least one; per-tool visibility and
+# RBAC enforcement happen inside server.py, which translates the token's
+# scopes into the RBAC grants the curated tools declare.
+MCP_SCOPES: frozenset[str] = frozenset({"patients:read", "patients:write"})
 
 _IDENTITY_KEY = "dentalpin"
 
@@ -59,12 +61,12 @@ class DentalPinAuthMiddleware:
                 description="Missing, invalid, or revoked API token",
             )
             return
-        if REQUIRED_SCOPE not in identity["scopes"]:
+        if not (MCP_SCOPES & set(identity["scopes"])):
             await self._reject(
                 send,
                 status_code=403,
                 error="insufficient_scope",
-                description=f"Required scope: {REQUIRED_SCOPE}",
+                description=f"Required scopes: {', '.join(sorted(MCP_SCOPES))}",
             )
             return
 

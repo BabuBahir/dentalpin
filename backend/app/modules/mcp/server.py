@@ -1,6 +1,6 @@
 """MCP (Model Context Protocol) bridge over DentalPin's tool registry.
 
-Curated, read-only exposure of agent tools to external MCP clients (AI
+Curated, scope-gated exposure of agent tools to external MCP clients (AI
 desktops, Cursor, etc.). Tools are NOT re-implemented here: each exposed
 tool maps to its registered ``<module>.<name>`` in the global
 :data:`~app.core.agents.tools.registry.tool_registry`, and every ``tools/
@@ -36,18 +36,37 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.agents import AgentContext, AgentMode, tool_registry
 from app.core.agents.models import Agent, AgentSession
 from app.core.agents.tools.schema import pydantic_to_json_schema
+from app.core.auth.permissions import permission_matches
 from app.database import async_session_maker
 
 logger = logging.getLogger(__name__)
 
 # The curated tool surface, namespaced registry keys. Deliberately a closed
-# allowlist: only tools that are safe for read-only machine access, and only
-# as the ``patients:read`` scope grants. Writers (``create_patient`` /
-# ``update_patient``) wait for a ``patients:write`` scope on API tokens.
+# allowlist: only tools a ``dp_`` token scope admits. ``search_patients`` /
+# ``get_patient`` take the ``patients:read`` scope, ``create_patient`` takes
+# ``patients:write`` — each tool's RBAC requirement (via
+# ``_SCOPE_TO_PERMISSION``) filters what a given session may even see.
 CURATED_TOOLS: tuple[str, ...] = (
     "patients.search_patients",
     "patients.get_patient",
+    "patients.create_patient",
 )
+
+# Token scope -> the RBAC grant it represents. Translating scopes into the
+# RBAC strings the curated tools declare means the registry chokepoint
+# enforces exactly what the HTTP routes would: a read-only token can
+# list/search but not create; a write-only token can create but not read;
+# a token with both gets both surfaces.
+_SCOPE_TO_PERMISSION: dict[str, str] = {
+    "patients:read": "patients.read",
+    "patients:write": "patients.write",
+}
+
+
+def _scopes_to_rbac(scopes: list[str]) -> list[str]:
+    """Translate the API-token scopes into the RBAC grants they cover."""
+    return [perm for scope, perm in _SCOPE_TO_PERMISSION.items() if scope in scopes]
+
 
 # Deterministic agent/session ids so the audit trail for one API token stays
 # grouped without any cross-request state. Namespaces are frozen constants
@@ -59,23 +78,38 @@ _SESSION_NS = uuid5(NAMESPACE_DNS, "dentalpin.sessions")
 
 
 def build_mcp_server() -> Server:
-    """Construct the lowlevel MCP server wiring the two curated handlers."""
+    """Construct the lowlevel MCP server wiring the curated handlers."""
     return Server(
         "dentalpin-mcp",
         version="0.1.0",
         title="DentalPin MCP",
-        description="Dental clinic data for AI agents — read-only patient access.",
+        description="Dental clinic data for AI agents — patient access scoped by API token.",
         on_list_tools=_list_tools,
         on_call_tool=_call_tool,
     )
 
 
 async def _list_tools(ctx, params: PaginatedRequestParams | None) -> ListToolsResult:
+    identity = _identity_from_ctx(ctx)
+    if identity is None:
+        # The auth middleware gate guarantees identity; reaching the handler
+        # without it is an internal inconsistency, fail closed.
+        raise MCPError(code=INTERNAL_ERROR, message="Missing request identity")
+
+    rbac = _scopes_to_rbac(identity["scopes"])
     tools: list[MCPTool] = []
     for qualified in CURATED_TOOLS:
         tool = tool_registry.get(qualified)
         if tool is None:
             # Only reachable when patients is not mounted — depends guards it.
+            continue
+        # Only surface tools the token's scopes would let it call; a
+        # read-only token never sees create_patient, so clients can't build
+        # prompts around permissions they don't have.
+        if not all(
+            any(permission_matches(required, granted) for granted in rbac)
+            for required in tool.permissions
+        ):
             continue
         tools.append(
             MCPTool(
@@ -109,7 +143,7 @@ async def _call_tool(ctx, params: CallToolRequestParams) -> CallToolResult:
             session_id=session_id,
             clinic_id=identity["clinic_id"],
             mode=AgentMode.AUTONOMOUS,
-            permissions=["patients.read"],
+            permissions=_scopes_to_rbac(identity["scopes"]),
             tools=tool_registry,
             db=db,
         )

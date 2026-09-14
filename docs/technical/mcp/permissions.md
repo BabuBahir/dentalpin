@@ -13,7 +13,8 @@ Access to the endpoint is controlled by the caller's API-token **scope**
 
 | Scope (token) | Grants |
 |---------------|--------|
-| `patients:read` | Full MCP surface: `search_patients`, `get_patient` |
+| `patients:read` | `search_patients`, `get_patient` (read a clinic's patients) |
+| `patients:write` | `create_patient` (write a new patient) |
 
 Staff-facing token CRUD lives under the integrations module and is
 governed by `integrations.tokens.read` / `integrations.tokens.write`

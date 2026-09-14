@@ -1,0 +1,155 @@
+{
+  "layers": [
+    "/app/app/modules/agenda/frontend",
+    "/app/app/modules/billing/frontend",
+    "/app/app/modules/budget/frontend",
+    "/app/app/modules/catalog/frontend",
+    "/app/app/modules/clinical_notes/frontend",
+    "/app/app/modules/copilot/frontend",
+    "/app/app/modules/media/frontend",
+    "/app/app/modules/notifications/frontend",
+    "/app/app/modules/odontogram/frontend",
+    "/app/app/modules/patient_timeline/frontend",
+    "/app/app/modules/patients/frontend",
+    "/app/app/modules/patients_clinical/frontend",
+    "/app/app/modules/payments/frontend",
+    "/app/app/modules/razorpay/frontend",
+    "/app/app/modules/recalls/frontend",
+    "/app/app/modules/reports/frontend",
+    "/app/app/modules/schedules/frontend",
+    "/app/app/modules/treatment_plan/frontend"
+  ],
+  "modules": [
+    {
+      "name": "agenda",
+      "path": "/app/app/modules/agenda/frontend",
+      "routes": [
+        "/appointments"
+      ]
+    },
+    {
+      "name": "billing",
+      "path": "/app/app/modules/billing/frontend",
+      "routes": [
+        "/invoices/:id/edit",
+        "/invoices/:id",
+        "/invoices/from-budget/:budgetId",
+        "/invoices",
+        "/invoices/new",
+        "/settings/invoice-series"
+      ]
+    },
+    {
+      "name": "budget",
+      "path": "/app/app/modules/budget/frontend",
+      "routes": [
+        "/budgets/:id",
+        "/budgets",
+        "/budgets/new",
+        "/p/budget/:token"
+      ]
+    },
+    {
+      "name": "catalog",
+      "path": "/app/app/modules/catalog/frontend",
+      "routes": [
+        "/settings/catalog",
+        "/settings/vat-types"
+      ]
+    },
+    {
+      "name": "clinical_notes",
+      "path": "/app/app/modules/clinical_notes/frontend",
+      "routes": []
+    },
+    {
+      "name": "copilot",
+      "path": "/app/app/modules/copilot/frontend",
+      "routes": [
+        "/copilot"
+      ]
+    },
+    {
+      "name": "media",
+      "path": "/app/app/modules/media/frontend",
+      "routes": []
+    },
+    {
+      "name": "notifications",
+      "path": "/app/app/modules/notifications/frontend",
+      "routes": [
+        "/settings/notifications"
+      ]
+    },
+    {
+      "name": "odontogram",
+      "path": "/app/app/modules/odontogram/frontend",
+      "routes": []
+    },
+    {
+      "name": "patient_timeline",
+      "path": "/app/app/modules/patient_timeline/frontend",
+      "routes": []
+    },
+    {
+      "name": "patients",
+      "path": "/app/app/modules/patients/frontend",
+      "routes": [
+        "/patients/:id",
+        "/patients"
+      ]
+    },
+    {
+      "name": "patients_clinical",
+      "path": "/app/app/modules/patients_clinical/frontend",
+      "routes": []
+    },
+    {
+      "name": "payments",
+      "path": "/app/app/modules/payments/frontend",
+      "routes": [
+        "/payments",
+        "/reports/payments"
+      ]
+    },
+    {
+      "name": "razorpay",
+      "path": "/app/app/modules/razorpay/frontend",
+      "routes": [
+        "/settings/razorpay"
+      ]
+    },
+    {
+      "name": "recalls",
+      "path": "/app/app/modules/recalls/frontend",
+      "routes": [
+        "/recalls"
+      ]
+    },
+    {
+      "name": "reports",
+      "path": "/app/app/modules/reports/frontend",
+      "routes": [
+        "/reports/billing",
+        "/reports/budgets",
+        "/reports",
+        "/reports/scheduling"
+      ]
+    },
+    {
+      "name": "schedules",
+      "path": "/app/app/modules/schedules/frontend",
+      "routes": []
+    },
+    {
+      "name": "treatment_plan",
+      "path": "/app/app/modules/treatment_plan/frontend",
+      "routes": [
+        "/treatment-plans/:id",
+        "/treatment-plans",
+        "/treatment-plans/new"
+      ]
+    }
+  ],
+  "version": 1
+}

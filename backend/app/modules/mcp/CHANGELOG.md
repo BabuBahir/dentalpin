@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Write exposure via `patients:write` scope
+
+- Adds `patients.create_patient` to the curated server allowlist
+  (`server.CURATED_TOOLS`). The token's scopes are translated to the RBAC
+  grants the tools declare (`_SCOPE_TO_PERMISSION`); `tools/list` only
+  surfaces tools the token could call, and every `tools/call` enforces the
+  translated grants at the registry chokepoint.
+- `auth.py`: the middleware gate now accepts any token carrying an
+  MCP-supported scope (`MCP_SCOPES` = `patients:read` / `patients:write`)
+  instead of hard-requiring `patients:read`.
+
 ### Initial MCP bridge (registration + transport)
 
 - New optional `mcp` module (`auto_install=False`, `removable=True`,
@@ -33,7 +44,9 @@
 - `server.py` re-exposes `patients.search_patients` and
   `patients.get_patient` through the shared `tool_registry` chokepoint —
   guardrails, RBAC, validation and audit log still enforced, no logic
-  duplicated. Writers wait for a `patients:write` token scope.
+  duplicated. (Initially read-only; `create_patient` shipped with the
+  `patients:write` scope — see "Write exposure" above. `update_patient`
+  remains out.)
 - Deterministic per-token `agents`/`agent_sessions` rows (UPSERT) so
   the audit trail's FKs resolve and one token's calls group under one
   agent/session.
