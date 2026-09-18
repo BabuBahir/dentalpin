@@ -189,9 +189,13 @@ async def test_do_not_contact_blocks_sms(db_session, test_patient, sms_adapter):
 
 @pytest.mark.asyncio
 async def test_clinic_channels_sms_fallback_order(
-    db_session, test_clinic, sms_adapter, whatsapp_adapter
+    db_session, test_clinic, sms_adapter, whatsapp_adapter, monkeypatch
 ):
     """Preferred SMS + fallback: connected channels follow in enum order."""
+    from app.config import settings
+
+    # A VAPID key in the runner's env would append "push" to the order.
+    monkeypatch.setattr(settings, "DENTALPIN_VAPID_PRIVATE_KEY", "")
     clinic_id = test_clinic.id
     await _channel_settings(db_session, clinic_id, preferred="sms", fallback=True)
     order = await NotificationGateway._clinic_channels(db_session, clinic_id)

@@ -77,21 +77,48 @@ const showOnboarding = computed(() => categoryId.value === (registry.firstVisibl
         />
       </div>
 
-      <!-- Registered pages -->
-      <div
-        v-if="visiblePages.length > 0"
-        class="grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <SettingsSection
-          v-for="page in visiblePages"
-          :key="page.path"
-          :icon="page.icon"
-          :title="t(page.labelKey)"
-          :subtitle="page.descriptionKey ? t(page.descriptionKey) : undefined"
-          :attention="page.attention?.() === true"
-          :to="page.to ?? `/settings/${categoryId}/${page.path}`"
-        />
-      </div>
+      <!--
+        Registered pages and the empty state that depends on them are
+        client-only: the registry is filled by module ``*.client.ts``
+        plugins, so the server would render the empty state and the
+        client the grid (#424). The fallback keeps the page from
+        collapsing while the client resolves the registry.
+      -->
+      <ClientOnly>
+        <div
+          v-if="visiblePages.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+          <SettingsSection
+            v-for="page in visiblePages"
+            :key="page.path"
+            :icon="page.icon"
+            :title="t(page.labelKey)"
+            :subtitle="page.descriptionKey ? t(page.descriptionKey) : undefined"
+            :attention="page.attention?.() === true"
+            :to="page.to ?? `/settings/${categoryId}/${page.path}`"
+          />
+        </div>
+
+        <!-- Empty state -->
+        <div
+          v-if="visiblePages.length === 0"
+          class="mt-4"
+        >
+          <EmptyState
+            icon="i-lucide-inbox"
+            :title="t('settings.emptyCategory.title')"
+            :description="t('settings.emptyCategory.description')"
+          />
+        </div>
+
+        <template #fallback>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <USkeleton class="h-20 w-full" />
+            <USkeleton class="h-20 w-full" />
+          </div>
+        </template>
+      </ClientOnly>
 
       <!-- Module-contributed inline sections, filtered by category -->
       <div class="mt-6 space-y-4">
@@ -99,18 +126,6 @@ const showOnboarding = computed(() => categoryId.value === (registry.firstVisibl
           name="settings.sections"
           :ctx="{}"
           :category-filter="categoryId"
-        />
-      </div>
-
-      <!-- Empty state -->
-      <div
-        v-if="visiblePages.length === 0"
-        class="mt-4"
-      >
-        <EmptyState
-          icon="i-lucide-inbox"
-          :title="t('settings.emptyCategory.title')"
-          :description="t('settings.emptyCategory.description')"
         />
       </div>
     </template>

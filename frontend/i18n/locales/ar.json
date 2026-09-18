@@ -31,6 +31,13 @@
     "menu": "القائمة",
     "openMenu": "فتح القائمة",
     "close": "إغلاق",
+    "sections": {
+      "clinical": "سريري",
+      "lab": "المختبر",
+      "financials": "المالية",
+      "inventory": "المخزون",
+      "practice": "العيادة"
+    },
     "toggleSidebar": "إظهار/إخفاء الشريط الجانبي",
     "inventory": "المخزون",
     "journal": "سجل النشاط",
@@ -1077,6 +1084,13 @@
         "description": "ملفك الشخصي وكلمة المرور واللغة."
       }
     },
+    "supergroups": {
+      "clinicalSetup": { "label": "إعدادات العيادة" },
+      "clinicalManagement": { "label": "إدارة العيادة" },
+      "financialConfiguration": { "label": "الإعدادات المالية" },
+      "systemAddons": { "label": "النظام والإضافات" },
+      "myPreferences": { "label": "تفضيلاتي" }
+    },
     "search": {
       "placeholder": "ابحث في الإعدادات…",
       "empty": "لا نتائج مطابقة لبحثك.",
@@ -1190,6 +1204,8 @@
       "title": "الوحدات",
       "subtitle": "تثبيت الوحدات وإلغاء تثبيتها وترقيتها.",
       "description": "أدر الوحدات النشطة في عيادتك.",
+      "searchPlaceholder": "البحث عن الوحدات…",
+      "filterState": "الحالة",
       "deps": "التبعيات",
       "noDeps": "لا توجد تبعيات",
       "state": {

@@ -251,5 +251,9 @@ export const PERMISSIONS = {
   supplierRatings: {
     read: 'supplier_ratings.read',
     write: 'supplier_ratings.write'
+  },
+  patientSegments: {
+    read: 'patient_segments.read',
+    write: 'patient_segments.write'
   }
 } as const

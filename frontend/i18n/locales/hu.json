@@ -35,6 +35,13 @@
     "menu": "Menü",
     "openMenu": "Menü megnyitása",
     "close": "Bezárás",
+    "sections": {
+      "clinical": "Klinikai",
+      "lab": "Labor",
+      "financials": "Pénzügyek",
+      "inventory": "Készlet",
+      "practice": "Rendelő"
+    },
     "toggleSidebar": "Oldalsáv be/ki",
     "documents": "Dokumentumok"
   },
@@ -1077,6 +1084,13 @@
         "description": "Profilja, jelszava és nyelve."
       }
     },
+    "supergroups": {
+      "clinicalSetup": { "label": "Rendelő beállításai" },
+      "clinicalManagement": { "label": "Rendelő kezelése" },
+      "financialConfiguration": { "label": "Pénzügyi beállítások" },
+      "systemAddons": { "label": "Rendszer és kiegészítők" },
+      "myPreferences": { "label": "Saját beállítások" }
+    },
     "search": {
       "placeholder": "Keresés a beállításokban…",
       "empty": "Nincs találat erre a keresésre.",
@@ -1190,6 +1204,8 @@
       "title": "Modulok",
       "subtitle": "A rendelő moduljainak telepítése, eltávolítása és frissítése.",
       "description": "Kezelje, mely modulok aktívak a rendelőjében.",
+      "searchPlaceholder": "Modulok keresése…",
+      "filterState": "Állapot",
       "deps": "Függőségek",
       "noDeps": "Nincs függőség",
       "state": {

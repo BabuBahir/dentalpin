@@ -16,6 +16,14 @@ operator runs — not the Python internals.
 - Cloned DentalPin repo (or equivalent deploy artefacts).
 - `.env` filled in with `POSTGRES_PASSWORD`, `SECRET_KEY`, etc.
 - A running stack: `docker compose up -d`.
+- **Serving the app and the API from different hosts?** Then they must be
+  siblings of one parent domain and `.env` must set `COOKIE_DOMAIN` to that
+  parent (`COOKIE_DOMAIN=.example.com` for `app.example.com` +
+  `api.example.com`). The session cookies are host-only without it, so the
+  server-rendered pages never see the session, every reload logs the user
+  out, and every write fails with "CSRF token missing" because the app
+  cannot read the `dp_csrf` cookie either. The backend logs a warning
+  naming the value to set.
 
 Smoke-check:
 
@@ -225,8 +233,18 @@ docker compose exec -T db psql -U dental -d dental_clinic \
 The schema must already exist (reinstall the module first, then
 restore data).
 
-For full-database backups use your usual Postgres workflow (pg_dump,
-point-in-time restore, etc.) — the module system does not replace it.
+### Full backup (database + files)
+
+```bash
+docker compose exec -T backend python -m app.cli db backup
+```
+
+Produces `full_<timestamp>.dump` (whole database) and
+`storage_<timestamp>.tar.gz` (documents, X-rays, imports) under
+`storage/backups/`. Schedule this nightly and copy the files off the
+server: a backup on the same disk is not a backup. Full restore,
+hardware-migration, and monthly-verification procedure:
+`docs/workflows/backup-restore.md`.
 
 ---
 
@@ -327,6 +345,8 @@ DELETE FROM alembic_version;
 | Community module page 404 | `modules.json` missing the layer path | `./bin/dentalpin modules sync-frontend` + frontend rebuild |
 | Uninstall blocked: "no Alembic branch" | Fase A legacy module | Not supported; wait for Fase B |
 | Uninstall blocked: "required by ..." | Reverse dependency exists | Uninstall dependents first, or `--force` |
+| Logged out on every page refresh, while clicking around works | App and API on different hosts with `COOKIE_DOMAIN` empty, so the session cookies never reach the app | Set `COOKIE_DOMAIN` to the shared parent domain (e.g. `.example.com`) and restart the backend |
+| Every save answers `403 CSRF token missing or invalid`, while reading works | Same cause: the app cannot read the `dp_csrf` cookie, so the `X-CSRF-Token` header is never sent | Same fix: set `COOKIE_DOMAIN` to the shared parent domain |
 
 ---
 
@@ -358,6 +378,11 @@ access needed. Open **Settings → Modules** (`/settings/modules`).
   (`installed`, `uninstalled`, `to_install`, `to_upgrade`,
   `to_remove`, `disabled`, `error`), version, category badge
   (official/community), dependencies and summary.
+- **Find & paginate:** the list has a search box and a state filter
+  (installed / uninstalled / pending / disabled / error), showing
+  twenty modules per page. The query (`?q=…`, `?states=…`, `?page=…`)
+  is synced to the URL, so a filtered view can be bookmarked or
+  linked.
 - **Install:** offered for uninstalled, installable modules present on
   disk. The confirmation modal previews the transitive dependency
   chain that will be scheduled.

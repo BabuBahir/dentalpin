@@ -35,6 +35,13 @@
     "menu": "மெனு",
     "openMenu": "மெனுவைத் திற",
     "close": "மூடு",
+    "sections": {
+      "clinical": "மருத்துவம்",
+      "lab": "ஆய்வகம்",
+      "financials": "நிதி",
+      "inventory": "சரக்கு",
+      "practice": "கிளினிக்"
+    },
     "toggleSidebar": "பக்கப்பட்டியை நிலைமாற்று",
     "documents": "ஆவணங்கள்"
   },
@@ -1077,6 +1084,13 @@
         "description": "உங்கள் சுயவிவரம், கடவுச்சொல் மற்றும் மொழி."
       }
     },
+    "supergroups": {
+      "clinicalSetup": { "label": "மருத்துவ அமைப்பு" },
+      "clinicalManagement": { "label": "மருத்துவ மேலாண்மை" },
+      "financialConfiguration": { "label": "நிதி உள்ளமைவு" },
+      "systemAddons": { "label": "அமைப்பு மற்றும் துணைநிரல்கள்" },
+      "myPreferences": { "label": "என் விருப்பங்கள்" }
+    },
     "search": {
       "placeholder": "அமைப்புகளைத் தேடு…",
       "empty": "அந்தத் தேடலுக்குப் பொருந்தும் முடிவுகள் இல்லை.",
@@ -1190,6 +1204,8 @@
       "title": "தொகுதிகள்",
       "subtitle": "கிளினிக் தொகுதிகளை நிறுவு, நீக்கு மற்றும் மேம்படுத்து.",
       "description": "உங்கள் கிளினிக்கில் எந்தத் தொகுதிகள் செயலில் உள்ளன என்பதை நிர்வகிக்கவும்.",
+      "searchPlaceholder": "தொகுதிகளை தேடு…",
+      "filterState": "நிலை",
       "deps": "சார்புகள்",
       "noDeps": "சார்புகள் இல்லை",
       "state": {

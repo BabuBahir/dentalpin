@@ -35,6 +35,13 @@
     "menu": "Menu",
     "openMenu": "Otwórz menu",
     "close": "Zamknij",
+    "sections": {
+      "clinical": "Kliniczne",
+      "lab": "Lab",
+      "financials": "Finanse",
+      "inventory": "Magazyn",
+      "practice": "Gabinet"
+    },
     "toggleSidebar": "Przełącz pasek boczny",
     "documents": "Dokumenty"
   },
@@ -1077,6 +1084,13 @@
         "description": "Twój profil, hasło i język."
       }
     },
+    "supergroups": {
+      "clinicalSetup": { "label": "Ustawienia kliniczne" },
+      "clinicalManagement": { "label": "Zarządzanie kliniką" },
+      "financialConfiguration": { "label": "Konfiguracja finansowa" },
+      "systemAddons": { "label": "System i dodatki" },
+      "myPreferences": { "label": "Moje preferencje" }
+    },
     "search": {
       "placeholder": "Szukaj w ustawieniach…",
       "empty": "Brak wyników dla tego wyszukiwania.",
@@ -1190,6 +1204,8 @@
       "title": "Moduły",
       "subtitle": "Instaluj, odinstalowuj i aktualizuj moduły gabinetu.",
       "description": "Zarządzaj modułami aktywnymi w Twoim gabinecie.",
+      "searchPlaceholder": "Szukaj modułów…",
+      "filterState": "Stan",
       "deps": "Zależności",
       "noDeps": "Brak zależności",
       "state": {

@@ -35,6 +35,13 @@
     "menu": "Menu",
     "openMenu": "Apri menu",
     "close": "Chiudi",
+    "sections": {
+      "clinical": "Clinica",
+      "lab": "Laboratorio",
+      "financials": "Finanze",
+      "inventory": "Magazzino",
+      "practice": "Studio"
+    },
     "toggleSidebar": "Mostra/nascondi barra laterale",
     "documents": "Documenti"
   },
@@ -1077,6 +1084,13 @@
         "description": "Il tuo profilo, la password e la lingua."
       }
     },
+    "supergroups": {
+      "clinicalSetup": { "label": "Configurazione clinica" },
+      "clinicalManagement": { "label": "Gestione clinica" },
+      "financialConfiguration": { "label": "Configurazione finanziaria" },
+      "systemAddons": { "label": "Sistema e componenti aggiuntivi" },
+      "myPreferences": { "label": "Le mie preferenze" }
+    },
     "search": {
       "placeholder": "Cerca nelle impostazioni…",
       "empty": "Nessun risultato per questa ricerca.",
@@ -1190,6 +1204,8 @@
       "title": "Moduli",
       "subtitle": "Installa, disinstalla e aggiorna i moduli dello studio.",
       "description": "Gestisci quali moduli sono attivi nel tuo studio.",
+      "searchPlaceholder": "Cerca moduli…",
+      "filterState": "Stato",
       "deps": "Dipendenze",
       "noDeps": "Nessuna dipendenza",
       "state": {

@@ -35,6 +35,13 @@
     "menu": "Menü",
     "openMenu": "Menü öffnen",
     "close": "Schließen",
+    "sections": {
+      "clinical": "Klinisch",
+      "lab": "Labor",
+      "financials": "Finanzen",
+      "inventory": "Inventar",
+      "practice": "Praxis"
+    },
     "toggleSidebar": "Seitenleiste umschalten",
     "documents": "Dokumente"
   },
@@ -1077,6 +1084,13 @@
         "description": "Ihr Profil, Passwort und Ihre Sprache."
       }
     },
+    "supergroups": {
+      "clinicalSetup": { "label": "Klinikeinrichtung" },
+      "clinicalManagement": { "label": "Klinikverwaltung" },
+      "financialConfiguration": { "label": "Finanzkonfiguration" },
+      "systemAddons": { "label": "System und Erweiterungen" },
+      "myPreferences": { "label": "Meine Einstellungen" }
+    },
     "search": {
       "placeholder": "Einstellungen durchsuchen…",
       "empty": "Keine Treffer für diese Suche.",
@@ -1190,6 +1204,8 @@
       "title": "Module",
       "subtitle": "Module der Praxis installieren, deinstallieren und aktualisieren.",
       "description": "Verwalten Sie, welche Module in Ihrer Praxis aktiv sind.",
+      "searchPlaceholder": "Module suchen…",
+      "filterState": "Status",
       "deps": "Abhängigkeiten",
       "noDeps": "Keine Abhängigkeiten",
       "state": {

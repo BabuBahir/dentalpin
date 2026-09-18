@@ -33,11 +33,12 @@ Maintained by `backend/scripts/generate_catalogs.py`. CI fails if a manifest cha
 | `medication_catalog` | 0.1.0 | community | — | manual | yes | 2 | 0 | 1 | yes |
 | `migration_import` | 0.1.0 | official | patients, patients_clinical, clinical_notes, agenda, schedules, recalls, catalog, budget, odontogram, treatment_plan, billing, payments, media | manual | yes | 4 | 5 | 0 | yes |
 | `nav_online` | 0.1.0 | official | billing | manual | yes | 4 | 0 | 0 | yes |
-| `notifications` | 0.1.0 | official | patients, agenda, budget, billing, catalog | auto | no | 8 | 7 | 7 | yes |
+| `notifications` | 0.1.0 | official | patients, agenda, budget, billing, catalog | auto | no | 10 | 7 | 7 | yes |
 | `odontogram` | 0.3.0 | official | patients, catalog | auto | no | 4 | 7 | 0 | yes |
 | `patient_relationships` | 0.2.0 | community | patients | manual | yes | 2 | 0 | 0 | yes |
+| `patient_segments` | 0.1.0 | community | patients | manual | yes | 2 | 0 | 0 | yes |
 | `patient_timeline` | 0.1.0 | official | patients | auto | no | 1 | 0 | 35 | yes |
-| `patients` | 0.1.0 | official | — | auto | no | 2 | 3 | 0 | yes |
+| `patients` | 0.1.0 | official | — | auto | no | 2 | 4 | 0 | yes |
 | `patients_clinical` | 0.1.0 | official | patients | auto | no | 4 | 1 | 0 | yes |
 | `payment_gateways` | 0.1.0 | official | patients, budget, payments | manual | yes | 0 | 0 | 0 | no |
 | `payments` | 0.1.0 | official | patients, budget | auto | no | 4 | 3 | 2 | yes |
@@ -498,6 +499,7 @@ Patient documents, photos, X-rays + polymorphic attachments.
   - `media.photo_uploaded`
 - **Events consumed:**
   - `patient.archived`
+  - `patient.restored`
 - **Module CLAUDE.md:** [`backend/app/modules/media/CLAUDE.md`](../backend/app/modules/media/CLAUDE.md)
 
 ### `medical_reference` — v0.4.0
@@ -592,6 +594,8 @@ Email templates, preferences, SMTP, event-driven sending.
   - `notifications.logs.read`
   - `notifications.preferences.read`
   - `notifications.preferences.write`
+  - `notifications.push.read`
+  - `notifications.push.write`
   - `notifications.send`
   - `notifications.settings.read`
   - `notifications.settings.write`
@@ -657,6 +661,23 @@ Patient family relationships (Lien de Parentée).
 - **Events emitted:** —
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/patient_relationships/CLAUDE.md`](../backend/app/modules/patient_relationships/CLAUDE.md)
+
+### `patient_segments` — v0.1.0
+
+Clinic-local patient tags for grouping and campaigns.
+
+- **Author:** DentalPin Core Team
+- **License:** BSL-1.1
+- **Category:** community
+- **Install policy:** installable=True · auto_install=False · removable=True
+- **Depends:** `patients`
+- **Frontend layer:** `frontend`
+- **Permissions:**
+  - `patient_segments.read`
+  - `patient_segments.write`
+- **Events emitted:** —
+- **Events consumed:** —
+- **Module CLAUDE.md:** [`backend/app/modules/patient_segments/CLAUDE.md`](../backend/app/modules/patient_segments/CLAUDE.md)
 
 ### `patient_timeline` — v0.1.0
 
@@ -725,6 +746,7 @@ Patient identity: name, contact, demographics, status.
 - **Events emitted:**
   - `patient.archived`
   - `patient.created`
+  - `patient.restored`
   - `patient.updated`
 - **Events consumed:** —
 - **Module CLAUDE.md:** [`backend/app/modules/patients/CLAUDE.md`](../backend/app/modules/patients/CLAUDE.md)

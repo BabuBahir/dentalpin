@@ -35,6 +35,13 @@
     "menu": "Menu",
     "openMenu": "Open menu",
     "close": "Close",
+    "sections": {
+      "clinical": "Clinical",
+      "lab": "Lab",
+      "financials": "Financials",
+      "inventory": "Inventory",
+      "practice": "Practice"
+    },
     "toggleSidebar": "Toggle sidebar",
     "documents": "Documents"
   },
@@ -1077,6 +1084,13 @@
         "description": "Your profile, password and language."
       }
     },
+    "supergroups": {
+      "clinicalSetup": { "label": "Clinical setup" },
+      "clinicalManagement": { "label": "Clinical management" },
+      "financialConfiguration": { "label": "Financial configuration" },
+      "systemAddons": { "label": "System & add-ons" },
+      "myPreferences": { "label": "My preferences" }
+    },
     "search": {
       "placeholder": "Search settings…",
       "empty": "No matches for that search.",
@@ -1190,6 +1204,8 @@
       "title": "Modules",
       "subtitle": "Install, uninstall and upgrade clinic modules.",
       "description": "Manage which modules are active in your clinic.",
+      "searchPlaceholder": "Search modules…",
+      "filterState": "State",
       "deps": "Dependencies",
       "noDeps": "No dependencies",
       "state": {
