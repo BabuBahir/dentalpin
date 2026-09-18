@@ -1,6 +1,6 @@
-# 0033 — MCP bridge: reuse the tool registry, don't add another data API
+# 0037 — MCP bridge: reuse the tool registry, don't add another data API
 
-- **Status:** accepted
+- **Status:** proposed
 - **Date:** 2026-09-13
 - **Deciders:** backend core
 - **Tags:** modules, agents, security, integrations

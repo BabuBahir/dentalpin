@@ -75,6 +75,13 @@ None.
 - **Auth happens before the manager runs.** The middleware lives
   *outside* the lazy runner, so unauthenticated traffic never touches
   the session group.
+- **Auth is shared with the integrations public API.** The middleware
+  calls `IntegrationsService.authenticate_token`, so the per-token
+  fixed-window rate limit (60/min + 1000/day) applies to every MCP
+  request — `initialize`, `tools/list`, bad-token floods alike — and
+  each successful auth stamps the token's `last_used_at` (visible on
+  the admin token list). A rate-limited token gets a 429
+  `rate_limited` JSON response, distinct from the 401 gate.
 - **Audit rows require real `agents`/`agent_sessions` rows.** Their ids
   are deterministic UUIDs derived from the API token
   (`server._ensure_agent_and_session`, UPSERT). Every call from one
@@ -89,7 +96,7 @@ None.
 
 ## Related ADRs
 
-- `docs/adr/0033-mcp-bridge.md` — why a transport bridge, not new
+- `docs/adr/0037-mcp-bridge.md` — why a transport bridge, not new
   endpoints or direct agent tools.
 - `docs/technical/copilot-agentic-architecture.md` §3 — the tool
   registry chokepoint this module builds on.

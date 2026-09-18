@@ -27,6 +27,7 @@ async def test_mcp_contract(
     db_session,
     test_clinic,
     test_patient,
+    monkeypatch,
 ):
     from mcp import ClientSession
     from mcp.client.streamable_http import streamable_http_client
@@ -107,6 +108,11 @@ async def test_mcp_contract(
         assert denied.is_error is True
         assert "permission denied" in denied.content[0].text
 
+    # --- Usage tracking: the shared helper stamps last_used_at -----------
+    listed = (await client.get(TOKENS_BASE, headers=auth_headers)).json()["data"]
+    used = next(t for t in listed if t["id"] == str(token_id))
+    assert used["last_used_at"] is not None
+
     # --- Write-scoped token: create_patient visible and executable. ------
     dp_write = await mint_token("test-mcp-write", ["patients:write"])
     async with mcp_session(dp_write) as session:
@@ -153,3 +159,23 @@ async def test_mcp_contract(
         json={"jsonrpc": "2.0", "id": 1, "method": "ping"},
     )
     assert gone.status_code == 401
+
+    # --- Rate limit: shared with integrations, enforced by the middleware.
+    from app.modules.integrations import service as integrations_service
+
+    monkeypatch.setattr(integrations_service, "RATE_LIMIT_PER_MINUTE", 2)
+    limited_token = await mint_token("test-mcp-limited", ["patients:read"])
+    limited_headers = {
+        "accept": "application/json, text/event-stream",
+        "authorization": f"Bearer {limited_token}",
+    }
+    for _ in range(2):
+        hit = await client.post(
+            MCP_BASE, headers=limited_headers, json={"jsonrpc": "2.0", "id": 1, "method": "ping"}
+        )
+        assert hit.status_code != 429, hit.text
+    over = await client.post(
+        MCP_BASE, headers=limited_headers, json={"jsonrpc": "2.0", "id": 1, "method": "ping"}
+    )
+    assert over.status_code == 429
+    assert "rate_limited" in over.text

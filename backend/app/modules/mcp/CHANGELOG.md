@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### Shared token auth (rate limit + usage tracking)
+
+- `DentalPinAuthMiddleware` now authenticates through the integrations
+  module's single shared entry point (`IntegrationsService.
+  authenticate_token`), which enforces the per-token fixed-window rate
+  limit (60/min + 1000/day) and stamps `last_used_at`. Every MCP request
+  (`initialize`, `tools/list`, `tools/call`, bad-token floods) is rate
+  limited per token, and admin-visible usage shows on the token list —
+  same semantics as the integrations public API. A rate-limited token
+  now gets a 429 `rate_limited` JSON response from the middleware
+  instead of proceeding into the app.
+
+### Review hygiene (PR #460)
+
+- Destroyed the stray `backend/D:/PROJECTS/...` absolute-path file
+  committed under `backend/`.
+- Reverted the `.gitignore` policy change to match `main` (dropped the
+  `.claude/` un-ignore and the `/.kilo/plans`/`/.vs` editor-tooling rules)
+  — the token-minting skill and `.kilo` config are no longer committed;
+  keep them local.
+- Renumbered the ADR from 0033 → 0037 (`docs/adr/0037-mcp-bridge.md`,
+  `Status: proposed`) — 0033 belongs to the Poland ADR on `main`.
+
 ### Write exposure via `patients:write` scope
 
 - Adds `patients.create_patient` to the curated server allowlist
@@ -57,7 +80,7 @@
   session initialize, curated tools/list, `search_patients` +
   `get_patient`, revoked-token rejection (single process-wide session).
 - Module CLAUDE.md + CHANGELOG, `docs/technical/mcp/` overview/events/
-  permissions, ADR 0033, glossary entry, catalogs regenerated.
+  permissions, ADR 0037, glossary entry, catalogs regenerated.
 - `docs/technical/mcp/overview.md` "Trying it out": token-minting steps
   + `dp_` token lifecycle (no expiry — revoke via
   `POST /tokens/{id}/revoke`, `last_used_at` tracking), a raw JSON-RPC
@@ -66,13 +89,7 @@
   Desktop/Claude Code + Kilo Code connection config (`.mcp.json`,
   `claude mcp add`, `kilo.jsonc` `skills.paths` reuse of
   `.claude/skills/`).
-- `.claude/skills/mint-dp-token/SKILL.md` — Claude Code skill that mints,
-  verifies, and revokes `dp_` tokens via the integrations API (login →
-  `POST /integrations/tokens`). `.claude/` is now ignored only for
-  local files (`settings.local.json`); skills ship with the repo.
-- `.kilo/kilo.jsonc` — project Kilo Code MCP config for `dentalpin`
-  (remote streamable-HTTP + `Authorization: Bearer dp_...` header, token
-  placeholder). Kilo reuses the single `mint-dp-token` skill from
-  `.claude/skills/` via `skills.paths` (no `.kilo/skills/` duplicate, no
-  undocumented compatibility toggle). Overview doc gains a Kilo section
-  (§5, audit trail → §6).
+- `.claude/skills/mint-dp-token/SKILL.md` and `.kilo/kilo.jsonc` were
+  part of the local experiment and are **not** committed to the repo —
+  they are tooling for one setup and were untracked during review (see
+  "Review hygiene" above). Keep them in your local tree.

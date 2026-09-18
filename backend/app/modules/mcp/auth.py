@@ -6,10 +6,16 @@ API tokens the integrations module already owns (issue #65). This ASGI
 middleware wraps the streamable-HTTP app and enforces:
 
 - a `dp_` prefix and a live (unrevoked) `ApiToken` row — else 401;
+- the shared per-token fixed-window rate limit (same limits as the
+  integrations public API; enforced inside
+  `IntegrationsService.authenticate_token`) — else 429, so `initialize`,
+  `tools/list`, `tools/call` and bad-token floods stay bounded;
 - at least one MCP-supported scope (`patients:read` / `patients:write`) on
   the token — else 403.
 
-On success it stores the resolved identity on ``scope["state"]["dentalpin"]``
+On success it stamps the token's `last_used_at` (via the shared helper) so
+an admin can see machine usage on the token list, and it stores the resolved
+identity on ``scope["state"]["dentalpin"]``
 (clinic id, token id, scopes) so the lowlevel ``tools/call`` handler can read
 it back from the per-message starlette request it receives (``ctx.request``),
 and it sets ``scope["user"]``/``scope["auth"]`` for the SDK's session-owner
@@ -28,7 +34,7 @@ from starlette.authentication import AuthCredentials
 from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.database import async_session_maker
-from app.modules.integrations.service import IntegrationsService
+from app.modules.integrations.service import IntegrationsService, RateLimitError
 
 # Scopes that authorize access to the MCP surface (subset of the integration
 # token catalog). The token must carry at least one; per-tool visibility and
@@ -52,7 +58,19 @@ class DentalPinAuthMiddleware:
         self.app = app
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        identity = await self._authenticate(scope)
+        try:
+            identity = await self._authenticate(scope)
+        except RateLimitError as exc:
+            await self._reject(
+                send,
+                status_code=429,
+                error="rate_limited",
+                description=(
+                    "Rate limit exceeded for this API token. "
+                    f"Retry after {exc.retry_after_seconds}s"
+                ),
+            )
+            return
         if identity is None:
             await self._reject(
                 send,
@@ -97,9 +115,13 @@ class DentalPinAuthMiddleware:
         plaintext = authorization.removeprefix("Bearer ").strip()
 
         async with async_session_maker() as db:
-            token = await IntegrationsService.authenticate_token(db, plaintext)
-            if token is None:
+            auth = await IntegrationsService.authenticate_token(db, plaintext)
+            if auth is None:
                 return None
+            # Commit so the helper's ``last_used_at`` stamp survives this
+            # short-lived session; rate limiting is enforced inside the helper.
+            await db.commit()
+            token = auth.token
             scopes = list(token.scopes or [])
         return {
             "token_id": UUID(str(token.id)),
