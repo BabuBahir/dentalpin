@@ -229,6 +229,7 @@ docker-compose up
 
 # Or run backend separately
 cd backend
+.\venv\Scripts\Activate.ps1
 pip install -e ".[dev]"
 uvicorn app.main:app --reload
 
